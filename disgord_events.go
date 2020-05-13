@@ -7,13 +7,13 @@ import (
 )
 
 // Handles setting the bot user initially.
-func (r *router) readyEvt(_ disgord.Session, evt *disgord.Ready) {
+func (r *Router) readyEvt(_ disgord.Session, evt *disgord.Ready) {
 	// Set the bot user.
 	r.BotUser = evt.User
 }
 
 // Handles changing the bot user if this is required.
-func (r *router) userUpdate(_ disgord.Session, evt *disgord.UserUpdate) {
+func (r *Router) userUpdate(_ disgord.Session, evt *disgord.UserUpdate) {
 	// Check if it's the same user.
 	r.cmdLock.RLock()
 	if r.BotUser.ID != evt.User.ID {
@@ -29,7 +29,7 @@ func (r *router) userUpdate(_ disgord.Session, evt *disgord.UserUpdate) {
 }
 
 // Handles processing new messages.
-func (r *router) msgCreate(s disgord.Session, evt *disgord.MessageCreate) {
+func (r *Router) msgCreate(s disgord.Session, evt *disgord.MessageCreate) {
 	// If the message is from a bot or this isn't in a guild, ignore it.
 	if evt.Message.Author.Bot || evt.Message.IsDirectMessage() {
 		return
@@ -125,7 +125,7 @@ func (r *router) msgCreate(s disgord.Session, evt *disgord.MessageCreate) {
 }
 
 // Hook is used to hook all required events into the disgord client.
-func (r *router) Hook(s disgord.Session) {
+func (r *Router) Hook(s disgord.Session) {
 	s.On(disgord.EvtReady, r.readyEvt)
 	s.On(disgord.EvtUserUpdate, r.userUpdate)
 	s.On(disgord.EvtMessageCreate, r.msgCreate)

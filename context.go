@@ -9,7 +9,7 @@ import (
 type Context struct {
 	Message          *disgord.Message       `json:"message"`
 	BotUser          *disgord.User          `json:"botUser"`
-	Router           *router                `json:"-"`
+	Router           *Router                `json:"-"`
 	Session          disgord.Session        `json:"session"`
 	Command          *Command               `json:"command"`
 	RawArgs          string                 `json:"rawArgs"`

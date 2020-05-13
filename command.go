@@ -19,7 +19,7 @@ type ArgTransformer struct {
 	Function func(ctx *Context, Arg string) (interface{}, error)
 }
 
-// Command defines a command which can be used within the router.
+// Command defines a command which can be used within the Router.
 type Command struct {
 	Name                 string                   `json:"name"`
 	Aliases              []string                 `json:"aliases"`

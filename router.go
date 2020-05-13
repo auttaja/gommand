@@ -16,7 +16,7 @@ type ErrorHandler = func(ctx *Context, err error) bool
 
 // CustomCommandsHandler is the handler which is used for custom commands.
 // An error being returned by the custom commands handler will return in that being passed through to the error handler instead.
-// true here represents this being a custom command. This means the router will not go through the errors handler unless an error is set.
+// true here represents this being a custom command. This means the Router will not go through the errors handler unless an error is set.
 type CustomCommandsHandler = func(ctx *Context, cmdname string, r *StringIterator) (bool, error)
 
 // PermissionValidator is a function which is used to validate someones permissions who is running a command.
@@ -29,7 +29,7 @@ type PermissionValidator = func(ctx *Context) (string, bool)
 // If this errors, it will just get passed through to the error handler.
 type Middleware = func(ctx *Context) error
 
-// RouterConfig defines the config which will be used for the router.
+// RouterConfig defines the config which will be used for the Router.
 type RouterConfig struct {
 	PrefixCheck          PrefixCheck
 	ErrorHandlers        []ErrorHandler
@@ -37,7 +37,9 @@ type RouterConfig struct {
 	Middleware           []Middleware
 }
 
-type router struct {
+// Router defines the command router which is being used.
+// Please call NewRouter to initialise this rather than creating a new struct.
+type Router struct {
 	BotUser               *disgord.User         `json:"-"`
 	PrefixCheck           PrefixCheck           `json:"-"`
 	CustomCommandsHandler CustomCommandsHandler `json:"-"`
@@ -48,8 +50,8 @@ type router struct {
 	middleware            []Middleware          `json:"-"`
 }
 
-// NewRouter creates a new command router.
-func NewRouter(Config *RouterConfig) *router {
+// NewRouter creates a new command Router.
+func NewRouter(Config *RouterConfig) *Router {
 	if Config.PrefixCheck == nil {
 		// No prefix.
 		Config.PrefixCheck = func(ctx *Context, r *StringIterator) bool {
@@ -57,8 +59,8 @@ func NewRouter(Config *RouterConfig) *router {
 		}
 	}
 
-	// Return the router.
-	return &router{
+	// Return the Router.
+	return &Router{
 		PrefixCheck:          Config.PrefixCheck,
 		middleware:           Config.Middleware,
 		permissionValidators: Config.PermissionValidators,
@@ -69,7 +71,7 @@ func NewRouter(Config *RouterConfig) *router {
 }
 
 // Dispatches the required error handlers in the event of an error.
-func (r *router) errorHandler(ctx *Context, err error) {
+func (r *Router) errorHandler(ctx *Context, err error) {
 	if r.errorHandlers != nil {
 		// There are error handlers, go through these first.
 		for _, v := range r.errorHandlers {
@@ -84,20 +86,20 @@ func (r *router) errorHandler(ctx *Context, err error) {
 	ctx.Session.Logger().Error(err)
 }
 
-// AddErrorHandler is used to add a error handler to the router.
+// AddErrorHandler is used to add a error handler to the Router.
 // An error handler takes the structure of the ErrorHandler type above.
-// Error handlers are executed in the order in which they are added to the router.
+// Error handlers are executed in the order in which they are added to the Router.
 // This can NOT be ran directly from a command due to the thread locking.
 // If you wish to do that (which you probably don't), you should launch this as a go-routine.
-func (r *router) AddErrorHandler(Handler ErrorHandler) {
+func (r *Router) AddErrorHandler(Handler ErrorHandler) {
 	r.cmdLock.Lock()
 	r.errorHandlers = append(r.errorHandlers, Handler)
 	r.cmdLock.Unlock()
 }
 
-// GetCommand is used to get a command from the router if it exists.
+// GetCommand is used to get a command from the Router if it exists.
 // If the command doesn't exist, this will be a nil pointer.
-func (r *router) GetCommand(Name string) *Command {
+func (r *Router) GetCommand(Name string) *Command {
 	r.cmdLock.RLock()
 	cmd, _ := r.cmds[strings.ToLower(Name)]
 	r.cmdLock.RUnlock()
@@ -107,7 +109,7 @@ func (r *router) GetCommand(Name string) *Command {
 // SetCommand is used to set a command.
 // This can NOT be ran directly from a command due to the thread locking.
 // If you wish to do that (which you probably don't), you should launch this as a go-routine.
-func (r *router) SetCommand(c *Command) {
+func (r *Router) SetCommand(c *Command) {
 	r.cmdLock.Lock()
 	c.Name = strings.ToLower(c.Name)
 	r.cmds[c.Name] = c
@@ -122,10 +124,10 @@ func (r *router) SetCommand(c *Command) {
 	r.cmdLock.Unlock()
 }
 
-// RemoveCommand is used to remove a command from the router.
+// RemoveCommand is used to remove a command from the Router.
 // This can NOT be ran directly from a command due to the thread locking.
 // If you wish to do that (which you probably don't), you should launch this as a go-routine.
-func (r *router) RemoveCommand(c *Command) {
+func (r *Router) RemoveCommand(c *Command) {
 	r.cmdLock.Lock()
 	delete(r.cmds, strings.ToLower(c.Name))
 	if c.Aliases != nil {
