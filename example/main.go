@@ -10,8 +10,8 @@ import (
 // Create the command router.
 var router = gommand.NewRouter(&gommand.RouterConfig{
 	// The prefix function should be set here or it will be blank.
-	// We are using % in this test.
-	PrefixCheck: gommand.StaticPrefix("%"),
+	// We are using % and mention prefixes for this example.
+	PrefixCheck: gommand.MultiplePrefixCheckers(gommand.StaticPrefix("%"), gommand.MentionPrefix),
 })
 
 func init() {
