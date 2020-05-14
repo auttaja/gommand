@@ -6,11 +6,13 @@ Package gommand provides an easy to use and high performance commands router and
 - **Custom commands support:** Gommand allows you to easily set a handler for custom commands if this is something which you require for your bot.
 - **Custom argument support:** Out of the box, gommand features many different argument converters for functionality such as integers and users. Should you need it, gommand also allows for the creation of custom converters through a very simple function.
 - **Argument formatting:** Gommand supports required, optional, remainder and greedy processors for commands.
-- **Middleware support:** Need to run something before a bunch of commands which requires repeating yourself? No problem! Gommand supports middleware on both a global (through the router object) and local (through the command object) scale. Simply add the function and it will be executed. There is also a map within the context called `MiddlewareArgs` in which middleware can very easily store data for the commands to run.
+- **Middleware support:** Need to run something before a bunch of commands which requires repeating yourself? No problem! Gommand supports middleware on both a global (through the router object) and local (through the command object) scale. Simply add the function and it will be executed. There is also a map within the context called `MiddlewareParams` in which middleware can very easily store data for the commands to run.
 - **Permission validators support:** If you need to validate permissions, you can simply use permission validators. If false is returned, a `IncorrectPermissions` will be sent to the error handlers with the string specified.
 - **Ease of use:** We pride this library on ease of use. The idea is to build a higher level wrapper around handling commands using disgord, and whilst doing this we add in helper functions. Additionally, we patch the member object into messages, meaning that you do not need to get this, solving potential code repetition.
 - **Advanced error handling:** Gommand features an advanced error handling system. The error is passed through all inserted error handlers in the order which the handlers were inserted. If a handler is able to solve an issue, it will simply return true and gommand will stop iterating through the list. If no handlers return true, it will be passed through to the disgord logger which you set.
 - **Battle tested:** The Gommand library is heavily unit tested. Feel free to submit a pull request if you feel there is something important which we are not testing, we will accept it. Find a bug? Feel free to file an issue and we will fix it.
+
+An example of the bot is accessable in the `example` folder.
 
 ## Contributing
 Do you have something which you wish to contribute? Feel free to make a pull request. The following simple criteria applies:
@@ -38,6 +40,70 @@ The router is then trivial to make:
 var router = gommand.NewRouter(&gommand.RouterConfig{
     ...
 })
+```
+
+## Adding a command
+When you have a working router, you should be ready to add commands. We do this with the `SetCommand` function. To use this function, we simply pass in a `Command` object:
+```go
+router.SetCommand(&gommand.Command{
+    ...
+})
+```
+The command **MUST** have the `Name` (the name of the command) and `Function` (the function that will be called with the [context](#context) and can return an error, any returned errors will be given to the error handlers) attributes set. The other attributes are optional:
+- `Aliases`: Any aliases which a command has.
+- `Description`: The description which is used in help commands.
+- `Usage`: The usage information for a command.
+- `PermissionValidators`: An array of [permission validators](#permission-validators) which only applies to this specific command.
+- `ArgTransformers`: This is an array of the `gommand.ArgTransformer` type. Each object in this array contains the following attributes:
+    - `Function`: The function which is used to transform the argument which must be set. The function simply takes the [context](#context) and argument as a string and returns an interface and error (if the error is nil - this parsed properly). The following transformers are supported by gommand right now:
+        - `gommand.StringTransformer`: Transforms the argument into a string.
+        - `gommand.IntTransformer`: Transforms the argument into a integer.
+        - `gommand.UIntTransformer`: Transforms the argument into a unsigned integer.
+        - `gommand.UserTransformer`: Transforms the argument into a user.
+        - `gommand.MemberTransformer`: Transforms the argument into a member.
+        - `gommand.ChannelTransformer`: Transforms the argument into a channel.
+    - `Optional`: If this is true and the argument does not exist, it will be sert to nil. Note that due to what this does, it has to be at the end of the array.
+    - `Remainder`: If this is true, it will just try and parse the raw remainder of the arguments. If the string is blank it will error with not enough arguments unless optional is set. Note that due to what this does, it has to be at the end of the array.
+    - `Greedy`: If this is true, the parser will keep trying to parse the users arguments until it hits the end of their message or a parse fails. When this happens, it will go to the next parser in the array. Note that if the first argument fails, this means that it was not set and an error will be put into the error handler unless it was set as optional. The greedy argument will be of the type `[]interface{}` (unless `Optional` is set and it was not specified).
+- `Middleware`: An array of [middleware](#middleware) which only applies to this specific command.
+
+## Context
+The context is a core part of the gommand functionality. The context contains several crucial bits of information:
+- `Message`: The base message which the command is relating to. Unless otherwise specified, the member object will be patched into this message.
+- `BotUser`: The `*disgord.User` object which is repersenting the bot. Do **NOT** edit this since it is shared across command calls.
+- `Router`: The base router.
+- `Session`: The `*disgord.Session` which was used to emit this event.
+- `Command`: The actual command which was called.
+- `RawArgs`: A string of the raw arguments.
+- `Args`: The transformed arguments.
+- `MidddlewareParams`: The params set by [middleware](#middleware).
+
+It also contains several helper functions:
+- `Replay() error`: Allows you to replay a command.
+- `BotMember() (*disgord.Member, error)`: Get the bot as a member of the guild which the command is being ran in.
+- `Channel() (*disgord.Channel, error)`: Get the channel which this is being ran in.
+- `Reply(data ...interface{}) (*disgord.Message, error)`: A shorter way to quickly reply to a message.
+- `WaitForMessage(CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message`: Waits for a message based on the check function you gave.
+
+## Hooking the router to your disgord session
+In the initialisation of your disgord session, you will want to hook the gommand handler with the `Hook` function:
+```go
+// Your client config can be how you please.
+client := disgord.New(disgord.Config{
+    BotToken: os.Getenv("TOKEN"),
+    Logger:   disgord.DefaultLogger(false),
+})
+
+// Hook the router.
+router.Hook(client)
+
+// ANY OTHER INITIALISATION OF DISGORD EVENTS HERE
+
+// Connect to Discord.
+err := client.StayConnectedUntilInterrupted(context.Background())
+if err != nil {
+    panic(err)
+}
 ```
 
 ## Error Handling
