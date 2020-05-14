@@ -31,7 +31,7 @@ Creating the router is very simple to do. You can simply create a router object 
     In the event that these prefix checkers won't suffice, you can write your own with the function type `func(ctx *gommand.Context, r *gommand.StringIterator) bool`. Note that the context does not contain the member object in the message or the command yet. See [using the string iterator](#using-the-string-iterator) below on how to use the string iterator. If this is nil, it defaults to no prefix.
 - `ErrorHandlers`: An array of functions of the [ErrorHandler](#error-handling) type which will run one after another. This can be nil and you can also add one with the `AddErrorHandler` function attached to the router.
 - `PermissionValidators`: This is any [permission validators](#permission-validators) which you wish to add on a global router scale. This can be nil.
-- `PermissionValidators`: This is any [middleware](#middleware) which you wish to add on a global router scale. This can be nil.
+- `Middleware`: This is any [middleware](#middleware) which you wish to add on a global router scale. This can be nil.
 
 The router is then trivial to make:
 ```go
