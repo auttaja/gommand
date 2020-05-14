@@ -32,7 +32,7 @@ func UIntTransformer(_ *Context, Arg string) (interface{}, error) {
 // UserTransformer is used to transform a user if possible.
 func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid user ID or mention."}
-	id := getUserMention(&StringIterator{Text: Arg})
+	id := getMention(&StringIterator{Text: Arg}, '@')
 	if id == nil {
 		return
 	}
@@ -46,11 +46,25 @@ func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
 // MemberTransformer is used to transform a member if possible.
 func MemberTransformer(ctx *Context, Arg string) (member interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid user ID or mention of someone in this guild."}
-	id := getUserMention(&StringIterator{Text: Arg})
+	id := getMention(&StringIterator{Text: Arg}, '@')
 	if id == nil {
 		return
 	}
 	member, e := ctx.Session.GetMember(context.TODO(), ctx.Message.GuildID, snowflake.ParseSnowflakeString(*id))
+	if e == nil {
+		err = nil
+	}
+	return
+}
+
+// ChannelTransformer is used to transform a channel if possible.
+func ChannelTransformer(ctx *Context, Arg string) (channel interface{}, err error) {
+	err = &InvalidTransformation{Description: "This was not a valid channel ID or mention of a channel in this guild."}
+	id := getMention(&StringIterator{Text: Arg}, '#')
+	if id == nil {
+		return
+	}
+	channel, e := ctx.Session.GetChannel(context.TODO(), snowflake.ParseSnowflakeString(*id))
 	if e == nil {
 		err = nil
 	}

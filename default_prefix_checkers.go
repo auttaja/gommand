@@ -25,7 +25,7 @@ func MentionPrefix(ctx *Context, r *StringIterator) bool {
 	BotID := ctx.BotUser.ID.String()
 
 	// The ID to compare.
-	CmpID := getUserMention(r)
+	CmpID := getMention(r, '@')
 
 	// Is it nil or not the ID?
 	if CmpID == nil || *CmpID != BotID {

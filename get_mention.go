@@ -1,6 +1,7 @@
 package gommand
 
-func getUserMention(r *StringIterator) *string {
+// Get the mention if it exists.
+func getMention(r *StringIterator, char uint8) *string {
 	// Defines the parsing stage.
 	stage := uint8(0)
 
@@ -37,7 +38,7 @@ func getUserMention(r *StringIterator) *string {
 			if stage == 0 {
 				// We expect a '<' char here.
 				if c == '<' {
-					// This is ok! move to stage 1 (at symbol).
+					// This is ok! move to stage 1 (type symbol).
 					stage = 1
 					mention = true
 				} else if c > 46 && 58 > c {
@@ -49,7 +50,7 @@ func getUserMention(r *StringIterator) *string {
 					return nil
 				}
 			} else if stage == 1 {
-				if c == '@' {
+				if c == char {
 					// This is increasingly looking like a mention. Move to stage 2 (possible number/explanation mark).
 					stage = 2
 				} else {
