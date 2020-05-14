@@ -132,10 +132,7 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 		for i, v := range c.ArgTransformers {
 			if v.Remainder {
 				// Get the remainder.
-				remainder, err := reader.GetRemainder(true)
-				if err != nil {
-					return err
-				}
+				remainder, _ := reader.GetRemainder(true)
 				remainder = strings.Trim(remainder, " ")
 				if remainder == "" {
 					// Is this an optional argument?
@@ -186,7 +183,9 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 					}
 					FirstArg = false
 				}
-				Args[i] = ArgsTransformed
+				if len(ArgsTransformed) != 0 {
+					Args[i] = ArgsTransformed
+				}
 			} else {
 				// Try and get one argument.
 				Arg, _ := GetOneArg()
