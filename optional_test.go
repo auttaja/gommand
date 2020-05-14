@@ -55,8 +55,8 @@ func TestOptional(t *testing.T) {
 				Function: UIntTransformer,
 			},
 			{
-				Function: StringTransformer,
-				Optional: true,
+				Function:  StringTransformer,
+				Optional:  true,
 				Remainder: true,
 			},
 		},
@@ -93,7 +93,7 @@ func TestOptional(t *testing.T) {
 			{
 				Function: IntTransformer,
 				Optional: true,
-				Greedy: true,
+				Greedy:   true,
 			},
 		},
 		Function: func(ctx *Context) error {

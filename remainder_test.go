@@ -15,7 +15,7 @@ func TestRemainder(t *testing.T) {
 		Name: "remainder",
 		ArgTransformers: []ArgTransformer{
 			{
-				Function: StringTransformer,
+				Function:  StringTransformer,
 				Remainder: true,
 			},
 		},

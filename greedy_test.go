@@ -16,7 +16,7 @@ func TestGreedy(t *testing.T) {
 		ArgTransformers: []ArgTransformer{
 			{
 				Function: IntTransformer,
-				Greedy:	  true,
+				Greedy:   true,
 			},
 			{
 				Function: StringTransformer,
