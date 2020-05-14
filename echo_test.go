@@ -13,8 +13,8 @@ func TestEcho(t *testing.T) {
 		PrefixCheck: StaticPrefix("%"),
 	})
 	r.SetCommand(&Command{
-		Name:                 "echo",
-		ArgTransformers:      []ArgTransformer{
+		Name: "echo",
+		ArgTransformers: []ArgTransformer{
 			{
 				Function: StringTransformer,
 			},
@@ -35,28 +35,28 @@ func TestEcho(t *testing.T) {
 	})
 	r.msgCmdProcessor(nil, &disgord.MessageCreate{
 		Message: &disgord.Message{
-			Lockable:                 disgord.Lockable{},
-			Author:                   &disgord.User{Bot: false},
-			Timestamp:                disgord.Time{},
-			EditedTimestamp:          disgord.Time{},
-			Content: 				  "%echo hello",
-			Type:                     disgord.MessageTypeDefault,
-			GuildID:				  1,
-			Activity:                 disgord.MessageActivity{},
-			Application:              disgord.MessageApplication{},
+			Lockable:        disgord.Lockable{},
+			Author:          &disgord.User{Bot: false},
+			Timestamp:       disgord.Time{},
+			EditedTimestamp: disgord.Time{},
+			Content:         "%echo hello",
+			Type:            disgord.MessageTypeDefault,
+			GuildID:         1,
+			Activity:        disgord.MessageActivity{},
+			Application:     disgord.MessageApplication{},
 		},
 	})
 	r.msgCmdProcessor(nil, &disgord.MessageCreate{
 		Message: &disgord.Message{
-			Lockable:                 disgord.Lockable{},
-			Author:                   &disgord.User{Bot: false},
-			Timestamp:                disgord.Time{},
-			EditedTimestamp:          disgord.Time{},
-			Content: 				  "%echo \"hello\"",
-			Type:                     disgord.MessageTypeDefault,
-			GuildID:				  1,
-			Activity:                 disgord.MessageActivity{},
-			Application:              disgord.MessageApplication{},
+			Lockable:        disgord.Lockable{},
+			Author:          &disgord.User{Bot: false},
+			Timestamp:       disgord.Time{},
+			EditedTimestamp: disgord.Time{},
+			Content:         "%echo \"hello\"",
+			Type:            disgord.MessageTypeDefault,
+			GuildID:         1,
+			Activity:        disgord.MessageActivity{},
+			Application:     disgord.MessageApplication{},
 		},
 	})
 }
@@ -68,8 +68,8 @@ func BenchmarkEcho(b *testing.B) {
 		PrefixCheck: StaticPrefix("%"),
 	})
 	r.SetCommand(&Command{
-		Name:                 "echo",
-		ArgTransformers:      []ArgTransformer{
+		Name: "echo",
+		ArgTransformers: []ArgTransformer{
 			{
 				Function: StringTransformer,
 			},
@@ -85,15 +85,15 @@ func BenchmarkEcho(b *testing.B) {
 	})
 	r.msgCmdProcessor(nil, &disgord.MessageCreate{
 		Message: &disgord.Message{
-			Lockable:                 disgord.Lockable{},
-			Author:                   &disgord.User{Bot: false},
-			Timestamp:                disgord.Time{},
-			EditedTimestamp:          disgord.Time{},
-			Content: 				  "%echo \"hello\"",
-			Type:                     disgord.MessageTypeDefault,
-			GuildID:				  1,
-			Activity:                 disgord.MessageActivity{},
-			Application:              disgord.MessageApplication{},
+			Lockable:        disgord.Lockable{},
+			Author:          &disgord.User{Bot: false},
+			Timestamp:       disgord.Time{},
+			EditedTimestamp: disgord.Time{},
+			Content:         "%echo \"hello\"",
+			Type:            disgord.MessageTypeDefault,
+			GuildID:         1,
+			Activity:        disgord.MessageActivity{},
+			Application:     disgord.MessageApplication{},
 		},
 	})
 }

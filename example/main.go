@@ -89,8 +89,8 @@ func init() {
 
 	// Waits for a message from the user.
 	router.SetCommand(&gommand.Command{
-		Name:                 "echowait",
-		Description:          "Wait for a message then echo it.",
+		Name:        "echowait",
+		Description: "Wait for a message then echo it.",
 		Function: func(ctx *gommand.Context) error {
 			_, _ = ctx.Reply("say the message")
 			resp := ctx.WaitForMessage(func(_ disgord.Session, msg *disgord.Message) bool {

@@ -54,7 +54,7 @@ type Router struct {
 	permissionValidators  []PermissionValidator `json:"-"`
 	middleware            []Middleware          `json:"-"`
 	msgWaitingQueue       []*msgQueueItem       `json:"-"`
-	msgWaitingQueueLock   *sync.Mutex	         `json:"-"`
+	msgWaitingQueueLock   *sync.Mutex           `json:"-"`
 }
 
 // NewRouter creates a new command Router.
@@ -68,14 +68,14 @@ func NewRouter(Config *RouterConfig) *Router {
 
 	// Return the Router.
 	return &Router{
-		PrefixCheck:           Config.PrefixCheck,
-		cmds:                  map[string]*Command{},
-		cmdLock:               &sync.RWMutex{},
-		errorHandlers:         Config.ErrorHandlers,
-		permissionValidators:  Config.PermissionValidators,
-		middleware:            Config.Middleware,
-		msgWaitingQueue:       []*msgQueueItem{},
-		msgWaitingQueueLock:   &sync.Mutex{},
+		PrefixCheck:          Config.PrefixCheck,
+		cmds:                 map[string]*Command{},
+		cmdLock:              &sync.RWMutex{},
+		errorHandlers:        Config.ErrorHandlers,
+		permissionValidators: Config.PermissionValidators,
+		middleware:           Config.Middleware,
+		msgWaitingQueue:      []*msgQueueItem{},
+		msgWaitingQueueLock:  &sync.Mutex{},
 	}
 }
 

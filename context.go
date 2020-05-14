@@ -47,5 +47,5 @@ func (c *Context) WaitForMessage(CheckFunc func(s disgord.Session, msg *disgord.
 		goroutine: x,
 	})
 	c.Router.msgWaitingQueueLock.Unlock()
-	return <- x
+	return <-x
 }
