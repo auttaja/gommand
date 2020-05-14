@@ -140,13 +140,17 @@ func basicErrorHandler(ctx *gommand.Context, err error) bool {
 This can then be added to the `ErrorHandlers` array or passed to `AddErrorHandler`. Note that they execute in the order they were added.
 
 ## Permission Validators
-TODO
+Permission validators allow for a quick method to check if the user has permission to run a command. Permission validators follow the format `func(ctx *Context) (string, bool)`. If the boolean is true, the user does have permission. If not, the string is used to construct a `IncorrectPermissions` error.
 
 ## Middleware
-TODO
+Middleware allows you to write powerful extensions on a per-command or per-router basis. Middleware is seperate from permission validators to allow the application to tell if the user has permission without re-executing all of the middleware which has been set. Middleware follows the format `func(ctx *Context) error`, with any errors being passed to the error handler. If you wish to get an argument from a middleware function to another function or command during execution, you can use the `MiddlewareParams` map within the context.
 
 ## Using The String Iterator
 If you are handling parts of the parsing which are very early in the process as is the case with prefixes and custom commands,0 and you are writing your own code to implement them, you will need to handle the `gommand.StringIterator` type. The objective of this is to try and prevent multiple iterations of the string, which can be computationally expensive, where this is possible. The iterator implements the following:
 - `GetRemainder(FillIterator bool) (string, error)`: This will get the remainder of the iterator. If it's already at the end, the error will be set. `FillIterator` defines if it should fill the iterator when it is done or if it should leave it where it is.
 - `GetChar() (uint8, error)`: Used to get a character from the iterator. If it's already at the end, the error will be set.
 - `Rewind(N uint)`: Used to rewind by N number of chars. Useful if you only iterated a few times to check something.
+
+## TODO's
+- More built-in transformers.
+- Add some built-in permission validators.
