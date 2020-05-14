@@ -20,4 +20,4 @@ jobs:
         run: $(go env GOPATH)/bin/golint .
 
       - name: Run unit tests
-        run: go test .
+        run: go test -v .
