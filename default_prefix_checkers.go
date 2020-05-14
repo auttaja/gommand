@@ -39,7 +39,7 @@ func MentionPrefix(ctx *Context, r *StringIterator) bool {
 			break
 		}
 		if c != ' ' {
-			r.Pos -= 1
+			r.Pos--
 			break
 		}
 	}

@@ -31,7 +31,7 @@ func (s *StringIterator) GetChar() (char uint8, err error) {
 		return
 	}
 	char = s.Text[s.Pos]
-	s.Pos += 1
+	s.Pos++
 	return
 }
 

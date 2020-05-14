@@ -174,10 +174,10 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 						if err != nil {
 							if FirstArg {
 								return err
-							} else {
-								ReaddArg(uint(n))
-								break
 							}
+
+							ReaddArg(uint(n))
+							break
 						}
 						ArgsTransformed = append(ArgsTransformed, res)
 					}

@@ -20,7 +20,7 @@ func IntTransformer(_ *Context, Arg string) (interface{}, error) {
 	return i, nil
 }
 
-// IntTransformer is used to transform an arg to a unsigned integer if possible.
+// UIntTransformer is used to transform an arg to a unsigned integer if possible.
 func UIntTransformer(_ *Context, Arg string) (interface{}, error) {
 	i, err := strconv.ParseUint(Arg, 10, 64)
 	if err != nil {

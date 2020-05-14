@@ -25,10 +25,10 @@ func getMention(r *StringIterator, char uint8) *string {
 				if mention {
 					// Isn't a prefix.
 					return nil
-				} else {
-					// Return the ID.
-					return &CmpID
 				}
+
+				// Return the ID.
+				return &CmpID
 			}
 		} else {
 			// Set start to false.
@@ -83,10 +83,9 @@ func getMention(r *StringIterator, char uint8) *string {
 					// Return nil if this is a mention. If it is, rewind one and return the ID.
 					if mention {
 						return nil
-					} else {
-						r.Rewind(1)
-						return &CmpID
 					}
+					r.Rewind(1)
+					return &CmpID
 				}
 			}
 		}
