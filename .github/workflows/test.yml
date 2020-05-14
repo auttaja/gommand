@@ -1,0 +1,16 @@
+name: Lint and run unit tests
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Lint the codebase
+        run: golint .
+
+      - name: Run unit tests
+        run: go test .
