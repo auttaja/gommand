@@ -87,6 +87,20 @@ func init() {
 		},
 	})
 
+	// Waits for a message from the user.
+	router.SetCommand(&gommand.Command{
+		Name:                 "echowait",
+		Description:          "Wait for a message then echo it.",
+		Function: func(ctx *gommand.Context) error {
+			_, _ = ctx.Reply("say the message")
+			resp := ctx.WaitForMessage(func(_ disgord.Session, msg *disgord.Message) bool {
+				return msg.Author.ID == ctx.Message.Author.ID && msg.ChannelID == ctx.Message.ChannelID
+			})
+			_, _ = ctx.Reply(resp.Content)
+			return nil
+		},
+	})
+
 	// Handles command errors where possible. If not, just passes it through to the default handler to log to console.
 	// Wanted to use Sentry? You could make a handler for this by capturing and returning false. Don't forget it's in the order if the handlers.
 	router.AddErrorHandler(func(ctx *gommand.Context, err error) bool {

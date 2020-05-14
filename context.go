@@ -37,3 +37,15 @@ func (c *Context) Channel() (*disgord.Channel, error) {
 func (c *Context) Reply(data ...interface{}) (*disgord.Message, error) {
 	return c.Session.SendMsg(context.TODO(), c.Message.ChannelID, data...)
 }
+
+// WaitForMessage allows you to wait for a message.
+func (c *Context) WaitForMessage(CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message {
+	c.Router.msgWaitingQueueLock.Lock()
+	x := make(chan *disgord.Message)
+	c.Router.msgWaitingQueue = append(c.Router.msgWaitingQueue, &msgQueueItem{
+		function:  CheckFunc,
+		goroutine: x,
+	})
+	c.Router.msgWaitingQueueLock.Unlock()
+	return <- x
+}

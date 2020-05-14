@@ -37,6 +37,11 @@ type RouterConfig struct {
 	Middleware           []Middleware
 }
 
+type msgQueueItem struct {
+	function  func(s disgord.Session, msg *disgord.Message) bool
+	goroutine chan *disgord.Message
+}
+
 // Router defines the command router which is being used.
 // Please call NewRouter to initialise this rather than creating a new struct.
 type Router struct {
@@ -48,6 +53,8 @@ type Router struct {
 	errorHandlers         []ErrorHandler        `json:"-"`
 	permissionValidators  []PermissionValidator `json:"-"`
 	middleware            []Middleware          `json:"-"`
+	msgWaitingQueue       []*msgQueueItem       `json:"-"`
+	msgWaitingQueueLock   *sync.Mutex	         `json:"-"`
 }
 
 // NewRouter creates a new command Router.
@@ -61,12 +68,14 @@ func NewRouter(Config *RouterConfig) *Router {
 
 	// Return the Router.
 	return &Router{
-		PrefixCheck:          Config.PrefixCheck,
-		middleware:           Config.Middleware,
-		permissionValidators: Config.PermissionValidators,
-		cmds:                 map[string]*Command{},
-		cmdLock:              &sync.RWMutex{},
-		errorHandlers:        Config.ErrorHandlers,
+		PrefixCheck:           Config.PrefixCheck,
+		cmds:                  map[string]*Command{},
+		cmdLock:               &sync.RWMutex{},
+		errorHandlers:         Config.ErrorHandlers,
+		permissionValidators:  Config.PermissionValidators,
+		middleware:            Config.Middleware,
+		msgWaitingQueue:       []*msgQueueItem{},
+		msgWaitingQueueLock:   &sync.Mutex{},
 	}
 }
 
