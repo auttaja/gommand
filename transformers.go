@@ -42,3 +42,17 @@ func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
 	}
 	return
 }
+
+// MemberTransformer is used to transform a member if possible.
+func MemberTransformer(ctx *Context, Arg string) (member interface{}, err error) {
+	err = &InvalidTransformation{Description: "This was not a valid user ID or mention of someone in this guild."}
+	id := getUserMention(&StringIterator{Text: Arg})
+	if id == nil {
+		return
+	}
+	member, e := ctx.Session.GetMember(context.TODO(), ctx.Message.GuildID, snowflake.ParseSnowflakeString(*id))
+	if e == nil {
+		err = nil
+	}
+	return
+}
