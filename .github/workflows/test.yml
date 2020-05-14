@@ -14,7 +14,7 @@ jobs:
           go-version: "1.14"
 
       - name: Install golint
-        run: go get -u golang.org/x/lint/golint
+        run: GO111MODULE=off go get -u golang.org/x/lint/golint
 
       - name: Lint the codebase
         run: golint .
