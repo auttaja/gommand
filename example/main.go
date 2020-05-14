@@ -25,6 +25,21 @@ func init() {
 		},
 	})
 
+	// A simple command to tag the user specified.
+	router.SetCommand(&gommand.Command{
+		Name:        "tag",
+		Description: "Tags the user specified.",
+		ArgTransformers: []gommand.ArgTransformer{
+			{
+				Function: gommand.UserTransformer,
+			},
+		},
+		Function: func(ctx *gommand.Context) error {
+			_, _ = ctx.Reply(ctx.Args[0].(*disgord.User).Mention())
+			return nil
+		},
+	})
+
 	// Echos one argument with an additional optional argument.
 	router.SetCommand(&gommand.Command{
 		Name:        "echo",

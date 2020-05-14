@@ -1,6 +1,10 @@
 package gommand
 
-import "strconv"
+import (
+	"context"
+	"github.com/andersfylling/snowflake/v4"
+	"strconv"
+)
 
 // StringTransformer just takes the argument and returns it.
 func StringTransformer(_ *Context, Arg string) (interface{}, error) {
@@ -23,4 +27,18 @@ func UIntTransformer(_ *Context, Arg string) (interface{}, error) {
 		return nil, &InvalidTransformation{Description: "Could not transform the argument to an unsigned integer."}
 	}
 	return i, nil
+}
+
+// UserTransformer is used to transform a user if possible.
+func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
+	err = &InvalidTransformation{Description: "This was not a valid user ID or mention."}
+	id := getUserMention(&StringIterator{Text: Arg})
+	if id == nil {
+		return
+	}
+	user, e := ctx.Session.GetUser(context.TODO(), snowflake.ParseSnowflakeString(*id))
+	if e == nil {
+		err = nil
+	}
+	return
 }
