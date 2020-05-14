@@ -20,3 +20,58 @@ Do you have something which you wish to contribute? Feel free to make a pull req
 - **Have you ran `gofmt -w .` and `golint .`?:** We like to stick to using Go standards within this project, therefore if this is not done you may be asked to do this for it to be acccepted.
 
 Have you experienced a bug? If so, please make an issue! We take bugs seriously and this will be a large priority for us.
+
+## Creating your router
+Creating the router is very simple to do. You can simply create a router object in the part of your project where all of your commands are by calling the `NewRouter` function with a `RouterConfig` object. The configuration object can contain the following attributes:
+- `PrefixCheck`: This is used to set the checker which will be used for prefixes. Gommand contains the following prefix checks which you can use:
+    - `gommand.StaticPrefix(<prefix>)`: This will return a function which can be used in the place of the prefix check attribute to specifically look for a static prefix.
+    - `gommand.MentionPrefix`: This is used to check if the bot is mentioned.
+    - `gommand.MultiplePrefixCheckers(<prefix checker>...)` - This allows you to combine prefix checkers. In the event that a prefix checker returns false, the string iterator will be rewinded back to where it was and the next checker will be called.
+    
+    In the event that these prefix checkers won't suffice, you can write your own with the function type `func(ctx *gommand.Context, r *gommand.StringIterator) bool`. Note that the context does not contain the member object in the message or the command yet. See [using the string iterator](#using-the-string-iterator) below on how to use the string iterator.
+- `ErrorHandlers`: An array of functions of the [ErrorHandler](#error-handling) type which will run one after another. This can be nil and you can also add one with the `AddErrorHandler` function attached to the router.
+
+```go
+var router = gommand.NewRouter(&gommand.RouterConfig{
+    ...
+})
+```
+
+## Error Handling
+In gommand, every negative action is treated as an error. It is then your job to handle these errors. If the error is not handled within the router, it is then just simply passed off to the logger which was configured in disgord. Error handlers take the context and the error. From this they return a boolean. If the boolean is true, it means the error was caught by the handler. If not it simply goes to the next handler in the array. Gommand has several errors which can pass through of its own:
+- `*gommand.CommandNotFound`: The command was not found within the router.
+- `*gommand.CommandBlank`: The command name was blank.
+- `*gommand.IncorrectPermissions`: The permissions this user has are incorrect for the command.
+- `*gommand.InvalidArgCount`: The argument count is not correct.
+- `*gommand.InvalidTransformation`: Passed through from a transformer when it cannot transform properly.
+
+Using this, we can build a simple error handler that ignores command not found events and logs errors to the chat for the others, although you may wish to implement this differently:
+```go
+func basicErrorHandler(ctx *gommand.Context, err error) bool {
+    // Check all the different types of errors.
+    switch err.(type) {
+    case *gommand.CommandNotFound, *gommand.CommandBlank:
+        // We will ignore.
+        return true
+    case *gommand.InvalidTransformation:
+        _, _ = ctx.Reply("Invalid argument:", err.Error())
+        return true
+    case *gommand.IncorrectPermissions:
+        _, _ = ctx.Reply("Invalid permissions:", err.Error())
+        return true
+    case *gommand.InvalidArgCount:
+        _, _ = ctx.Reply("Invalid argument count.")
+        return true
+    }
+
+    // This was not handled here.
+    return false
+}
+```
+This can then be added to the `ErrorHandlers` array or passed to `AddErrorHandler`. Note that they execute in the order they were added.
+
+## Using The String Iterator
+If you are handling parts of the parsing which are very early in the process as is the case with prefixes and custom commands,0 and you are writing your own code to implement them, you will need to handle the `gommand.StringIterator` type. The objective of this is to try and prevent multiple iterations of the string, which can be computationally expensive, where this is possible. The iterator implements the following:
+- `GetRemainder(FillIterator bool) (string, error)`: This will get the remainder of the iterator. If it's already at the end, the error will be set. `FillIterator` defines if it should fill the iterator when it is done or if it should leave it where it is.
+- `GetChar() (uint8, error)`: Used to get a character from the iterator. If it's already at the end, the error will be set.
+- `Rewind(N uint)`: Used to rewind by N number of chars. Useful if you only iterated a few times to check something.
