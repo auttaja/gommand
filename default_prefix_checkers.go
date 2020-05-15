@@ -3,7 +3,7 @@ package gommand
 // StaticPrefix is used for simple static prefixes.
 func StaticPrefix(Prefix string) func(_ *Context, r *StringIterator) bool {
 	l := len(Prefix)
-	return func(_ *Context, r *StringIterator) bool {
+	return func(ctx *Context, r *StringIterator) bool {
 		i := 0
 		for i != l {
 			b, err := r.GetChar()
@@ -15,6 +15,7 @@ func StaticPrefix(Prefix string) func(_ *Context, r *StringIterator) bool {
 			}
 			i++
 		}
+		ctx.Prefix = Prefix
 		return true
 	}
 }
@@ -44,7 +45,8 @@ func MentionPrefix(ctx *Context, r *StringIterator) bool {
 		}
 	}
 
-	// Return true.
+	// Return true and set the prefix.
+	ctx.Prefix = "<@" + BotID + "> "
 	return true
 }
 

@@ -30,7 +30,7 @@ Creating the router is very simple to do. You can simply create a router object 
     - `gommand.MentionPrefix`: This is used to check if the bot is mentioned.
     - `gommand.MultiplePrefixCheckers(<prefix checker>...)` - This allows you to combine prefix checkers. In the event that a prefix checker returns false, the string iterator will be rewinded back to where it was and the next checker will be called.
     
-    In the event that these prefix checkers won't suffice, you can write your own with the function type `func(ctx *gommand.Context, r *gommand.StringIterator) bool`. Note that the context does not contain the member object in the message or the command yet. See [using the string iterator](#using-the-string-iterator) below on how to use the string iterator. If this is nil, it defaults to no prefix.
+    In the event that these prefix checkers won't suffice, you can write your own with the function type `func(ctx *gommand.Context, r *gommand.StringIterator) bool` where `true` represents if the prefix is used. If the prefix was used, you should also set `ctx.Prefix` to your prefix. Note that the context does not contain the member object in the message or the command yet. See [using the string iterator](#using-the-string-iterator) below on how to use the string iterator. If this is nil, it defaults to no prefix.
 - `ErrorHandlers`: An array of functions of the [ErrorHandler](#error-handling) type which will run one after another. This can be nil and you can also add one with the `AddErrorHandler` function attached to the router.
 - `PermissionValidators`: This is any [permission validators](#permission-validators) which you wish to add on a global router scale. This can be nil.
 - `Middleware`: This is any [middleware](#middleware) which you wish to add on a global router scale. This can be nil.
@@ -76,6 +76,7 @@ The context is a core part of the gommand functionality. The context contains se
 - `Command`: The actual command which was called.
 - `RawArgs`: A string of the raw arguments.
 - `Args`: The transformed arguments.
+- `Prefix`: Defines the prefix which was used.
 - `MidddlewareParams`: The params set by [middleware](#middleware).
 
 It also contains several helper functions:

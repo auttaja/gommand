@@ -7,6 +7,7 @@ import (
 
 // Context defines the information which might be required to run the command.
 type Context struct {
+	Prefix           string                 `json:"prefix"`
 	Message          *disgord.Message       `json:"message"`
 	BotUser          *disgord.User          `json:"botUser"`
 	Router           *Router                `json:"-"`
