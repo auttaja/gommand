@@ -146,3 +146,51 @@ func (r *Router) RemoveCommand(c *Command) {
 	}
 	r.cmdLock.Unlock()
 }
+
+// GetAllCommands is used to get all of the commands.
+func (r *Router) GetAllCommands() []*Command {
+	// Read lock the commands.
+	r.cmdLock.RLock()
+
+	// Get the command count.
+	count := 0
+	for k, v := range r.cmds {
+		if k == v.Name {
+			count++
+		}
+	}
+
+	// Allocate the commands.
+	a := make([]*Command, count)
+
+	// Set the index.
+	index := 0
+
+	// Go through each command and add it to the array.
+	for k, v := range r.cmds {
+		if k == v.Name {
+			a[index] = v
+			index++
+		}
+	}
+
+	// Read unlock the commands.
+	r.cmdLock.RUnlock()
+
+	// Return the commands.
+	return a
+}
+
+// GetCommandsOrderedByCategory is used to order commands by the categories.
+func (r *Router) GetCommandsOrderedByCategory() map[CategoryInterface][]*Command {
+	m := map[CategoryInterface][]*Command{}
+	cmds := r.GetAllCommands()
+	for _, v := range cmds {
+		items, ok := m[v.Category]
+		if !ok {
+			items = []*Command{}
+		}
+		m[v.Category] = append(items, v)
+	}
+	return m
+}
