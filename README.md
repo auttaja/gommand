@@ -66,6 +66,7 @@ The command **MUST** have the `Name` (the name of the command) and `Function` (t
     - `Remainder`: If this is true, it will just try and parse the raw remainder of the arguments. If the string is blank it will error with not enough arguments unless optional is set. Note that due to what this does, it has to be at the end of the array.
     - `Greedy`: If this is true, the parser will keep trying to parse the users arguments until it hits the end of their message or a parse fails. When this happens, it will go to the next parser in the array. Note that if the first argument fails, this means that it was not set and an error will be put into the error handler unless it was set as optional. The greedy argument will be of the type `[]interface{}` (unless `Optional` is set and it was not specified).
 - `Middleware`: An array of [middleware](#middleware) which only applies to this specific command.
+- `Category`: Allows you to set a [Category](#categories) for your command.
 
 ## Context
 The context is a core part of the gommand functionality. The context contains several crucial bits of information:
@@ -139,6 +140,21 @@ func basicErrorHandler(ctx *gommand.Context, err error) bool {
 }
 ```
 This can then be added to the `ErrorHandlers` array or passed to `AddErrorHandler`. Note that they execute in the order they were added.
+
+## Categories
+In Go, categories use the `gommand.CategoryInterface` interface to ensure that they can be modular. The interface has the following functions which must be set:
+- `GetName() string`: Gets the name of the category.
+- `GetDescription() string`: Gets the description of the category.
+- `GetPermissionValidators() []gommand.PermissionValidator`: Gets the array of permission validators. This array cannot be nil.
+- `GetMiddleware() []gommand.Middleware`: Gets the array of permission validators. This array cannot be nil.
+
+For ease of use, gommand has the `Category` struct that implements all of these for you. The following attributes can be set in this:
+- `Name`: The name of the category.
+- `Description`: The description of the category.
+- `PermissionValidators`: An array of [permission validators](#permission-validators) which will be used on each item in the category. This can be nil.
+- `Middleware`: An array of [middleware](#middleware) which will be used on each item in the category. This can be nil.
+
+Note that to allow for the easy categorisation of commands and prevent repatition, a pointer should be created somewhere in your codebase (using `var` or before your commands) to a category which multiple commands use and they should all just pass through the same pointer.
 
 ## Permission Validators
 Permission validators allow for a quick method to check if the user has permission to run a command. Permission validators follow the format `func(ctx *Context) (string, bool)`. If the boolean is true, the user does have permission. If not, the string is used to construct a `IncorrectPermissions` error.

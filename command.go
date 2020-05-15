@@ -25,37 +25,69 @@ type Command struct {
 	Aliases              []string                 `json:"aliases"`
 	Description          string                   `json:"description"`
 	Usage                string                   `json:"usage"`
+	Category             CategoryInterface        `json:"category"`
 	PermissionValidators []PermissionValidator    `json:"-"`
 	ArgTransformers      []ArgTransformer         `json:"-"`
 	Middleware           []Middleware             `json:"-"`
 	Function             func(ctx *Context) error `json:"-"`
 }
 
-// Used to run the command.
-func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
-	// Run any permission validators on both a global and local scale.
+// HasPermission is used to run through the permission validators and check if the user has permission.
+// The error will be of the IncorrectPermissions type if they do not have permission.
+func (c *Command) HasPermission(ctx *Context) error {
+	// Run any permission validators on a global scale.
 	if ctx.Router.permissionValidators != nil {
 		for _, v := range ctx.Router.permissionValidators {
 			msg, ok := v(ctx)
 			if !ok {
-				err = &IncorrectPermissions{err: msg}
-				return
-			}
-		}
-	}
-	if c.PermissionValidators != nil {
-		for _, v := range c.PermissionValidators {
-			msg, ok := v(ctx)
-			if !ok {
-				err = &IncorrectPermissions{err: msg}
-				return
+				return &IncorrectPermissions{err: msg}
 			}
 		}
 	}
 
-	// Run any middleware on both a global and local scale.
+	// Run any permission validators on a category scale.
+	if c.Category != nil {
+		for _, v := range c.Category.GetPermissionValidators() {
+			msg, ok := v(ctx)
+			if !ok {
+				return &IncorrectPermissions{err: msg}
+			}
+		}
+	}
+
+	// Run any permission validators on a local scale.
+	if c.PermissionValidators != nil {
+		for _, v := range c.PermissionValidators {
+			msg, ok := v(ctx)
+			if !ok {
+				return &IncorrectPermissions{err: msg}
+			}
+		}
+	}
+
+	// Return no errors.
+	return nil
+}
+
+// Used to run the command.
+func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
+	// Run any permission validators.
+	err = c.HasPermission(ctx)
+	if err != nil {
+		return
+	}
+
+	// Run any middleware.
 	if ctx.Router.middleware != nil {
 		for _, v := range ctx.Router.middleware {
+			err = v(ctx)
+			if err != nil {
+				return
+			}
+		}
+	}
+	if c.Category != nil {
+		for _, v := range c.Category.GetMiddleware() {
 			err = v(ctx)
 			if err != nil {
 				return
