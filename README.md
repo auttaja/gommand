@@ -195,4 +195,3 @@ The following manage storing channel/guild ID relationships. This is important s
 
 ## TODO's
 - More built-in transformers.
-- Add some built-in permission validators.
