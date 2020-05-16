@@ -112,8 +112,6 @@ func (r *Router) errorHandler(ctx *Context, err error) {
 // AddErrorHandler is used to add a error handler to the Router.
 // An error handler takes the structure of the ErrorHandler type above.
 // Error handlers are executed in the order in which they are added to the Router.
-// This can NOT be ran directly from a command due to the thread locking.
-// If you wish to do that (which you probably don't), you should launch this as a go-routine.
 func (r *Router) AddErrorHandler(Handler ErrorHandler) {
 	r.cmdLock.Lock()
 	r.errorHandlers = append(r.errorHandlers, Handler)
@@ -130,8 +128,6 @@ func (r *Router) GetCommand(Name string) *Command {
 }
 
 // SetCommand is used to set a command.
-// This can NOT be ran directly from a command due to the thread locking.
-// If you wish to do that (which you probably don't), you should launch this as a go-routine.
 func (r *Router) SetCommand(c *Command) {
 	r.cmdLock.Lock()
 	c.Name = strings.ToLower(c.Name)
@@ -148,8 +144,6 @@ func (r *Router) SetCommand(c *Command) {
 }
 
 // RemoveCommand is used to remove a command from the Router.
-// This can NOT be ran directly from a command due to the thread locking.
-// If you wish to do that (which you probably don't), you should launch this as a go-routine.
 func (r *Router) RemoveCommand(c *Command) {
 	r.cmdLock.Lock()
 	delete(r.cmds, strings.ToLower(c.Name))

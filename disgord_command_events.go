@@ -42,9 +42,6 @@ func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) 
 	// Read lock the commands.
 	r.cmdLock.RLock()
 
-	// Defer read unlocking commands.
-	defer r.cmdLock.RUnlock()
-
 	// Create the context.
 	ctx := &Context{
 		Message:          evt.Message,
@@ -61,6 +58,7 @@ func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) 
 	// Run a prefix check.
 	if !r.PrefixCheck(ctx, reader) {
 		// The prefix was not used.
+		r.cmdLock.RUnlock()
 		return
 	}
 
@@ -68,6 +66,7 @@ func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) 
 	if patchMember {
 		member, err := s.GetMember(context.TODO(), evt.Message.GuildID, evt.Message.Author.ID)
 		if err != nil {
+			r.cmdLock.RUnlock()
 			r.errorHandler(ctx, err)
 			return
 		}
@@ -85,6 +84,7 @@ func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) 
 		cmdname += string(b)
 	}
 	if cmdname == "" {
+		r.cmdLock.RUnlock()
 		var ok bool
 		var err error
 		if r.CustomCommandsHandler != nil {
@@ -108,6 +108,7 @@ func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) 
 	cmd := r.cmds[strings.ToLower(cmdname)]
 	ctx.Command = cmd
 	if cmd == nil {
+		r.cmdLock.RUnlock()
 		var ok bool
 		var err error
 		if r.CustomCommandsHandler != nil {
@@ -124,6 +125,7 @@ func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) 
 	}
 
 	// Run the command handler.
+	r.cmdLock.RUnlock()
 	err := cmd.run(ctx, reader)
 	if err != nil {
 		r.errorHandler(ctx, err)
