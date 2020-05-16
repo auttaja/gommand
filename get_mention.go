@@ -1,7 +1,7 @@
 package gommand
 
 // Get the mention if it exists.
-func getMention(r *StringIterator, char uint8) *string {
+func getMention(r *StringIterator, char uint8, role bool) *string {
 	// Defines the parsing stage.
 	stage := uint8(0)
 
@@ -16,7 +16,10 @@ func getMention(r *StringIterator, char uint8) *string {
 	for {
 		c, err := r.GetChar()
 		if err != nil {
-			// Ok this string is too small to be the prefix.
+			// Check the stage. If it can't be a ID, return nil.
+			if stage == 3 {
+				return &CmpID
+			}
 			return nil
 		}
 		if c == ' ' {
@@ -58,7 +61,11 @@ func getMention(r *StringIterator, char uint8) *string {
 					return nil
 				}
 			} else if stage == 2 {
-				if c == '!' {
+				x := uint8('!')
+				if role {
+					x = '&'
+				}
+				if c == x {
 					// Ok, we should be ok to move to stage 3 without any ID logging.
 					stage = 3
 				} else {

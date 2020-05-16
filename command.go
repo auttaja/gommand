@@ -1,6 +1,9 @@
 package gommand
 
-import "strings"
+import (
+	"bytes"
+	"strings"
+)
 
 // ArgTransformer defines a transformer which is to be used on arguments.
 type ArgTransformer struct {
@@ -119,7 +122,7 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 		// The functions to handle raw arguments.
 		GetOneArg := func() (string, int) {
 			raw := 0
-			arg := ""
+			arg := bytes.Buffer{}
 			first := true
 			quote := false
 			for {
@@ -127,7 +130,7 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 				c, err := reader.GetChar()
 				if err != nil {
 					// Return the current argument and raw length.
-					return arg, raw
+					return arg.String(), raw
 				}
 				raw++
 				if c == '"' {
@@ -136,20 +139,20 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 						quote = true
 					} else if quote {
 						// If this is within the quote, return the arg.
-						return arg, raw
+						return arg.String(), raw
 					}
 				} else if c == ' ' {
 					// If this is the beginning, continue. If this isn't a quote, return. If it is, add to it.
 					if first {
 						continue
 					} else if quote {
-						arg += " "
+						_ = arg.WriteByte(' ')
 					} else {
-						return arg, raw
+						return arg.String(), raw
 					}
 				} else {
 					// Just add to the argument.
-					arg += string(c)
+					_ = arg.WriteByte(c)
 				}
 
 				// Set first to false.
