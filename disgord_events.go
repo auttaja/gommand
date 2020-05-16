@@ -105,7 +105,7 @@ func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) 
 	ctx.RawArgs = remainder
 
 	// Get the command if it exists.
-	cmd, _ := r.cmds[strings.ToLower(cmdname)]
+	cmd := r.cmds[strings.ToLower(cmdname)]
 	ctx.Command = cmd
 	if cmd == nil {
 		var ok bool

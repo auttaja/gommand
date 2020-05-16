@@ -36,7 +36,7 @@ func (c *InMemoryMessageCacheStorageAdapter) Init() {
 // GetAllChannelIDs is used to get all of the channel ID's.
 func (c *InMemoryMessageCacheStorageAdapter) GetAllChannelIDs(GuildID string) []string {
 	c.guildLock.RLock()
-	channels, _ := c.channelMap[GuildID]
+	channels := c.channelMap[GuildID]
 	if channels == nil {
 		channels = []string{}
 	}
@@ -47,7 +47,7 @@ func (c *InMemoryMessageCacheStorageAdapter) GetAllChannelIDs(GuildID string) []
 // AddChannelID is used to add a channel ID to the guild.
 func (c *InMemoryMessageCacheStorageAdapter) AddChannelID(GuildID, ChannelID string) {
 	c.guildLock.Lock()
-	channels, _ := c.channelMap[GuildID]
+	channels := c.channelMap[GuildID]
 	if channels == nil {
 		channels = []string{}
 	}
@@ -58,7 +58,7 @@ func (c *InMemoryMessageCacheStorageAdapter) AddChannelID(GuildID, ChannelID str
 // RemoveChannelID is used to remove a channel ID to the guild.
 func (c *InMemoryMessageCacheStorageAdapter) RemoveChannelID(GuildID, ChannelID string) {
 	c.guildLock.Lock()
-	channels, _ := c.channelMap[GuildID]
+	channels := c.channelMap[GuildID]
 	if channels == nil {
 		channels = []string{}
 	}
@@ -87,7 +87,7 @@ func (c *InMemoryMessageCacheStorageAdapter) GetAndDelete(ChannelID, MessageID s
 	c.lock.RLock()
 
 	// Get the channel cache from the base.
-	msgs, _ := c.cache[ChannelID]
+	msgs := c.cache[ChannelID]
 	if msgs == nil {
 		// Nope not in this cache, return nil.
 		c.lock.RUnlock()
@@ -95,7 +95,7 @@ func (c *InMemoryMessageCacheStorageAdapter) GetAndDelete(ChannelID, MessageID s
 	}
 
 	// Try and get the compressed message from the cache.
-	msg, _ := (*msgs)[MessageID]
+	msg := (*msgs)[MessageID]
 	c.lock.RUnlock()
 	if msg == nil {
 		// Nothing to delete.
@@ -115,7 +115,7 @@ func (c *InMemoryMessageCacheStorageAdapter) Delete(ChannelID, MessageID string)
 	c.lock.Lock()
 
 	// Get the channel cache from the base.
-	msgs, _ := c.cache[ChannelID]
+	msgs := c.cache[ChannelID]
 	if msgs == nil {
 		// Nope not in this cache, return.
 		c.lock.Unlock()
@@ -155,7 +155,7 @@ func (c *InMemoryMessageCacheStorageAdapter) DeleteChannelsMessages(ChannelID st
 	c.lock.Lock()
 
 	// Get the channel cache and remove all messages in it.
-	msgs, _ := c.cache[ChannelID]
+	msgs := c.cache[ChannelID]
 	for _, v := range *msgs {
 		c.list.Remove(v.el)
 		c.len--
@@ -186,7 +186,7 @@ func (c *InMemoryMessageCacheStorageAdapter) Set(ChannelID, MessageID string, Me
 	}
 
 	// Set the message.
-	msgs, _ := c.cache[ChannelID]
+	msgs := c.cache[ChannelID]
 	if msgs == nil {
 		m := map[string]*cachedMessage{}
 		msgs = &m

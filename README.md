@@ -19,7 +19,7 @@ Do you have something which you wish to contribute? Feel free to make a pull req
 
 - **Is it useful to everyone?:** If this is a domain specific edit, you probably want to keep this as middleware since it will not be accepted into the main project.
 - **Does it slow down parsing by >1ms?:** This will likely be denied. We want to keep parsing as high performance as possible.
-- **Have you ran `gofmt -w .` and `golint .`?:** We like to stick to using Go standards within this project, therefore if this is not done you may be asked to do this for it to be acccepted.
+- **Have you ran `gofmt -w .` and [golangci-lint](https://golangci-lint.run/usage/install/)?:** We like to stick to using Go standards within this project, therefore if this is not done you may be asked to do this for it to be acccepted.
 
 Have you experienced a bug? If so, please make an issue! We take bugs seriously and this will be a large priority for us.
 
@@ -158,7 +158,11 @@ For ease of use, gommand has the `Category` struct that implements all of these 
 Note that to allow for the easy categorisation of commands and prevent repatition, a pointer should be created somewhere in your codebase (using `var` or before your commands) to a category which multiple commands use and they should all just pass through the same pointer.
 
 ## Permission Validators
-Permission validators allow for a quick method to check if the user has permission to run a command. Permission validators follow the format `func(ctx *Context) (string, bool)`. If the boolean is true, the user does have permission. If not, the string is used to construct a `IncorrectPermissions` error.
+Permission validators allow for a quick method to check if the user has permission to run a command.
+
+Gommand contains built-in permission validators for all [Discord permisions](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags). To use them, simply use the permission ID as the permission validator function. For example, if you want to check if someone is an administrator, simply add `gommand.ADMINISTRATOR` to your `PermissionValidators` array.
+
+If you wish to write your own permission validators, they follow the format `func(ctx *Context) (string, bool)`. If the boolean is true, the user does have permission. If not, the string is used to construct a `IncorrectPermissions` error.
 
 ## Middleware
 Middleware allows you to write powerful extensions on a per-command or per-router basis. Middleware is seperate from permission validators to allow the application to tell if the user has permission without re-executing all of the middleware which has been set. Middleware follows the format `func(ctx *Context) error`, with any errors being passed to the error handler. If you wish to get an argument from a middleware function to another function or command during execution, you can use the `MiddlewareParams` map within the context.

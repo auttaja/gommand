@@ -95,5 +95,5 @@ func (d *DeletedMessageHandler) messageCreate(_ disgord.Session, evt *disgord.Me
 	} else if 0 > Limit {
 		Limit = 0
 	}
-	go d.MessageCacheStorageAdapter.Set(evt.Message.ChannelID.String(), evt.Message.ID.String(), evt.Message, uint(d.Limit))
+	go d.MessageCacheStorageAdapter.Set(evt.Message.ChannelID.String(), evt.Message.ID.String(), evt.Message, uint(Limit))
 }

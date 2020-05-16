@@ -46,17 +46,17 @@ type msgQueueItem struct {
 // Router defines the command router which is being used.
 // Please call NewRouter to initialise this rather than creating a new struct.
 type Router struct {
-	BotUser               *disgord.User          `json:"-"`
-	PrefixCheck           PrefixCheck            `json:"-"`
-	CustomCommandsHandler CustomCommandsHandler  `json:"-"`
-	cmds                  map[string]*Command    `json:"-"`
-	cmdLock               *sync.RWMutex          `json:"-"`
-	errorHandlers         []ErrorHandler         `json:"-"`
-	permissionValidators  []PermissionValidator  `json:"-"`
-	middleware            []Middleware           `json:"-"`
-	msgWaitingQueue       []*msgQueueItem        `json:"-"`
-	msgWaitingQueueLock   *sync.Mutex            `json:"-"`
-	DeletedMessageHandler *DeletedMessageHandler `json:"-"`
+	BotUser               *disgord.User         `json:"-"`
+	PrefixCheck           PrefixCheck           `json:"-"`
+	CustomCommandsHandler CustomCommandsHandler `json:"-"`
+	cmds                  map[string]*Command
+	cmdLock               *sync.RWMutex
+	errorHandlers         []ErrorHandler
+	permissionValidators  []PermissionValidator
+	middleware            []Middleware
+	msgWaitingQueue       []*msgQueueItem
+	msgWaitingQueueLock   *sync.Mutex
+	DeletedMessageHandler *DeletedMessageHandler
 }
 
 // NewRouter creates a new command Router.
@@ -124,7 +124,7 @@ func (r *Router) AddErrorHandler(Handler ErrorHandler) {
 // If the command doesn't exist, this will be a nil pointer.
 func (r *Router) GetCommand(Name string) *Command {
 	r.cmdLock.RLock()
-	cmd, _ := r.cmds[strings.ToLower(Name)]
+	cmd := r.cmds[strings.ToLower(Name)]
 	r.cmdLock.RUnlock()
 	return cmd
 }

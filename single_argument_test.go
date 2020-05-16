@@ -58,6 +58,7 @@ func BenchmarkSingleArgument(b *testing.B) {
 			arg := ctx.Args[0].(string)
 
 			// Do something here to cause a bit of activity in the function.
+			//nolint:staticcheck
 			strings.ToLower(arg)
 
 			return nil

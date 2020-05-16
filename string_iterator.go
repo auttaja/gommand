@@ -7,7 +7,7 @@ import "errors"
 type StringIterator struct {
 	Text string `json:"text"`
 	Pos  uint   `json:"pos"`
-	len  *uint  `json:"-"`
+	len  *uint
 }
 
 func (s *StringIterator) ensureLen() {

@@ -13,11 +13,11 @@ jobs:
         with:
           go-version: "1.14"
 
-      - name: Install golint
-        run: GO111MODULE=off go get -u golang.org/x/lint/golint
-
-      - name: Lint the codebase
-        run: $(go env GOPATH)/bin/golint .
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v1
+        with:
+          version: v1.27
+          args: .
 
       - name: Run unit tests
         run: go test -v .
