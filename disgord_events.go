@@ -169,4 +169,11 @@ func (r *Router) Hook(s disgord.Session) {
 	s.On(disgord.EvtReady, r.readyEvt)
 	s.On(disgord.EvtUserUpdate, r.userUpdate)
 	s.On(disgord.EvtMessageCreate, r.msgCreate)
+	if r.DeletedMessageHandler != nil {
+		s.On(disgord.EvtGuildDelete, r.DeletedMessageHandler.guildDelete)
+		s.On(disgord.EvtChannelDelete, r.DeletedMessageHandler.channelDelete)
+		s.On(disgord.EvtGuildCreate, r.DeletedMessageHandler.guildCreate)
+		s.On(disgord.EvtMessageCreate, r.DeletedMessageHandler.messageCreate)
+		s.On(disgord.EvtMessageDelete, r.DeletedMessageHandler.messageDelete)
+	}
 }

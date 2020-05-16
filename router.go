@@ -31,10 +31,11 @@ type Middleware = func(ctx *Context) error
 
 // RouterConfig defines the config which will be used for the Router.
 type RouterConfig struct {
-	PrefixCheck          PrefixCheck
-	ErrorHandlers        []ErrorHandler
-	PermissionValidators []PermissionValidator
-	Middleware           []Middleware
+	DeletedMessageHandler *DeletedMessageHandler
+	PrefixCheck           PrefixCheck
+	ErrorHandlers         []ErrorHandler
+	PermissionValidators  []PermissionValidator
+	Middleware            []Middleware
 }
 
 type msgQueueItem struct {
@@ -45,16 +46,17 @@ type msgQueueItem struct {
 // Router defines the command router which is being used.
 // Please call NewRouter to initialise this rather than creating a new struct.
 type Router struct {
-	BotUser               *disgord.User         `json:"-"`
-	PrefixCheck           PrefixCheck           `json:"-"`
-	CustomCommandsHandler CustomCommandsHandler `json:"-"`
-	cmds                  map[string]*Command   `json:"-"`
-	cmdLock               *sync.RWMutex         `json:"-"`
-	errorHandlers         []ErrorHandler        `json:"-"`
-	permissionValidators  []PermissionValidator `json:"-"`
-	middleware            []Middleware          `json:"-"`
-	msgWaitingQueue       []*msgQueueItem       `json:"-"`
-	msgWaitingQueueLock   *sync.Mutex           `json:"-"`
+	BotUser               *disgord.User          `json:"-"`
+	PrefixCheck           PrefixCheck            `json:"-"`
+	CustomCommandsHandler CustomCommandsHandler  `json:"-"`
+	cmds                  map[string]*Command    `json:"-"`
+	cmdLock               *sync.RWMutex          `json:"-"`
+	errorHandlers         []ErrorHandler         `json:"-"`
+	permissionValidators  []PermissionValidator  `json:"-"`
+	middleware            []Middleware           `json:"-"`
+	msgWaitingQueue       []*msgQueueItem        `json:"-"`
+	msgWaitingQueueLock   *sync.Mutex            `json:"-"`
+	DeletedMessageHandler *DeletedMessageHandler `json:"-"`
 }
 
 // NewRouter creates a new command Router.
@@ -66,17 +68,29 @@ func NewRouter(Config *RouterConfig) *Router {
 		}
 	}
 
-	// Return the Router.
-	return &Router{
-		PrefixCheck:          Config.PrefixCheck,
-		cmds:                 map[string]*Command{},
-		cmdLock:              &sync.RWMutex{},
-		errorHandlers:        Config.ErrorHandlers,
-		permissionValidators: Config.PermissionValidators,
-		middleware:           Config.Middleware,
-		msgWaitingQueue:      []*msgQueueItem{},
-		msgWaitingQueueLock:  &sync.Mutex{},
+	// Set the Router.
+	r := &Router{
+		PrefixCheck:           Config.PrefixCheck,
+		cmds:                  map[string]*Command{},
+		cmdLock:               &sync.RWMutex{},
+		errorHandlers:         Config.ErrorHandlers,
+		permissionValidators:  Config.PermissionValidators,
+		middleware:            Config.Middleware,
+		DeletedMessageHandler: Config.DeletedMessageHandler,
+		msgWaitingQueue:       []*msgQueueItem{},
+		msgWaitingQueueLock:   &sync.Mutex{},
 	}
+
+	// If deleted message handler isn't nil, initialise the storage adapter.
+	if r.DeletedMessageHandler != nil {
+		if r.DeletedMessageHandler.MessageCacheStorageAdapter == nil {
+			r.DeletedMessageHandler.MessageCacheStorageAdapter = &InMemoryMessageCacheStorageAdapter{}
+		}
+		r.DeletedMessageHandler.MessageCacheStorageAdapter.Init()
+	}
+
+	// Return the router.
+	return r
 }
 
 // Dispatches the required error handlers in the event of an error.

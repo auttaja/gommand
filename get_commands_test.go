@@ -15,7 +15,7 @@ func TestGetCommands(t *testing.T) {
 	cat := &Category{Name: "a"}
 	r.SetCommand(&Command{
 		Name:     "b",
-		Aliases: []string{"c"},
+		Aliases:  []string{"c"},
 		Category: cat,
 		Function: func(ctx *Context) error {
 			return nil

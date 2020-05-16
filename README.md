@@ -34,6 +34,7 @@ Creating the router is very simple to do. You can simply create a router object 
 - `ErrorHandlers`: An array of functions of the [ErrorHandler](#error-handling) type which will run one after another. This can be nil and you can also add one with the `AddErrorHandler` function attached to the router.
 - `PermissionValidators`: This is any [permission validators](#permission-validators) which you wish to add on a global router scale. This can be nil.
 - `Middleware`: This is any [middleware](#middleware) which you wish to add on a global router scale. This can be nil.
+- `DeletedMessageHandler`: See the [deleted message handler](#deleted-message-handler) documentation below.
 
 The router is then trivial to make:
 ```go
@@ -167,6 +168,26 @@ If you are handling parts of the parsing which are very early in the process as 
 - `GetRemainder(FillIterator bool) (string, error)`: This will get the remainder of the iterator. If it's already at the end, the error will be set. `FillIterator` defines if it should fill the iterator when it is done or if it should leave it where it is.
 - `GetChar() (uint8, error)`: Used to get a character from the iterator. If it's already at the end, the error will be set.
 - `Rewind(N uint)`: Used to rewind by N number of chars. Useful if you only iterated a few times to check something.
+
+## Deleted message handler
+For some bots, being able to track deleted messages in an easy to use way is important due to the ability to get the content/author of deleted messages. In standalone disgord, you need to manually cache messages. However, gommand has the ability built in to cache deleted messages. To use this handler, simply set the `DeletedMessageHandler` attribute of the router configuration to a struct of the type `&gommand.DeletedMessageHandler`. You can then set the following attributes in this handler:
+- `Limit`: Defines the maximum amount of cached messages. -1 = unlimited (not suggested if it's in-memory since it'll lead to memory leaks), 0 = default, >0 = user set maximum. This should run on a First In First Out (FIFO) basis. By default, this will be set to 1,000 messages. Messages which have been purged due to this limit will not have an event fired for them.
+- `Callback`: The callback of type `func(s disgord.Session, msg *disgord.Message)` which is called when a message is deleted. As with commands, for ease of use the `Member` attribute is set on the message.
+- `MessageCacheStorageAdapter`: The [message cache storage adapter](#message-cache-storage-adapter) which is used for this. If this is not set, it will default to the built-in in-memory caching adapter.
+
+## Message cache storage adapter
+By default (like other libraries such as discord.py), gommand keeps a finite amount of messages cached into RAM which is set by the user in the deleted message handler parameters. However, if you wish to keep messages until the guild removes your bot/is deleted or the message/channel is deleted, you will likely want to want to write your own message caching adapter. In gommand, memory cachers use the `gommand.MemoryCacheStorageAdapter` interface. This contains the following functions which need to be set:
+- `Init()`: Called on the initialisation of the router.
+- `GetAndDelete(ChannelID, MessageID string) *disgord.Message`: Gets a message from the cache and then deletes it since this is only called when the message is being deleted so it will then be unneeded.
+- `Delete(ChannelID, MessageID string)`: Deletes a message from the cache.
+- `DeleteChannelsMessages(ChannelID string)`: Deletes all messages cached for a specific channel.
+- `Set(ChannelID, MessageID string, Message *disgord.Message, Limit uint)`: Sets an item in the cache. The limit is passed through so that you can implement a simple First In First Out (FIFO) caching system. The limit will be 0 if it is set to unlimited.
+
+The following manage storing channel/guild ID relationships. This is important so that if a guild is removed, we know what channel ID's to purge from the cache:
+- `GetAllChannelIDs(GuildID string) []string`: Get all channel ID's which have a relationship with a specific guild ID.
+- `AddChannelID(GuildID, ChannelID string)`: Add a relationship between a guild ID and a channel ID.
+- `RemoveChannelID(GuildID, ChannelID string)`: Remove a channel ID's relationship with a guild ID.
+- `RemoveGuild(GuildID string)`: Remove all channel ID relationships with a specific guild ID.
 
 ## TODO's
 - More built-in transformers.
