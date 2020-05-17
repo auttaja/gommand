@@ -117,13 +117,13 @@ func MessageURLTransformer(ctx *Context, Arg string) (message interface{}, err e
 }
 
 var str2bool = map[string]bool{
-	"y": true,
-	"yes": true,
-	"1": true,
-	"n": false,
-	"no": false,
-	"0": false,
-	"true": true,
+	"y":     true,
+	"yes":   true,
+	"1":     true,
+	"n":     false,
+	"no":    false,
+	"0":     false,
+	"true":  true,
 	"false": false,
 }
 

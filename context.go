@@ -50,3 +50,12 @@ func (c *Context) WaitForMessage(CheckFunc func(s disgord.Session, msg *disgord.
 	c.Router.msgWaitingQueueLock.Unlock()
 	return <-x
 }
+
+// DisplayEmbedMenu is used to allow you to easily display a embed menu.
+func (c *Context) DisplayEmbedMenu(m *EmbedMenu) error {
+	msg, err := c.Reply("Loading...")
+	if err != nil {
+		return err
+	}
+	return m.Display(c.Message.ChannelID, msg.ID, c.Session)
+}

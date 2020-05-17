@@ -108,6 +108,33 @@ func init() {
 		},
 	})
 
+	// Create a basic embed menu.
+	router.SetCommand(&gommand.Command{
+		Name:        "embedmenu",
+		Description: "Displays a embed menu.",
+		Function: func(ctx *gommand.Context) error {
+			menu := gommand.NewEmbedMenu(&disgord.Embed{
+				Title:       "Want to see doge?",
+				Description: "Click the option below.",
+			}, ctx)
+
+			child := menu.NewChildMenu(&disgord.Embed{
+				Image: &disgord.EmbedImage{
+					URL: "https://cdn.vox-cdn.com/thumbor/s6HznC4HCYrV3axUS-7wVOPbC2c=/0x0:1020x680/2050x1367/cdn.vox-cdn.com/assets/3785529/DOGE-10.jpg",
+				},
+			}, gommand.MenuButton{
+				Emoji:       "🇦",
+				Name:        "Show doge",
+				Description: "such doge such wow",
+			})
+			child.AddBackButton()
+
+			_ = ctx.DisplayEmbedMenu(menu)
+
+			return nil
+		},
+	})
+
 	// Handles command errors where possible. If not, just passes it through to the default handler to log to console.
 	// Wanted to use Sentry? You could make a handler for this by capturing and returning false. Don't forget it's in the order if the handlers.
 	router.AddErrorHandler(func(ctx *gommand.Context, err error) bool {

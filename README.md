@@ -90,6 +90,7 @@ It also contains several helper functions:
 - `Channel() (*disgord.Channel, error)`: Get the channel which this is being ran in.
 - `Reply(data ...interface{}) (*disgord.Message, error)`: A shorter way to quickly reply to a message.
 - `WaitForMessage(CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message`: Waits for a message based on the check function you gave.
+- `DisplayEmbedMenu(m *EmbedMenu) error`: Used to display an [embed menu](#embed-menus).
 
 ## Hooking the router to your disgord session
 In the initialisation of your disgord session, you will want to hook the gommand handler with the `Hook` function:
@@ -159,6 +160,11 @@ For ease of use, gommand has the `Category` struct that implements all of these 
 - `Middleware`: An array of [middleware](#middleware) which will be used on each item in the category. This can be nil.
 
 Note that to allow for the easy categorisation of commands and prevent repatition, a pointer should be created somewhere in your codebase (using `var` or before your commands) to a category which multiple commands use and they should all just pass through the same pointer.
+
+## Embed menus
+Gommand contains support for embed menus.
+
+TODO: docs
 
 ## Permission Validators
 Permission validators allow for a quick method to check if the user has permission to run a command.
