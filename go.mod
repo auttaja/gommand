@@ -1,4 +1,4 @@
-module github.com/jakemakesstuff/gommand
+module github.com/auttaja/gommand
 
 go 1.14
 
