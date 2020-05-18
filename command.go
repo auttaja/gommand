@@ -29,6 +29,7 @@ type Command struct {
 	Description          string                   `json:"description"`
 	Usage                string                   `json:"usage"`
 	Category             CategoryInterface        `json:"category"`
+	CommandAttributes    interface{}              `json:"commandAttributes"`
 	PermissionValidators []PermissionValidator    `json:"-"`
 	ArgTransformers      []ArgTransformer         `json:"-"`
 	Middleware           []Middleware             `json:"-"`

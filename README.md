@@ -71,6 +71,7 @@ The command **MUST** have the `Name` (the name of the command) and `Function` (t
     - `Greedy`: If this is true, the parser will keep trying to parse the users arguments until it hits the end of their message or a parse fails. When this happens, it will go to the next parser in the array. Note that if the first argument fails, this means that it was not set and an error will be put into the error handler unless it was set as optional. The greedy argument will be of the type `[]interface{}` (unless `Optional` is set and it was not specified).
 - `Middleware`: An array of [middleware](#middleware) which only applies to this specific command.
 - `Category`: Allows you to set a [Category](#categories) for your command.
+- `CommandAttributes`: A generic interface which you can use for whatever you want.
 
 ## Context
 The context is a core part of the gommand functionality. The context contains several crucial bits of information:
