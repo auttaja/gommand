@@ -8,9 +8,20 @@ import (
 )
 
 // Creates the embeds for the categories.
-func createCategoryEmbeds(prefix string, key CategoryInterface, value []*Command) []*disgord.Embed {
+func createCategoryEmbeds(ctx *Context, key CategoryInterface, value []*Command) []*disgord.Embed {
 	// Defines the number of fields per page.
 	FieldsPerPage := 5
+
+	// Ignore commands which the user can't run.
+	cmds := make([]*Command, 0, len(value))
+	for _, v := range value {
+		if v.HasPermission(ctx) == nil {
+			cmds = append(cmds, v)
+		}
+	}
+	if len(cmds) == 0 {
+		return []*disgord.Embed{}
+	}
 
 	// Creates an array full of Discord embeds.
 	EmbedsLen := int(math.Ceil(float64(len(value)) / float64(FieldsPerPage)))
@@ -28,7 +39,7 @@ func createCategoryEmbeds(prefix string, key CategoryInterface, value []*Command
 			Description = "No description set."
 		}
 		current = append(current, &disgord.EmbedField{
-			Name:   prefix + v.Name + " " + v.Usage,
+			Name:   ctx.Prefix + v.Name + " " + v.Usage,
 			Value:  Description,
 			Inline: false,
 		})
@@ -101,7 +112,7 @@ func defaultHelpCommand() *Command {
 			// Get the embed pages.
 			pages := make([]*disgord.Embed, 0)
 			for k, v := range ctx.Router.GetCommandsOrderedByCategory() {
-				pages = append(pages, createCategoryEmbeds(ctx.Prefix, k, v)...)
+				pages = append(pages, createCategoryEmbeds(ctx, k, v)...)
 			}
 
 			// Send the embed pages.
