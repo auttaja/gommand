@@ -135,6 +135,28 @@ func init() {
 		},
 	})
 
+	// Creates embed pages.
+	router.SetCommand(&gommand.Command{
+		Name:        "embedpages",
+		Description: "Shows embed pages.",
+		Function: func(ctx *gommand.Context) error {
+			_ = gommand.EmbedsPaginator(ctx, []*disgord.Embed{
+				{
+					Title: "Hi",
+				},
+				{
+					Title: "World",
+				},
+				{
+					Image: &disgord.EmbedImage{
+						URL: "https://cdn.vox-cdn.com/thumbor/s6HznC4HCYrV3axUS-7wVOPbC2c=/0x0:1020x680/2050x1367/cdn.vox-cdn.com/assets/3785529/DOGE-10.jpg",
+					},
+				},
+			})
+			return nil
+		},
+	})
+
 	// Handles command errors where possible. If not, just passes it through to the default handler to log to console.
 	// Wanted to use Sentry? You could make a handler for this by capturing and returning false. Don't forget it's in the order if the handlers.
 	router.AddErrorHandler(func(ctx *gommand.Context, err error) bool {
