@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/andersfylling/disgord"
-	"github.com/autaja/gommand"
+	"github.com/auttaja/gommand"
 	"os"
 )
 
