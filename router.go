@@ -81,6 +81,9 @@ func NewRouter(Config *RouterConfig) *Router {
 		msgWaitingQueueLock:   &sync.Mutex{},
 	}
 
+	// Set the help command.
+	r.SetCommand(defaultHelpCommand())
+
 	// If deleted message handler isn't nil, initialise the storage adapter.
 	if r.DeletedMessageHandler != nil {
 		if r.DeletedMessageHandler.MessageCacheStorageAdapter == nil {

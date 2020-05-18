@@ -63,7 +63,7 @@ func (e *EmbedMenu) Display(ChannelID, MessageID snowflake.Snowflake, client dis
 	menuCache[MessageID.String()] = e
 	menuCacheLock.Unlock()
 
-	EmbedCopy := e.Embed
+	EmbedCopy := e.Embed.DeepCopy().(*disgord.Embed)
 	Fields := make([]*disgord.EmbedField, 0)
 	for _, k := range e.Reactions.ReactionSlice {
 		Fields = append(Fields, &disgord.EmbedField{
@@ -72,7 +72,7 @@ func (e *EmbedMenu) Display(ChannelID, MessageID snowflake.Snowflake, client dis
 			Inline: false,
 		})
 	}
-	EmbedCopy.Fields = Fields
+	EmbedCopy.Fields = append(EmbedCopy.Fields, Fields...)
 
 	_, err := client.UpdateMessage(context.TODO(), ChannelID, MessageID).SetContent("").SetEmbed(EmbedCopy).Execute()
 	if err != nil {
