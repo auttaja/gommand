@@ -6,6 +6,7 @@ import (
 	"github.com/andersfylling/snowflake/v4"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // StringTransformer just takes the argument and returns it.
@@ -152,6 +153,16 @@ func RoleTransformer(ctx *Context, Arg string) (role interface{}, err error) {
 			err = nil
 			return
 		}
+	}
+	return
+}
+
+// DurationTransformer is used to transform a duration if possible.
+func DurationTransformer(_ *Context, Arg string) (duration interface{}, err error) {
+	err = &InvalidTransformation{Description: "This was not a valid duration."}
+	duration, e := time.ParseDuration(Arg)
+	if e == nil {
+		err = nil
 	}
 	return
 }
