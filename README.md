@@ -120,6 +120,7 @@ In gommand, every negative action is treated as an error. It is then your job to
 - `*gommand.IncorrectPermissions`: The permissions this user has are incorrect for the command.
 - `*gommand.InvalidArgCount`: The argument count is not correct.
 - `*gommand.InvalidTransformation`: Passed through from a transformer when it cannot transform properly.
+- `*gommand.PanicError`: This is used when a string is returned from a panic. If it isn't a string, the error will just be pushed into the handler.
 
 Using this, we can build a simple error handler that ignores command not found events and logs errors to the chat for the others, although you may wish to implement this differently:
 ```go

@@ -49,3 +49,13 @@ type InvalidTransformation struct {
 func (c *InvalidTransformation) Error() string {
 	return c.Description
 }
+
+// PanicError is used when a string is returned from a panic. If it isn't a string, the error will just be pushed into the handler.
+type PanicError struct {
+	msg string
+}
+
+// Error is used to give the error description.
+func (c *PanicError) Error() string {
+	return c.msg
+}

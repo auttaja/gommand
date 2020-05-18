@@ -74,6 +74,18 @@ func (c *Command) HasPermission(ctx *Context) error {
 
 // Used to run the command.
 func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
+	// Handle recovering from exceptions.
+	defer func() {
+		if r := recover(); r != nil {
+			switch v := r.(type) {
+			case string:
+				ctx.Router.errorHandler(ctx, &PanicError{msg: v})
+			case error:
+				ctx.Router.errorHandler(ctx, v)
+			}
+		}
+	}()
+
 	// Run any permission validators.
 	err = c.HasPermission(ctx)
 	if err != nil {
