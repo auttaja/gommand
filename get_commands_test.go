@@ -21,8 +21,9 @@ func TestGetCommands(t *testing.T) {
 			return nil
 		},
 	})
+	r.RemoveCommand(r.GetCommand("help"))
 	l := len(r.GetAllCommands())
-	if l != 3 {
+	if l != 2 {
 		t.Log("command count should be", l)
 		t.FailNow()
 		return
