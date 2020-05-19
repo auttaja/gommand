@@ -166,3 +166,19 @@ func DurationTransformer(_ *Context, Arg string) (duration interface{}, err erro
 	}
 	return
 }
+
+// AnyTransformer takes multiple transformers and tries to find one which works.
+func AnyTransformer(Transformers ...func(ctx *Context, Arg string) (interface{}, error)) func(ctx *Context, Arg string) (item interface{}, err error) {
+	return func(ctx *Context, Arg string) (item interface{}, err error) {
+		err = &InvalidTransformation{Description: "Unable to transform the argument properly."}
+		for _, v := range Transformers {
+			res, e := v(ctx, Arg)
+			if e == nil {
+				item = res
+				err = nil
+				return
+			}
+		}
+		return
+	}
+}
