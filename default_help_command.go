@@ -24,11 +24,11 @@ func createCategoryEmbeds(ctx *Context, key CategoryInterface, value []*Command)
 	}
 
 	// Creates an array full of Discord embeds.
-	EmbedsLen := int(math.Ceil(float64(len(value)) / float64(FieldsPerPage)))
+	EmbedsLen := int(math.Ceil(float64(len(cmds)) / float64(FieldsPerPage)))
 	Fields := make([][]*disgord.EmbedField, EmbedsLen)
 	CurrentField := 0
 	current := make([]*disgord.EmbedField, 0, FieldsPerPage)
-	for i, v := range value {
+	for i, v := range cmds {
 		if i != 0 && i%FieldsPerPage == 0 {
 			Fields[CurrentField] = current
 			CurrentField++
