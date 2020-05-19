@@ -11,7 +11,7 @@ type ArgTransformer struct {
 	Greedy bool
 
 	// Optional defines if the argument is optional. This can be mixed with greedy or remainder.
-	// This has to be at the end of the argument list.
+	// This has to be either at the end of the argument list or followed by other optional arguments (if you don't combine with Remainder).
 	Optional bool
 
 	// Remainder defines if it should just parse the rest of the arguments.
@@ -125,10 +125,11 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 		ArgCount := 0
 		for _, v := range c.ArgTransformers {
 			ArgCount++
-			if v.Remainder || v.Optional {
+			if v.Remainder {
 				break
 			}
 		}
+
 		// The array containing all transformed arguments.
 		Args := make([]interface{}, ArgCount)
 

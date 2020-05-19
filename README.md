@@ -67,7 +67,7 @@ The command **MUST** have the `Name` (the name of the command) and `Function` (t
         - `gommand.BooleanTransformer`: Transforms the argument into a boolean.
         - `gommand.RoleTransformer`: Transforms the argument into a role.
         - `gommand.DurationTransformer`: Transforms the argument into a duration.
-    - `Optional`: If this is true and the argument does not exist, it will be sert to nil. Note that due to what this does, it has to be at the end of the array.
+    - `Optional`: If this is true and the argument does not exist, it will be set to nil. Note that due to what this does, it has to be either at the end of the argument list or followed by other optional arguments (if you don't combine with Remainder).
     - `Remainder`: If this is true, it will just try and parse the raw remainder of the arguments. If the string is blank it will error with not enough arguments unless optional is set. Note that due to what this does, it has to be at the end of the array.
     - `Greedy`: If this is true, the parser will keep trying to parse the users arguments until it hits the end of their message or a parse fails. When this happens, it will go to the next parser in the array. Note that if the first argument fails, this means that it was not set and an error will be put into the error handler unless it was set as optional. The greedy argument will be of the type `[]interface{}` (unless `Optional` is set and it was not specified).
 - `Middleware`: An array of [middleware](#middleware) which only applies to this specific command.

@@ -47,6 +47,62 @@ func TestOptional(t *testing.T) {
 		},
 	})
 
+	// Handle multiple optional arguments.
+	r.SetCommand(&Command{
+		Name: "multioptional",
+		ArgTransformers: []ArgTransformer{
+			{
+				Function: UIntTransformer,
+			},
+			{
+				Function: StringTransformer,
+				Optional: true,
+			},
+			{
+				Function: StringTransformer,
+				Optional: true,
+			},
+		},
+		Function: func(ctx *Context) error {
+			strexists := ctx.Args[0].(uint64) == 1
+			s, ok := ctx.Args[1].(string)
+			if ok {
+				if !strexists {
+					t.Log("string exists when it shouldn't: ", s)
+					t.FailNow()
+					return nil
+				}
+				if s != "test" {
+					t.Log("string is", s)
+					t.FailNow()
+					return nil
+				}
+			} else if strexists {
+				t.Log("string doesn't exist.")
+				t.FailNow()
+				return nil
+			}
+			s, ok = ctx.Args[2].(string)
+			if ok {
+				if !strexists {
+					t.Log("string exists when it shouldn't: ", s)
+					t.FailNow()
+					return nil
+				}
+				if s != "123" {
+					t.Log("string is", s)
+					t.FailNow()
+					return nil
+				}
+			} else if strexists {
+				t.Log("string doesn't exist.")
+				t.FailNow()
+				return nil
+			}
+			return nil
+		},
+	})
+
 	// Handle optional remainders.
 	r.SetCommand(&Command{
 		Name: "remainder",
@@ -136,6 +192,12 @@ func TestOptional(t *testing.T) {
 	})
 	r.msgCmdProcessor(nil, &disgord.MessageCreate{
 		Message: mockMessage("%oneoptional 1 test"),
+	})
+	r.msgCmdProcessor(nil, &disgord.MessageCreate{
+		Message: mockMessage("%multioptional 0"),
+	})
+	r.msgCmdProcessor(nil, &disgord.MessageCreate{
+		Message: mockMessage("%multioptional 1 test \"123\""),
 	})
 	r.msgCmdProcessor(nil, &disgord.MessageCreate{
 		Message: mockMessage("%remainder 0"),
