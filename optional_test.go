@@ -1,9 +1,6 @@
 package gommand
 
-import (
-	"github.com/andersfylling/disgord"
-	"testing"
-)
+import "testing"
 
 // TestOptional is used to test the optional argument parser.
 func TestOptional(t *testing.T) {
@@ -187,28 +184,12 @@ func TestOptional(t *testing.T) {
 	})
 
 	// Run the commands.
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%oneoptional 0"),
-	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%oneoptional 1 test"),
-	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%multioptional 0"),
-	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%multioptional 1 test \"123\""),
-	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%remainder 0"),
-	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%remainder 1 test"),
-	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%greedy 0"),
-	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%greedy 1 1 1  1 1"),
-	})
+	r.CommandProcessor(nil, mockMessage("%oneoptional 0"))
+	r.CommandProcessor(nil, mockMessage("%oneoptional 1 test"))
+	r.CommandProcessor(nil, mockMessage("%multioptional 0"))
+	r.CommandProcessor(nil, mockMessage("%multioptional 1 test \"123\""))
+	r.CommandProcessor(nil, mockMessage("%remainder 0"))
+	r.CommandProcessor(nil, mockMessage("%remainder 1 test"))
+	r.CommandProcessor(nil, mockMessage("%greedy 0"))
+	r.CommandProcessor(nil, mockMessage("%greedy 1 1 1  1 1"))
 }

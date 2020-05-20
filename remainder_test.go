@@ -1,9 +1,6 @@
 package gommand
 
-import (
-	"github.com/andersfylling/disgord"
-	"testing"
-)
+import "testing"
 
 // TestRemainder is used to test the remainder argument parser.
 func TestRemainder(t *testing.T) {
@@ -33,7 +30,5 @@ func TestRemainder(t *testing.T) {
 		t.FailNow()
 		return true
 	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%remainder   \"hello\""),
-	})
+	r.CommandProcessor(nil, mockMessage("%remainder   \"hello\""))
 }

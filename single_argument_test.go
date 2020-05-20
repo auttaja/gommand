@@ -1,7 +1,6 @@
 package gommand
 
 import (
-	"github.com/andersfylling/disgord"
 	"strings"
 	"testing"
 )
@@ -33,12 +32,8 @@ func TestSingleArgument(t *testing.T) {
 		t.FailNow()
 		return true
 	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%echo hello"),
-	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%echo \"hello\""),
-	})
+	r.CommandProcessor(nil, mockMessage("%echo hello"))
+	r.CommandProcessor(nil, mockMessage("%echo \"hello\""))
 }
 
 // BenchmarkSingleArgument is used to benchmark a basic echo command.
@@ -64,7 +59,5 @@ func BenchmarkSingleArgument(b *testing.B) {
 			return nil
 		},
 	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%echo \"hello\""),
-	})
+	r.CommandProcessor(nil, mockMessage("%echo \"hello\""))
 }

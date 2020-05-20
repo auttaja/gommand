@@ -1,9 +1,6 @@
 package gommand
 
-import (
-	"github.com/andersfylling/disgord"
-	"testing"
-)
+import "testing"
 
 // TestMiddleware is used to test the middleware functionality.
 func TestMiddleware(t *testing.T) {
@@ -46,7 +43,5 @@ func TestMiddleware(t *testing.T) {
 		t.FailNow()
 		return true
 	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%middleware"),
-	})
+	r.CommandProcessor(nil, mockMessage("%middleware"))
 }

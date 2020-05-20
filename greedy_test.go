@@ -1,7 +1,6 @@
 package gommand
 
 import (
-	"github.com/andersfylling/disgord"
 	"testing"
 )
 
@@ -45,7 +44,5 @@ func TestGreedy(t *testing.T) {
 		t.FailNow()
 		return true
 	})
-	r.msgCmdProcessor(nil, &disgord.MessageCreate{
-		Message: mockMessage("%add 1 1 1  1 hello"),
-	})
+	r.CommandProcessor(nil, mockMessage("%add 1 1 1  1 hello"))
 }

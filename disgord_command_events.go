@@ -32,10 +32,10 @@ func (r *Router) userUpdate(_ disgord.Session, evt *disgord.UserUpdate) {
 	r.cmdLock.Unlock()
 }
 
-// Does the message command processing.
-func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) {
+// CommandProcessor is used to do the message command processing.
+func (r *Router) CommandProcessor(s disgord.Session, msg *disgord.Message) {
 	// If the message is from a bot or this isn't in a guild, ignore it.
-	if evt.Message.Author.Bot || evt.Message.IsDirectMessage() {
+	if msg.Author.Bot || msg.IsDirectMessage() {
 		return
 	}
 
@@ -44,7 +44,7 @@ func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) 
 
 	// Create the context.
 	ctx := &Context{
-		Message:          evt.Message,
+		Message:          msg,
 		BotUser:          r.BotUser,
 		Router:           r,
 		Session:          s,
@@ -53,7 +53,7 @@ func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) 
 	}
 
 	// Create a string iterator of the message content.
-	reader := &StringIterator{Text: evt.Message.Content}
+	reader := &StringIterator{Text: msg.Content}
 
 	// Run a prefix check.
 	if !r.PrefixCheck(ctx, reader) {
@@ -64,14 +64,14 @@ func (r *Router) msgCmdProcessor(s disgord.Session, evt *disgord.MessageCreate) 
 
 	// The member should be patched into the message object here to make it easier.
 	if patchMember {
-		member, err := s.GetMember(context.TODO(), evt.Message.GuildID, evt.Message.Author.ID)
+		member, err := s.GetMember(context.TODO(), msg.GuildID, msg.Author.ID)
 		if err != nil {
 			r.cmdLock.RUnlock()
 			r.errorHandler(ctx, err)
 			return
 		}
-		member.GuildID = evt.Message.GuildID
-		evt.Message.Member = member
+		member.GuildID = msg.GuildID
+		msg.Member = member
 	}
 
 	// Iterate the message until the space.
@@ -163,7 +163,7 @@ func (r *Router) msgCreate(s disgord.Session, evt *disgord.MessageCreate) {
 	}()
 
 	// Launch the handler in a go-routine.
-	go r.msgCmdProcessor(s, evt)
+	go r.CommandProcessor(s, evt.Message)
 }
 
 // Hook is used to hook all required events into the disgord client.
