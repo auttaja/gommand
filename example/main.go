@@ -21,16 +21,24 @@ var router = gommand.NewRouter(&gommand.RouterConfig{
 	},
 })
 
+// An example of building your own struct for a command.
+type ping struct {
+	gommand.CommandBasics
+}
+
+func (p *ping) Init() {
+	p.Name = "ping"
+	p.Description = "Responds with pong."
+}
+
+func (p *ping) CommandFunction(ctx *gommand.Context) error {
+	_, _ = ctx.Reply("Pong!")
+	return nil
+}
+
 func init() {
 	// A simple command to respond with pong.
-	router.SetCommand(&gommand.Command{
-		Name:        "ping",
-		Description: "Responds with pong.",
-		Function: func(ctx *gommand.Context) error {
-			_, _ = ctx.Reply("Pong!")
-			return nil
-		},
-	})
+	router.SetCommand(&ping{})
 
 	// A simple command to tag the user specified.
 	router.SetCommand(&gommand.Command{

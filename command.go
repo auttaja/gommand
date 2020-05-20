@@ -22,6 +22,23 @@ type ArgTransformer struct {
 	Function func(ctx *Context, Arg string) (interface{}, error)
 }
 
+// CommandInterface is used to define a interface which is used for commands.
+type CommandInterface interface {
+	// Get the attributes of the command.
+	GetName() string
+	GetAliases() []string
+	GetDescription() string
+	GetUsage() string
+	GetCategory() CategoryInterface
+	GetPermissionValidators() []PermissionValidator
+	GetArgTransformers() []ArgTransformer
+	GetMiddleware() []Middleware
+
+	// Initialisation function.
+	Init()
+	CommandFunction(ctx *Context) error
+}
+
 // Command defines a command which can be used within the Router.
 type Command struct {
 	Name                 string                   `json:"name"`
@@ -36,9 +53,60 @@ type Command struct {
 	Function             func(ctx *Context) error `json:"-"`
 }
 
-// HasPermission is used to run through the permission validators and check if the user has permission.
+// GetName is used to get the name.
+func (c *Command) GetName() string {
+	return c.Name
+}
+
+// GetAliases is used to get the aliases.
+func (c *Command) GetAliases() []string {
+	if c.Aliases == nil {
+		return []string{}
+	}
+	return c.Aliases
+}
+
+// GetDescription is used to get the description.
+func (c *Command) GetDescription() string {
+	return c.Description
+}
+
+// GetUsage is used to get the usage.
+func (c *Command) GetUsage() string {
+	return c.Usage
+}
+
+// GetCategory is used to get the category.
+func (c *Command) GetCategory() CategoryInterface {
+	return c.Category
+}
+
+// GetPermissionValidators is used to get the permission validators.
+func (c *Command) GetPermissionValidators() []PermissionValidator {
+	return c.PermissionValidators
+}
+
+// GetArgTransformers is used to get the arg transformers.
+func (c *Command) GetArgTransformers() []ArgTransformer {
+	return c.ArgTransformers
+}
+
+// GetMiddleware is used to get the middleware.
+func (c *Command) GetMiddleware() []Middleware {
+	return c.Middleware
+}
+
+// Init does nothing (it is unneeded for this struct).
+func (c *Command) Init() {}
+
+// CommandFunction is used to run the command function.
+func (c *Command) CommandFunction(ctx *Context) error {
+	return c.Function(ctx)
+}
+
+// CommandHasPermission is used to run through the permission validators and check if the user has permission.
 // The error will be of the IncorrectPermissions type if they do not have permission.
-func (c *Command) HasPermission(ctx *Context) error {
+func CommandHasPermission(ctx *Context, c CommandInterface) error {
 	// Run any permission validators on a global scale.
 	if ctx.Router.permissionValidators != nil {
 		for _, v := range ctx.Router.permissionValidators {
@@ -50,8 +118,8 @@ func (c *Command) HasPermission(ctx *Context) error {
 	}
 
 	// Run any permission validators on a category scale.
-	if c.Category != nil {
-		for _, v := range c.Category.GetPermissionValidators() {
+	if c.GetCategory() != nil {
+		for _, v := range c.GetCategory().GetPermissionValidators() {
 			msg, ok := v(ctx)
 			if !ok {
 				return &IncorrectPermissions{err: msg}
@@ -60,8 +128,8 @@ func (c *Command) HasPermission(ctx *Context) error {
 	}
 
 	// Run any permission validators on a local scale.
-	if c.PermissionValidators != nil {
-		for _, v := range c.PermissionValidators {
+	if c.GetPermissionValidators() != nil {
+		for _, v := range c.GetPermissionValidators() {
 			msg, ok := v(ctx)
 			if !ok {
 				return &IncorrectPermissions{err: msg}
@@ -73,8 +141,14 @@ func (c *Command) HasPermission(ctx *Context) error {
 	return nil
 }
 
+// HasPermission is a shorthand for running CommandHasPermission on the command.
+// This is here to prevent a breaking change.
+func (c *Command) HasPermission(ctx *Context) error {
+	return CommandHasPermission(ctx, c)
+}
+
 // Used to run the command.
-func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
+func runCommand(ctx *Context, reader *StringIterator, c CommandInterface) (err error) {
 	// Handle recovering from exceptions.
 	defer func() {
 		if r := recover(); r != nil {
@@ -88,7 +162,7 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 	}()
 
 	// Run any permission validators.
-	err = c.HasPermission(ctx)
+	err = CommandHasPermission(ctx, c)
 	if err != nil {
 		return
 	}
@@ -102,16 +176,16 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 			}
 		}
 	}
-	if c.Category != nil {
-		for _, v := range c.Category.GetMiddleware() {
+	if c.GetCategory() != nil {
+		for _, v := range c.GetCategory().GetMiddleware() {
 			err = v(ctx)
 			if err != nil {
 				return
 			}
 		}
 	}
-	if c.Middleware != nil {
-		for _, v := range c.Middleware {
+	if c.GetMiddleware() != nil {
+		for _, v := range c.GetMiddleware() {
 			err = v(ctx)
 			if err != nil {
 				return
@@ -120,10 +194,10 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 	}
 
 	// Transform all arguments if this is possible. If not, error.
-	if c.ArgTransformers != nil {
+	if c.GetArgTransformers() != nil {
 		// Slice the arguments.
 		ArgCount := 0
-		for _, v := range c.ArgTransformers {
+		for _, v := range c.GetArgTransformers() {
 			ArgCount++
 			if v.Remainder {
 				break
@@ -178,7 +252,7 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 		}
 
 		// This is where we transform each argument.
-		for i, v := range c.ArgTransformers {
+		for i, v := range c.GetArgTransformers() {
 			if v.Remainder {
 				// Get the remainder.
 				remainder, _ := reader.GetRemainder(true)
@@ -258,6 +332,6 @@ func (c *Command) run(ctx *Context, reader *StringIterator) (err error) {
 	}
 
 	// Run the command and return.
-	err = c.Function(ctx)
+	err = c.CommandFunction(ctx)
 	return
 }

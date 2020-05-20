@@ -12,7 +12,7 @@ type Context struct {
 	BotUser          *disgord.User          `json:"botUser"`
 	Router           *Router                `json:"-"`
 	Session          disgord.Session        `json:"session"`
-	Command          *Command               `json:"command"`
+	Command          CommandInterface       `json:"command"`
 	RawArgs          string                 `json:"rawArgs"`
 	Args             []interface{}          `json:"args"`
 	MiddlewareParams map[string]interface{} `json:"middlewareParams"`
@@ -21,7 +21,7 @@ type Context struct {
 // Replay is used to replay a command.
 func (c *Context) Replay() error {
 	c.Args = []interface{}{}
-	return c.Command.run(c, &StringIterator{Text: c.RawArgs})
+	return runCommand(c, &StringIterator{Text: c.RawArgs}, c.Command)
 }
 
 // BotMember is used to get the bot as a member of the server this was within.

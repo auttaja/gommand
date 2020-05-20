@@ -126,7 +126,7 @@ func (r *Router) CommandProcessor(s disgord.Session, msg *disgord.Message) {
 
 	// Run the command handler.
 	r.cmdLock.RUnlock()
-	err := cmd.run(ctx, reader)
+	err := runCommand(ctx, reader, cmd)
 	if err != nil {
 		r.errorHandler(ctx, err)
 	}

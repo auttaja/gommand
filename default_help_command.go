@@ -8,14 +8,14 @@ import (
 )
 
 // Creates the embeds for the categories.
-func createCategoryEmbeds(ctx *Context, key CategoryInterface, value []*Command) []*disgord.Embed {
+func createCategoryEmbeds(ctx *Context, key CategoryInterface, value []CommandInterface) []*disgord.Embed {
 	// Defines the number of fields per page.
 	FieldsPerPage := 5
 
 	// Ignore commands which the user can't run.
-	cmds := make([]*Command, 0, len(value))
+	cmds := make([]CommandInterface, 0, len(value))
 	for _, v := range value {
-		if v.HasPermission(ctx) == nil {
+		if CommandHasPermission(ctx, v) == nil {
 			cmds = append(cmds, v)
 		}
 	}
@@ -34,12 +34,12 @@ func createCategoryEmbeds(ctx *Context, key CategoryInterface, value []*Command)
 			CurrentField++
 			current = make([]*disgord.EmbedField, 0, FieldsPerPage)
 		}
-		Description := v.Description
+		Description := v.GetDescription()
 		if Description == "" {
 			Description = "No description set."
 		}
 		current = append(current, &disgord.EmbedField{
-			Name:   ctx.Prefix + v.Name + " " + v.Usage,
+			Name:   ctx.Prefix + v.GetName() + " " + v.GetUsage(),
 			Value:  Description,
 			Inline: false,
 		})
@@ -97,12 +97,12 @@ func defaultHelpCommand() *Command {
 					})
 					return nil
 				}
-				desc := cmd.Description
-				if cmd.HasPermission(ctx) != nil {
+				desc := cmd.GetDescription()
+				if CommandHasPermission(ctx, cmd) != nil {
 					desc += "\n\n**You do not have permission to run this.**"
 				}
 				_, _ = ctx.Reply(disgord.Embed{
-					Title:       ctx.Prefix + cmdname + " " + cmd.Usage,
+					Title:       ctx.Prefix + cmdname + " " + cmd.GetUsage(),
 					Description: desc,
 					Color:       2818303,
 				})

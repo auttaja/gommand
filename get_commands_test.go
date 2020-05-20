@@ -29,12 +29,12 @@ func TestGetCommands(t *testing.T) {
 		return
 	}
 	ordered := r.GetCommandsOrderedByCategory()
-	if ordered[nil][0].Name != "a" {
+	if ordered[nil][0].GetName() != "a" {
 		t.Log("command is invalid")
 		t.FailNow()
 		return
 	}
-	if ordered[cat][0].Name != "b" {
+	if ordered[cat][0].GetName() != "b" {
 		t.Log("command is invalid")
 		t.FailNow()
 		return

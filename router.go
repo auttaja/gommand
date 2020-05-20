@@ -49,7 +49,7 @@ type Router struct {
 	BotUser               *disgord.User         `json:"-"`
 	PrefixCheck           PrefixCheck           `json:"-"`
 	CustomCommandsHandler CustomCommandsHandler `json:"-"`
-	cmds                  map[string]*Command
+	cmds                  map[string]CommandInterface
 	cmdLock               *sync.RWMutex
 	errorHandlers         []ErrorHandler
 	permissionValidators  []PermissionValidator
@@ -71,7 +71,7 @@ func NewRouter(Config *RouterConfig) *Router {
 	// Set the Router.
 	r := &Router{
 		PrefixCheck:           Config.PrefixCheck,
-		cmds:                  map[string]*Command{},
+		cmds:                  map[string]CommandInterface{},
 		cmdLock:               &sync.RWMutex{},
 		errorHandlers:         Config.ErrorHandlers,
 		permissionValidators:  Config.PermissionValidators,
@@ -123,7 +123,7 @@ func (r *Router) AddErrorHandler(Handler ErrorHandler) {
 
 // GetCommand is used to get a command from the Router if it exists.
 // If the command doesn't exist, this will be a nil pointer.
-func (r *Router) GetCommand(Name string) *Command {
+func (r *Router) GetCommand(Name string) CommandInterface {
 	r.cmdLock.RLock()
 	cmd := r.cmds[strings.ToLower(Name)]
 	r.cmdLock.RUnlock()
@@ -131,27 +131,26 @@ func (r *Router) GetCommand(Name string) *Command {
 }
 
 // SetCommand is used to set a command.
-func (r *Router) SetCommand(c *Command) {
+func (r *Router) SetCommand(c CommandInterface) {
+	c.Init()
 	r.cmdLock.Lock()
-	c.Name = strings.ToLower(c.Name)
-	r.cmds[c.Name] = c
-	if c.Aliases == nil {
-		c.Aliases = []string{}
-	}
-	for i, v := range c.Aliases {
-		v = strings.ToLower(v)
-		c.Aliases[i] = v
-		r.cmds[v] = c
+	name := strings.ToLower(c.GetName())
+	r.cmds[name] = c
+	if c.GetAliases() != nil {
+		for _, v := range c.GetAliases() {
+			v = strings.ToLower(v)
+			r.cmds[v] = c
+		}
 	}
 	r.cmdLock.Unlock()
 }
 
 // RemoveCommand is used to remove a command from the Router.
-func (r *Router) RemoveCommand(c *Command) {
+func (r *Router) RemoveCommand(c CommandInterface) {
 	r.cmdLock.Lock()
-	delete(r.cmds, strings.ToLower(c.Name))
-	if c.Aliases != nil {
-		for _, v := range c.Aliases {
+	delete(r.cmds, strings.ToLower(c.GetName()))
+	if c.GetAliases() != nil {
+		for _, v := range c.GetAliases() {
 			delete(r.cmds, strings.ToLower(v))
 		}
 	}
@@ -159,27 +158,27 @@ func (r *Router) RemoveCommand(c *Command) {
 }
 
 // GetAllCommands is used to get all of the commands.
-func (r *Router) GetAllCommands() []*Command {
+func (r *Router) GetAllCommands() []CommandInterface {
 	// Read lock the commands.
 	r.cmdLock.RLock()
 
 	// Get the command count.
 	count := 0
 	for k, v := range r.cmds {
-		if k == v.Name {
+		if k == v.GetName() {
 			count++
 		}
 	}
 
 	// Allocate the commands.
-	a := make([]*Command, count)
+	a := make([]CommandInterface, count)
 
 	// Set the index.
 	index := 0
 
 	// Go through each command and add it to the array.
 	for k, v := range r.cmds {
-		if k == v.Name {
+		if k == v.GetName() {
 			a[index] = v
 			index++
 		}
@@ -193,15 +192,15 @@ func (r *Router) GetAllCommands() []*Command {
 }
 
 // GetCommandsOrderedByCategory is used to order commands by the categories.
-func (r *Router) GetCommandsOrderedByCategory() map[CategoryInterface][]*Command {
-	m := map[CategoryInterface][]*Command{}
+func (r *Router) GetCommandsOrderedByCategory() map[CategoryInterface][]CommandInterface {
+	m := map[CategoryInterface][]CommandInterface{}
 	cmds := r.GetAllCommands()
 	for _, v := range cmds {
-		items, ok := m[v.Category]
+		items, ok := m[v.GetCategory()]
 		if !ok {
-			items = []*Command{}
+			items = []CommandInterface{}
 		}
-		m[v.Category] = append(items, v)
+		m[v.GetCategory()] = append(items, v)
 	}
 	return m
 }
