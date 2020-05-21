@@ -3,9 +3,10 @@ package gommand
 import (
 	"context"
 	"errors"
+	"strconv"
+
 	"github.com/andersfylling/disgord"
 	"github.com/andersfylling/snowflake/v4"
-	"strconv"
 )
 
 // EmbedsPaginator is used to paginate together several embeds.
@@ -49,7 +50,7 @@ func EmbedsPaginator(ctx *Context, Pages []*disgord.Embed) error {
 				Emoji:       "▶️",
 				Name:        "Forward",
 				Description: "Goes forward a page.",
-			})
+			}, nil)
 			LastPage.Reactions.Add(MenuReaction{
 				Button: MenuButton{
 					Emoji:       "◀️",
