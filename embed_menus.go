@@ -89,7 +89,7 @@ func (e *EmbedMenu) Display(ChannelID, MessageID snowflake.Snowflake, client dis
 }
 
 // NewChildMenu is used to create a new child menu.
-func (e *EmbedMenu) NewChildMenu(embed *disgord.Embed, item MenuButton, onDisplay func()) *EmbedMenu {
+func (e *EmbedMenu) NewChildMenu(embed *disgord.Embed, item MenuButton, callback func()) *EmbedMenu {
 	NewEmbedMenu := &EmbedMenu{
 		Reactions: &MenuReactions{
 			ReactionSlice: []MenuReaction{},
@@ -103,7 +103,7 @@ func (e *EmbedMenu) NewChildMenu(embed *disgord.Embed, item MenuButton, onDispla
 		Function: func(ChannelID, MessageID snowflake.Snowflake, _ *EmbedMenu, client disgord.Session) {
 			_ = client.DeleteAllReactions(context.TODO(), ChannelID, MessageID)
 			_ = NewEmbedMenu.Display(ChannelID, MessageID, client)
-			go onDisplay()
+			go callback()
 		},
 	}
 	e.Reactions.Add(Reaction)
