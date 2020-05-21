@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"os"
+
 	"github.com/andersfylling/disgord"
 	"github.com/auttaja/gommand"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 // Create the command router.
@@ -135,6 +136,8 @@ func init() {
 				Emoji:       "🇦",
 				Name:        "Show doge",
 				Description: "such doge such wow",
+			}, func() {
+				println("Doge was here!")
 			})
 			child.AddBackButton()
 
