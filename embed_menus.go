@@ -3,9 +3,10 @@ package gommand
 import (
 	"context"
 	"fmt"
+	"sync"
+
 	"github.com/andersfylling/disgord"
 	"github.com/andersfylling/snowflake/v4"
-	"sync"
 )
 
 // This is used to represent all of the current menus.
@@ -88,7 +89,7 @@ func (e *EmbedMenu) Display(ChannelID, MessageID snowflake.Snowflake, client dis
 }
 
 // NewChildMenu is used to create a new child menu.
-func (e *EmbedMenu) NewChildMenu(embed *disgord.Embed, item MenuButton) *EmbedMenu {
+func (e *EmbedMenu) NewChildMenu(embed *disgord.Embed, item MenuButton, onDisplay func()) *EmbedMenu {
 	NewEmbedMenu := &EmbedMenu{
 		Reactions: &MenuReactions{
 			ReactionSlice: []MenuReaction{},
@@ -102,6 +103,7 @@ func (e *EmbedMenu) NewChildMenu(embed *disgord.Embed, item MenuButton) *EmbedMe
 		Function: func(ChannelID, MessageID snowflake.Snowflake, _ *EmbedMenu, client disgord.Session) {
 			_ = client.DeleteAllReactions(context.TODO(), ChannelID, MessageID)
 			_ = NewEmbedMenu.Display(ChannelID, MessageID, client)
+			go onDisplay()
 		},
 	}
 	e.Reactions.Add(Reaction)
