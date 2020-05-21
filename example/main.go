@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/andersfylling/disgord"
 	"github.com/auttaja/gommand"
+	"github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -190,9 +191,10 @@ func init() {
 }
 
 func main() {
+	logrus.SetLevel(logrus.DebugLevel)
 	client := disgord.New(disgord.Config{
 		BotToken: os.Getenv("TOKEN"),
-		Logger:   disgord.DefaultLogger(false),
+		Logger:   logrus.New(),
 	})
 	router.Hook(client)
 	_ = client.StayConnectedUntilInterrupted(context.Background())

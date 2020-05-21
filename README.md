@@ -98,10 +98,15 @@ It also contains several helper functions:
 ## Hooking the router to your disgord session
 In the initialisation of your disgord session, you will want to hook the gommand handler with the `Hook` function:
 ```go
+// You can use any logger you like.
+// In this example, we use logrus.
+import "github.com/sirupsen/logrus"
+logrus.SetLevel(logrus.DebugLevel)
+
 // Your client config can be how you please.
 client := disgord.New(disgord.Config{
     BotToken: os.Getenv("TOKEN"),
-    Logger:   disgord.DefaultLogger(false),
+    Logger:   logrus.New(),
 })
 
 // Hook the router.
