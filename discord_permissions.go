@@ -9,12 +9,13 @@ func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(ctx *
 		if err != nil {
 			return err.Error(), false
 		}
-		if guild.OwnerID == ctx.Message.Author.ID {
-			return "", true
-		}
 		perms, err := ctx.Message.Member.GetPermissions(context.TODO(), ctx.Session)
 		if err != nil {
 			return err.Error(), false
+		}
+		// 0x00000008 is the ADMINISTRATOR permission's hex code.
+		if guild.OwnerID == ctx.Message.Author.ID || (perms&0x00000008) == 0x00000008 {
+			return "", true
 		}
 		return "You must have the  \"" + PermissionName + "\" permission to run this command.", (perms & PermissionsHex) == PermissionsHex
 	}
