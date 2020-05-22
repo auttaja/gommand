@@ -16,6 +16,12 @@ func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(ctx *
 		if err != nil {
 			return err.Error(), false
 		}
+
+		// 0x00000008 is the ADMINISTRATOR permission hex code and bypasses everything.
+		if (perms & 0x00000008) == 0x00000008 {
+			return "", true
+		}
+
 		return "You must have the  \"" + PermissionName + "\" permission to run this command.", (perms & PermissionsHex) == PermissionsHex
 	}
 }
