@@ -30,7 +30,7 @@ type MenuButton struct {
 
 // MenuReaction represents the button and the function which it triggers.
 type MenuReaction struct {
-	Button   MenuButton
+	Button   *MenuButton
 	Function func(ChannelID, MessageID snowflake.Snowflake, _ *EmbedMenu, client disgord.Session)
 }
 
@@ -53,7 +53,7 @@ func (mr *MenuReactions) Add(reaction MenuReaction) {
 	mr.ReactionSlice = Slice
 }
 
-// AddParent is used to add a new parent menu.
+// AddParentMenu is used to add a new parent menu.
 func (e *EmbedMenu) AddParentMenu(Menu *EmbedMenu) {
 	e.parent = Menu
 }
@@ -88,22 +88,35 @@ func (e *EmbedMenu) Display(ChannelID, MessageID snowflake.Snowflake, client dis
 	return nil
 }
 
+// ChildMenuOptions are options which can be set when creating a child menu.
+type ChildMenuOptions struct {
+	Embed        *disgord.Embed `json:"embed"`
+	Button       *MenuButton    `json:"button"`
+	BeforeAction func()         `json:"-"`
+	AfterAction  func()         `json:"-"`
+}
+
 // NewChildMenu is used to create a new child menu.
-func (e *EmbedMenu) NewChildMenu(embed *disgord.Embed, item MenuButton, callback func()) *EmbedMenu {
+func (e *EmbedMenu) NewChildMenu(options *ChildMenuOptions) *EmbedMenu {
 	NewEmbedMenu := &EmbedMenu{
 		Reactions: &MenuReactions{
 			ReactionSlice: []MenuReaction{},
 		},
-		Embed:    embed,
+		Embed:    options.Embed,
 		MenuInfo: e.MenuInfo,
 	}
 	NewEmbedMenu.parent = e
 	Reaction := MenuReaction{
-		Button: item,
+		Button: options.Button,
 		Function: func(ChannelID, MessageID snowflake.Snowflake, _ *EmbedMenu, client disgord.Session) {
+			if options.BeforeAction != nil {
+				options.BeforeAction()
+			}
 			_ = client.DeleteAllReactions(context.TODO(), ChannelID, MessageID)
 			_ = NewEmbedMenu.Display(ChannelID, MessageID, client)
-			go callback()
+			if options.AfterAction != nil {
+				options.AfterAction()
+			}
 		},
 	}
 	e.Reactions.Add(Reaction)
@@ -113,7 +126,7 @@ func (e *EmbedMenu) NewChildMenu(embed *disgord.Embed, item MenuButton, callback
 // AddBackButton is used to add a back Button to the page.
 func (e *EmbedMenu) AddBackButton() {
 	Reaction := MenuReaction{
-		Button: MenuButton{
+		Button: &MenuButton{
 			Description: "Goes back to the parent menu.",
 			Name:        "Back",
 			Emoji:       "⬆",

@@ -46,13 +46,16 @@ func EmbedsPaginator(ctx *Context, Pages []*disgord.Embed) error {
 			LastPage = FirstPage
 		} else {
 			PageBefore := LastPage
-			LastPage = LastPage.NewChildMenu(em, MenuButton{
-				Emoji:       "▶️",
-				Name:        "Forward",
-				Description: "Goes forward a page.",
-			}, nil)
+			LastPage = LastPage.NewChildMenu(&ChildMenuOptions{
+				Embed: em,
+				Button: &MenuButton{
+					Emoji:       "▶️",
+					Name:        "Forward",
+					Description: "Goes forward a page.",
+				},
+			})
 			LastPage.Reactions.Add(MenuReaction{
-				Button: MenuButton{
+				Button: &MenuButton{
 					Emoji:       "◀️",
 					Name:        "Back",
 					Description: "Goes back a page.",

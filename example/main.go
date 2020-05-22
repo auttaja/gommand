@@ -128,16 +128,20 @@ func init() {
 				Description: "Click the option below.",
 			}, ctx)
 
-			child := menu.NewChildMenu(&disgord.Embed{
-				Image: &disgord.EmbedImage{
-					URL: "https://cdn.vox-cdn.com/thumbor/s6HznC4HCYrV3axUS-7wVOPbC2c=/0x0:1020x680/2050x1367/cdn.vox-cdn.com/assets/3785529/DOGE-10.jpg",
+			child := menu.NewChildMenu(&gommand.ChildMenuOptions{
+				Embed: &disgord.Embed{
+					Image: &disgord.EmbedImage{
+						URL: "https://cdn.vox-cdn.com/thumbor/s6HznC4HCYrV3axUS-7wVOPbC2c=/0x0:1020x680/2050x1367/cdn.vox-cdn.com/assets/3785529/DOGE-10.jpg",
+					},
 				},
-			}, gommand.MenuButton{
-				Emoji:       "🇦",
-				Name:        "Show doge",
-				Description: "such doge such wow",
-			}, func() {
-				println("Doge was here!")
+				Button: &gommand.MenuButton{
+					Emoji:       "🇦",
+					Name:        "Show doge",
+					Description: "such doge such wow",
+				},
+				AfterAction: func() {
+					println("Doge was here!")
+				},
 			})
 			child.AddBackButton()
 
