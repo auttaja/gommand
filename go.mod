@@ -5,5 +5,4 @@ go 1.14
 require (
 	github.com/andersfylling/disgord v0.17.0
 	github.com/andersfylling/snowflake/v4 v4.0.2
-	github.com/sirupsen/logrus v1.6.0
 )
