@@ -41,6 +41,10 @@ type DeletedMessageHandler struct {
 
 // Removes the guild from the cache.
 func (d *DeletedMessageHandler) guildDelete(_ disgord.Session, evt *disgord.GuildDelete) {
+	if evt.UnavailableGuild.Unavailable {
+		// We shouldn't purge the guilds messages. The guild is simply down.
+		return
+	}
 	go func() {
 		ids := d.MessageCacheStorageAdapter.GetAllChannelIDs(evt.UnavailableGuild.ID.String())
 		d.MessageCacheStorageAdapter.RemoveGuild(evt.UnavailableGuild.ID.String())
