@@ -3,6 +3,7 @@ package gommand
 import (
 	"context"
 	"github.com/andersfylling/disgord"
+	"github.com/andersfylling/snowflake/v4"
 )
 
 // The default number of messages that will be cached by the storage adapter.
@@ -14,18 +15,18 @@ type MessageCacheStorageAdapter interface {
 	Init()
 
 	// Related to message caching.
-	GetAndDelete(ChannelID, MessageID string) *disgord.Message
-	Delete(ChannelID, MessageID string)
-	DeleteChannelsMessages(ChannelID string)
-	Set(ChannelID, MessageID string, Message *disgord.Message, Limit uint)
+	GetAndDelete(ChannelID, MessageID snowflake.Snowflake) *disgord.Message
+	Delete(ChannelID, MessageID snowflake.Snowflake)
+	DeleteChannelsMessages(ChannelID snowflake.Snowflake)
+	Set(ChannelID, MessageID snowflake.Snowflake, Message *disgord.Message, Limit uint)
 
 	// Related to channel and guild ID relationship caching.
 	// Channel ID's are NOT confirmed to be unique and will be repeated on bot reboot as per the Discord API.
 	// You should manage this in your adapter.
-	GetAllChannelIDs(GuildID string) []string
-	AddChannelID(GuildID, ChannelID string)
-	RemoveChannelID(GuildID, ChannelID string)
-	RemoveGuild(GuildID string)
+	GetAllChannelIDs(GuildID snowflake.Snowflake) []snowflake.Snowflake
+	AddChannelID(GuildID, ChannelID snowflake.Snowflake)
+	RemoveChannelID(GuildID, ChannelID snowflake.Snowflake)
+	RemoveGuild(GuildID snowflake.Snowflake)
 }
 
 // DeletedMessageHandler is used to handle dispatching events for deleted messages.
@@ -46,8 +47,8 @@ func (d *DeletedMessageHandler) guildDelete(_ disgord.Session, evt *disgord.Guil
 		return
 	}
 	go func() {
-		ids := d.MessageCacheStorageAdapter.GetAllChannelIDs(evt.UnavailableGuild.ID.String())
-		d.MessageCacheStorageAdapter.RemoveGuild(evt.UnavailableGuild.ID.String())
+		ids := d.MessageCacheStorageAdapter.GetAllChannelIDs(evt.UnavailableGuild.ID)
+		d.MessageCacheStorageAdapter.RemoveGuild(evt.UnavailableGuild.ID)
 		for _, v := range ids {
 			d.MessageCacheStorageAdapter.DeleteChannelsMessages(v)
 		}
@@ -57,8 +58,8 @@ func (d *DeletedMessageHandler) guildDelete(_ disgord.Session, evt *disgord.Guil
 // Removes a channel from the cache.
 func (d *DeletedMessageHandler) channelDelete(_ disgord.Session, evt *disgord.ChannelDelete) {
 	go func() {
-		gid := evt.Channel.GuildID.String()
-		cid := evt.Channel.ID.String()
+		gid := evt.Channel.GuildID
+		cid := evt.Channel.ID
 		d.MessageCacheStorageAdapter.RemoveChannelID(gid, cid)
 		d.MessageCacheStorageAdapter.DeleteChannelsMessages(cid)
 	}()
@@ -67,9 +68,9 @@ func (d *DeletedMessageHandler) channelDelete(_ disgord.Session, evt *disgord.Ch
 // Adds the guild to the cache.
 func (d *DeletedMessageHandler) guildCreate(_ disgord.Session, evt *disgord.GuildCreate) {
 	go func() {
-		gid := evt.Guild.ID.String()
+		gid := evt.Guild.ID
 		for _, v := range evt.Guild.Channels {
-			d.MessageCacheStorageAdapter.AddChannelID(gid, v.ID.String())
+			d.MessageCacheStorageAdapter.AddChannelID(gid, v.ID)
 		}
 	}()
 }
@@ -77,7 +78,7 @@ func (d *DeletedMessageHandler) guildCreate(_ disgord.Session, evt *disgord.Guil
 // Defines the message deletion handler.
 func (d *DeletedMessageHandler) messageDelete(s disgord.Session, evt *disgord.MessageDelete) {
 	go func() {
-		msg := d.MessageCacheStorageAdapter.GetAndDelete(evt.ChannelID.String(), evt.MessageID.String())
+		msg := d.MessageCacheStorageAdapter.GetAndDelete(evt.ChannelID, evt.MessageID)
 		if msg != nil {
 			member, err := s.GetMember(context.TODO(), msg.GuildID, msg.Author.ID)
 			if err != nil {
@@ -99,5 +100,5 @@ func (d *DeletedMessageHandler) messageCreate(_ disgord.Session, evt *disgord.Me
 	} else if 0 > Limit {
 		Limit = 0
 	}
-	go d.MessageCacheStorageAdapter.Set(evt.Message.ChannelID.String(), evt.Message.ID.String(), evt.Message, uint(Limit))
+	go d.MessageCacheStorageAdapter.Set(evt.Message.ChannelID, evt.Message.ID, evt.Message, uint(Limit))
 }

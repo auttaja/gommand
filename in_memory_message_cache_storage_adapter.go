@@ -3,6 +3,7 @@ package gommand
 import (
 	"container/list"
 	"github.com/andersfylling/disgord"
+	"github.com/andersfylling/snowflake/v4"
 	"strings"
 	"sync"
 )
@@ -15,52 +16,52 @@ type cachedMessage struct {
 // InMemoryMessageCacheStorageAdapter is used to hold cached messages in RAM. This is extremely fast, but will lead to increased RAM usage.
 type InMemoryMessageCacheStorageAdapter struct {
 	lock  *sync.RWMutex
-	cache map[string]*map[string]*cachedMessage
+	cache map[snowflake.Snowflake]*map[snowflake.Snowflake]*cachedMessage
 	list  *list.List
 	len   uint
 
 	guildLock  *sync.RWMutex
-	channelMap map[string][]string
+	channelMap map[snowflake.Snowflake][]snowflake.Snowflake
 }
 
 // Init is used to initialise the in-memory message cache.
 func (c *InMemoryMessageCacheStorageAdapter) Init() {
 	c.lock = &sync.RWMutex{}
-	c.cache = map[string]*map[string]*cachedMessage{}
+	c.cache = map[snowflake.Snowflake]*map[snowflake.Snowflake]*cachedMessage{}
 	c.list = list.New()
 
 	c.guildLock = &sync.RWMutex{}
-	c.channelMap = map[string][]string{}
+	c.channelMap = map[snowflake.Snowflake][]snowflake.Snowflake{}
 }
 
 // GetAllChannelIDs is used to get all of the channel ID's.
-func (c *InMemoryMessageCacheStorageAdapter) GetAllChannelIDs(GuildID string) []string {
+func (c *InMemoryMessageCacheStorageAdapter) GetAllChannelIDs(GuildID snowflake.Snowflake) []snowflake.Snowflake {
 	c.guildLock.RLock()
 	channels := c.channelMap[GuildID]
 	if channels == nil {
-		channels = []string{}
+		channels = []snowflake.Snowflake{}
 	}
 	c.guildLock.RUnlock()
 	return channels
 }
 
 // AddChannelID is used to add a channel ID to the guild.
-func (c *InMemoryMessageCacheStorageAdapter) AddChannelID(GuildID, ChannelID string) {
+func (c *InMemoryMessageCacheStorageAdapter) AddChannelID(GuildID, ChannelID snowflake.Snowflake) {
 	c.guildLock.Lock()
 	channels := c.channelMap[GuildID]
 	if channels == nil {
-		channels = []string{}
+		channels = []snowflake.Snowflake{}
 	}
 	c.channelMap[GuildID] = append(channels, ChannelID)
 	c.guildLock.Unlock()
 }
 
 // RemoveChannelID is used to remove a channel ID to the guild.
-func (c *InMemoryMessageCacheStorageAdapter) RemoveChannelID(GuildID, ChannelID string) {
+func (c *InMemoryMessageCacheStorageAdapter) RemoveChannelID(GuildID, ChannelID snowflake.Snowflake) {
 	c.guildLock.Lock()
 	channels := c.channelMap[GuildID]
 	if channels == nil {
-		channels = []string{}
+		channels = []snowflake.Snowflake{}
 	}
 	for i, v := range channels {
 		if v != ChannelID {
@@ -75,14 +76,14 @@ func (c *InMemoryMessageCacheStorageAdapter) RemoveChannelID(GuildID, ChannelID 
 }
 
 // RemoveGuild is used to remove a guild from the cache.
-func (c *InMemoryMessageCacheStorageAdapter) RemoveGuild(GuildID string) {
+func (c *InMemoryMessageCacheStorageAdapter) RemoveGuild(GuildID snowflake.Snowflake) {
 	c.guildLock.Lock()
 	delete(c.channelMap, GuildID)
 	c.guildLock.Unlock()
 }
 
 // GetAndDelete is used to get and delete from the cache where this is possible.
-func (c *InMemoryMessageCacheStorageAdapter) GetAndDelete(ChannelID, MessageID string) *disgord.Message {
+func (c *InMemoryMessageCacheStorageAdapter) GetAndDelete(ChannelID, MessageID snowflake.Snowflake) *disgord.Message {
 	// Read lock the cache.
 	c.lock.RLock()
 
@@ -110,7 +111,7 @@ func (c *InMemoryMessageCacheStorageAdapter) GetAndDelete(ChannelID, MessageID s
 }
 
 // Delete is used to delete a specific message from the cache.
-func (c *InMemoryMessageCacheStorageAdapter) Delete(ChannelID, MessageID string) {
+func (c *InMemoryMessageCacheStorageAdapter) Delete(ChannelID, MessageID snowflake.Snowflake) {
 	// Write lock the cache.
 	c.lock.Lock()
 
@@ -150,7 +151,7 @@ func (c *InMemoryMessageCacheStorageAdapter) Delete(ChannelID, MessageID string)
 }
 
 // DeleteChannelsMessages is used to delete a channels messages from a cache.
-func (c *InMemoryMessageCacheStorageAdapter) DeleteChannelsMessages(ChannelID string) {
+func (c *InMemoryMessageCacheStorageAdapter) DeleteChannelsMessages(ChannelID snowflake.Snowflake) {
 	// Write lock the cache.
 	c.lock.Lock()
 
@@ -169,7 +170,7 @@ func (c *InMemoryMessageCacheStorageAdapter) DeleteChannelsMessages(ChannelID st
 }
 
 // Set is used to set a item in the cache.
-func (c *InMemoryMessageCacheStorageAdapter) Set(ChannelID, MessageID string, Message *disgord.Message, Limit uint) {
+func (c *InMemoryMessageCacheStorageAdapter) Set(ChannelID, MessageID snowflake.Snowflake, Message *disgord.Message, Limit uint) {
 	// Write lock the cache.
 	c.lock.Lock()
 
@@ -179,7 +180,7 @@ func (c *InMemoryMessageCacheStorageAdapter) Set(ChannelID, MessageID string, Me
 		if f != nil {
 			c.lock.Unlock()
 			s := strings.Split(f.Value.(string), "-")
-			c.Delete(s[0], s[1])
+			c.Delete(snowflake.ParseSnowflakeString(s[0]), snowflake.ParseSnowflakeString(s[1]))
 			c.list.Remove(f)
 			c.lock.Lock()
 		}
@@ -188,13 +189,13 @@ func (c *InMemoryMessageCacheStorageAdapter) Set(ChannelID, MessageID string, Me
 	// Set the message.
 	msgs := c.cache[ChannelID]
 	if msgs == nil {
-		m := map[string]*cachedMessage{}
+		m := map[snowflake.Snowflake]*cachedMessage{}
 		msgs = &m
 		c.cache[ChannelID] = msgs
 	}
 	(*msgs)[MessageID] = &cachedMessage{
 		msg: Message,
-		el:  c.list.PushBack(ChannelID + "-" + MessageID),
+		el:  c.list.PushBack(ChannelID.String() + "-" + MessageID.String()),
 	}
 	c.len++
 
