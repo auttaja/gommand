@@ -203,7 +203,7 @@ By default (like other libraries such as discord.py), gommand keeps a finite amo
 - `GetAndDelete(ChannelID, MessageID snowflake.Snowflake) *disgord.Message`: Gets a message from the cache and then deletes it since this is only called when the message is being deleted so it will then be unneeded.
 - `Delete(ChannelID, MessageID snowflake.Snowflake)`: Deletes a message from the cache.
 - `DeleteChannelsMessages(ChannelID snowflake.Snowflake)`: Deletes all messages cached for a specific channel.
-- `Set(ChannelID, MessageID string, Message *disgord.Message, Limit uint)`: Sets an item in the cache. The limit is passed through so that you can implement a simple First In First Out (FIFO) caching system. The limit will be 0 if it is set to unlimited.
+- `Set(ChannelID, MessageID snowflake.Snowflake, Message *disgord.Message, Limit uint)`: Sets an item in the cache. The limit is passed through so that you can implement a simple First In First Out (FIFO) caching system. The limit will be 0 if it is set to unlimited.
 
 The following manage storing channel/guild ID relationships. This is important so that if a guild is removed, we know what channel ID's to purge from the cache:
 - `GetAllChannelIDs(GuildID snowflake.Snowflake) []snowflake.Snowflake`: Get all channel ID's which have a relationship with a specific guild ID.
