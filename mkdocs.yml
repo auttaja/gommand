@@ -1,0 +1,16 @@
+site_name: Gommand Documentation
+nav:
+  - Home: index.md
+  - Writing your first bot: writing-your-first-bot.md
+  - API Reference:
+    - Commands: commands.md
+    - Categories: categories.md
+    - Router: router.md
+    - Handling deleted messages: handling-deleted-messages.md
+    - Permission validators: permission-validators.md
+    - Middleware: middleware.md
+    - Embed paginator: embed-paginator.md
+    - Embed menus: embed-menus.md
+    - Context: context.md
+    - Prefix checkers: prefix-checkers.md
+    - Using the String Iterator: using-the-string-iterator.md

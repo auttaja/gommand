@@ -33,7 +33,7 @@ func (p *ping) Init() {
 	p.Description = "Responds with pong."
 }
 
-func (p *ping) CommandFunction(ctx *gommand.Context) error {
+func (ping) CommandFunction(ctx *gommand.Context) error {
 	_, _ = ctx.Reply("Pong!")
 	return nil
 }

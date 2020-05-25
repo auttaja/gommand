@@ -34,7 +34,7 @@ type CommandInterface interface {
 	GetArgTransformers() []ArgTransformer
 	GetMiddleware() []Middleware
 
-	// Initialisation function.
+	// Initialisation function and command.
 	Init()
 	CommandFunction(ctx *Context) error
 }
