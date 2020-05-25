@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/andersfylling/disgord"
-	"github.com/andersfylling/snowflake/v4"
 )
 
 // EmbedsPaginator is used to paginate together several embeds.
@@ -60,7 +59,7 @@ func EmbedsPaginator(ctx *Context, Pages []*disgord.Embed) error {
 					Name:        "Back",
 					Description: "Goes back a page.",
 				},
-				Function: func(ChannelID, MessageID snowflake.Snowflake, _ *EmbedMenu, client disgord.Session) {
+				Function: func(ChannelID, MessageID disgord.Snowflake, _ *EmbedMenu, client disgord.Session) {
 					_ = client.DeleteAllReactions(context.TODO(), ChannelID, MessageID)
 					_ = PageBefore.Display(ChannelID, MessageID, client)
 				},

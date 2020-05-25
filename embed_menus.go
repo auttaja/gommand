@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/andersfylling/disgord"
-	"github.com/andersfylling/snowflake/v4"
 )
 
 // This is used to represent all of the current menus.
@@ -31,7 +30,7 @@ type MenuButton struct {
 // MenuReaction represents the button and the function which it triggers.
 type MenuReaction struct {
 	Button   *MenuButton
-	Function func(ChannelID, MessageID snowflake.Snowflake, _ *EmbedMenu, client disgord.Session)
+	Function func(ChannelID, MessageID disgord.Snowflake, _ *EmbedMenu, client disgord.Session)
 }
 
 // MenuReactions are all of the reactions which the menu has.
@@ -59,7 +58,7 @@ func (e *EmbedMenu) AddParentMenu(Menu *EmbedMenu) {
 }
 
 // Display is used to show a menu. This is un-protected so that people can write their own things on top of embed menus, but you probably want to use ctx.DisplayEmbedMenu(menu).
-func (e *EmbedMenu) Display(ChannelID, MessageID snowflake.Snowflake, client disgord.Session) error {
+func (e *EmbedMenu) Display(ChannelID, MessageID disgord.Snowflake, client disgord.Session) error {
 	menuCacheLock.Lock()
 	menuCache[MessageID.String()] = e
 	menuCacheLock.Unlock()
@@ -108,7 +107,7 @@ func (e *EmbedMenu) NewChildMenu(options *ChildMenuOptions) *EmbedMenu {
 	NewEmbedMenu.parent = e
 	Reaction := MenuReaction{
 		Button: options.Button,
-		Function: func(ChannelID, MessageID snowflake.Snowflake, _ *EmbedMenu, client disgord.Session) {
+		Function: func(ChannelID, MessageID disgord.Snowflake, _ *EmbedMenu, client disgord.Session) {
 			if options.BeforeAction != nil {
 				options.BeforeAction()
 			}
@@ -131,7 +130,7 @@ func (e *EmbedMenu) AddBackButton() {
 			Name:        "Back",
 			Emoji:       "⬆",
 		},
-		Function: func(ChannelID, MessageID snowflake.Snowflake, _ *EmbedMenu, client disgord.Session) {
+		Function: func(ChannelID, MessageID disgord.Snowflake, _ *EmbedMenu, client disgord.Session) {
 			_ = client.DeleteAllReactions(context.TODO(), ChannelID, MessageID)
 			_ = e.parent.Display(ChannelID, MessageID, client)
 		},

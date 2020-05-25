@@ -3,7 +3,6 @@ package gommand
 import (
 	"context"
 	"github.com/andersfylling/disgord"
-	"github.com/andersfylling/snowflake/v4"
 	"strconv"
 	"strings"
 	"time"
@@ -39,7 +38,7 @@ func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
 	if id == nil {
 		return
 	}
-	user, e := ctx.Session.GetUser(context.TODO(), snowflake.ParseSnowflakeString(*id))
+	user, e := ctx.Session.GetUser(context.TODO(), disgord.ParseSnowflakeString(*id))
 	if e == nil {
 		err = nil
 	}
@@ -53,7 +52,7 @@ func MemberTransformer(ctx *Context, Arg string) (member interface{}, err error)
 	if id == nil {
 		return
 	}
-	member, e := ctx.Session.GetMember(context.TODO(), ctx.Message.GuildID, snowflake.ParseSnowflakeString(*id))
+	member, e := ctx.Session.GetMember(context.TODO(), ctx.Message.GuildID, disgord.ParseSnowflakeString(*id))
 	if e == nil {
 		err = nil
 	}
@@ -67,7 +66,7 @@ func ChannelTransformer(ctx *Context, Arg string) (channel interface{}, err erro
 	if id == nil {
 		return
 	}
-	channel, e := ctx.Session.GetChannel(context.TODO(), snowflake.ParseSnowflakeString(*id))
+	channel, e := ctx.Session.GetChannel(context.TODO(), disgord.ParseSnowflakeString(*id))
 	if e == nil {
 		err = nil
 	}
@@ -110,7 +109,7 @@ func MessageURLTransformer(ctx *Context, Arg string) (message interface{}, err e
 			return
 		}
 	}
-	message, e := ctx.Session.GetMessage(context.TODO(), snowflake.ParseSnowflakeString(a[1]), snowflake.ParseSnowflakeString(a[2]))
+	message, e := ctx.Session.GetMessage(context.TODO(), disgord.ParseSnowflakeString(a[1]), disgord.ParseSnowflakeString(a[2]))
 	if e == nil {
 		err = nil
 	}

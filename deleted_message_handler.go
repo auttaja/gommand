@@ -3,7 +3,6 @@ package gommand
 import (
 	"context"
 	"github.com/andersfylling/disgord"
-	"github.com/andersfylling/snowflake/v4"
 )
 
 // The default number of messages that will be cached by the storage adapter.
@@ -15,18 +14,18 @@ type MessageCacheStorageAdapter interface {
 	Init()
 
 	// Related to message caching.
-	GetAndDelete(ChannelID, MessageID snowflake.Snowflake) *disgord.Message
-	Delete(ChannelID, MessageID snowflake.Snowflake)
-	DeleteChannelsMessages(ChannelID snowflake.Snowflake)
-	Set(ChannelID, MessageID snowflake.Snowflake, Message *disgord.Message, Limit uint)
+	GetAndDelete(ChannelID, MessageID disgord.Snowflake) *disgord.Message
+	Delete(ChannelID, MessageID disgord.Snowflake)
+	DeleteChannelsMessages(ChannelID disgord.Snowflake)
+	Set(ChannelID, MessageID disgord.Snowflake, Message *disgord.Message, Limit uint)
 
 	// Related to channel and guild ID relationship caching.
 	// Channel ID's are NOT confirmed to be unique and will be repeated on bot reboot as per the Discord API.
 	// You should manage this in your adapter.
-	GetAllChannelIDs(GuildID snowflake.Snowflake) []snowflake.Snowflake
-	AddChannelID(GuildID, ChannelID snowflake.Snowflake)
-	RemoveChannelID(GuildID, ChannelID snowflake.Snowflake)
-	RemoveGuild(GuildID snowflake.Snowflake)
+	GetAllChannelIDs(GuildID disgord.Snowflake) []disgord.Snowflake
+	AddChannelID(GuildID, ChannelID disgord.Snowflake)
+	RemoveChannelID(GuildID, ChannelID disgord.Snowflake)
+	RemoveGuild(GuildID disgord.Snowflake)
 }
 
 // DeletedMessageHandler is used to handle dispatching events for deleted messages.

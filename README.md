@@ -200,13 +200,13 @@ For some bots, being able to track deleted messages in an easy to use way is imp
 ## Message cache storage adapter
 By default (like other libraries such as discord.py), gommand keeps a finite amount of messages cached into RAM which is set by the user in the deleted message handler parameters. However, if you wish to keep messages until the guild removes your bot/is deleted or the message/channel is deleted, you will likely want to want to write your own message caching adapter. In gommand, memory cachers use the `gommand.MemoryCacheStorageAdapter` interface. This contains the following functions which need to be set:
 - `Init()`: Called on the initialisation of the router.
-- `GetAndDelete(ChannelID, MessageID snowflake.Snowflake) *disgord.Message`: Gets a message from the cache and then deletes it since this is only called when the message is being deleted so it will then be unneeded.
-- `Delete(ChannelID, MessageID snowflake.Snowflake)`: Deletes a message from the cache.
-- `DeleteChannelsMessages(ChannelID snowflake.Snowflake)`: Deletes all messages cached for a specific channel.
-- `Set(ChannelID, MessageID snowflake.Snowflake, Message *disgord.Message, Limit uint)`: Sets an item in the cache. The limit is passed through so that you can implement a simple First In First Out (FIFO) caching system. The limit will be 0 if it is set to unlimited.
+- `GetAndDelete(ChannelID, MessageID disgord.Snowflake) *disgord.Message`: Gets a message from the cache and then deletes it since this is only called when the message is being deleted so it will then be unneeded.
+- `Delete(ChannelID, MessageID disgord.Snowflake)`: Deletes a message from the cache.
+- `DeleteChannelsMessages(ChannelID disgord.Snowflake)`: Deletes all messages cached for a specific channel.
+- `Set(ChannelID, MessageID disgord.Snowflake, Message *disgord.Message, Limit uint)`: Sets an item in the cache. The limit is passed through so that you can implement a simple First In First Out (FIFO) caching system. The limit will be 0 if it is set to unlimited.
 
 The following manage storing channel/guild ID relationships. This is important so that if a guild is removed, we know what channel ID's to purge from the cache:
-- `GetAllChannelIDs(GuildID snowflake.Snowflake) []snowflake.Snowflake`: Get all channel ID's which have a relationship with a specific guild ID.
-- `AddChannelID(GuildID, ChannelID snowflake.Snowflake)`: Add a relationship between a guild ID and a channel ID.
-- `RemoveChannelID(GuildID, ChannelID snowflake.Snowflake)`: Remove a channel ID's relationship with a guild ID.
-- `RemoveGuild(GuildID snowflake.Snowflake)`: Remove all channel ID relationships with a specific guild ID.
+- `GetAllChannelIDs(GuildID disgord.Snowflake) []disgord.Snowflake`: Get all channel ID's which have a relationship with a specific guild ID.
+- `AddChannelID(GuildID, ChannelID disgord.Snowflake)`: Add a relationship between a guild ID and a channel ID.
+- `RemoveChannelID(GuildID, ChannelID disgord.Snowflake)`: Remove a channel ID's relationship with a guild ID.
+- `RemoveGuild(GuildID disgord.Snowflake)`: Remove all channel ID relationships with a specific guild ID.
