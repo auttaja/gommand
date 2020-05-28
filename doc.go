@@ -1,4 +1,4 @@
-// Package gommand has a lot of built in functionality to allow for a higher level commands experience. Read README.md to read the getting started documentation:
+// Package gommand is a package with a lot of built in functionality to allow for a higher level commands experience. Read README.md to read the getting started documentation:
 //
 // - **Custom prefix support:** Gommand allows you to easily set a custom prefix. Gommand has various helper functions for this such as static prefix and mention support.
 //
