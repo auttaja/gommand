@@ -10,8 +10,8 @@ For ease of use, gommand has the `Category` struct that implements all of these 
 
 - `Name`: The name of the category.
 - `Description`: The description of the category.
-- `PermissionValidators`: An array of [permission validators](/permission-validators) which will be used on each item in the category. This can be nil.
-- `Middleware`: An array of [middleware](/middleware) which will be used on each item in the category. This can be nil.
+- `PermissionValidators`: An array of [permission validators](./permission-validators.md) which will be used on each item in the category. This can be nil.
+- `Middleware`: An array of [middleware](./middleware.md) which will be used on each item in the category. This can be nil.
 
 The default help command will automatically take advantage of categories when it is displaying commands. Note that you might want to change the category of the default help command. This is simple to do:
 ```go

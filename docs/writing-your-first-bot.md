@@ -3,7 +3,7 @@
 Creating your first bot with Gommand is a breeze:
 
 ## Creating the router
-Firstly, we will create the new [router](/router) for all disgord/gommand events. In this example, we are using several of the built-in [prefix checkers](/prefix-checckers) (`MultiplePrefixCheckers` to use multiple prefix checkers, `StaticPrefix("%")` to use the `%` prefix, and `MentionPrefix` to allow for the mentioning of the bot):
+Firstly, we will create the new [router](./router.md) for all disgord/gommand events. In this example, we are using several of the built-in [prefix checkers](./prefix-checckers.md) (`MultiplePrefixCheckers` to use multiple prefix checkers, `StaticPrefix("%")` to use the `%` prefix, and `MentionPrefix` to allow for the mentioning of the bot):
 ```go
 var router = gommand.NewRouter(&gommand.RouterConfig{
 	// The prefix function should be set here or it will be blank.
@@ -15,7 +15,7 @@ var router = gommand.NewRouter(&gommand.RouterConfig{
 The router will also create a basic help command which you can either use or delete.
 
 ## Setting the command
-To set a command, we will want to call the `SetCommand` function on the router. To set the command, we will create a new instance of the [`Command`](/commands#Command) struct and then set it to the router:
+To set a command, we will want to call the `SetCommand` function on the router. To set the command, we will create a new instance of the [`Command`](./commands.md#Command) struct and then set it to the router:
 ```go
 func init() {
 	router.SetCommand(&gommand.Command{
@@ -102,7 +102,7 @@ Gommand contains the following built-in errors:
 The boolean in this function represents whether the error should be parsed through to the next error handler. If true is returned, it is handled within the function. If false is returned, it will be passed through to the next error handler, or to disgord's default logger if there are no error handlers after it.
 
 ## Waiting for a message
-The [`Context`](/context) struct which is provided when a command is ran contains some extremely powerful features. One example of this would be waiting for a message. To wait for a message, we can use the `WaitForMessage` function to wait for a message based on the condition specified. When the condition is met, the response will be the message:
+The [`Context`](./context.md) struct which is provided when a command is ran contains some extremely powerful features. One example of this would be waiting for a message. To wait for a message, we can use the `WaitForMessage` function to wait for a message based on the condition specified. When the condition is met, the response will be the message:
 ```go
     // Echos the message.
     resp := ctx.WaitForMessage(func(_ disgord.Session, msg *disgord.Message) bool {
@@ -112,7 +112,7 @@ The [`Context`](/context) struct which is provided when a command is ran contain
 ```
 
 ## Aliases
-But what if you want the ping command to respond to `%p`? The [`Command`](/commands#Command) struct contains a `Aliases` field among many other things which you can use to set a simple string array to handle exactly this:
+But what if you want the ping command to respond to `%p`? The [`Command`](./commands.md#Command) struct contains a `Aliases` field among many other things which you can use to set a simple string array to handle exactly this:
 ```go
     Aliases: []string{"p"},
 ```
@@ -120,9 +120,9 @@ But what if you want the ping command to respond to `%p`? The [`Command`](/comma
 ## What to check out next
 Now you have learned the basic structure of Gommand, you may want to check out the following:
 
-- [Categories](/categories)
-- [Handling deleted messages](/handling-deleted-messages)
-- [Permission validators](/permission-validators)
-- [Middleware](/middleware)
-- [Embed paginator](/embed-paginator)
-- [Embed menus](/embed-menus)
+- [Categories](./categories.md)
+- [Handling deleted messages](./handling-deleted-messages.md)
+- [Permission validators](./permission-validators.md)
+- [Middleware](./middleware.md)
+- [Embed paginator](./embed-paginator.md)
+- [Embed menus](./embed-menus.md)

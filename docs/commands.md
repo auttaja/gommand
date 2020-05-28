@@ -9,14 +9,14 @@ router.SetCommand(&gommand.Command{
 ```
 
 ## `Command`
-The command **MUST** have the `Name` (the name of the command) and `Function` (the function that will be called with the [context](/context) and can return an error, any returned errors will be given to the error handlers) attributes set. The other attributes are optional:
+The command **MUST** have the `Name` (the name of the command) and `Function` (the function that will be called with the [context](./context.md) and can return an error, any returned errors will be given to the error handlers) attributes set. The other attributes are optional:
 
 - `Aliases`: Any aliases which a command has.
 - `Description`: The description which is used in help commands.
 - `Usage`: The usage information for a command.
-- `PermissionValidators`: An array of [permission validators](/permission-validators) which only applies to this specific command.
+- `PermissionValidators`: An array of [permission validators](./permission-validators.md) which only applies to this specific command.
 - `ArgTransformers`: This is an array of the `gommand.ArgTransformer` type. Each object in this array contains the following attributes:
-    - `Function`: The function which is used to transform the argument which must be set. The function simply takes the [context](/context) and argument as a string and returns an interface and error (if the error is nil - this parsed properly). The following transformers are supported by gommand right now:
+    - `Function`: The function which is used to transform the argument which must be set. The function simply takes the [context](./context.md) and argument as a string and returns an interface and error (if the error is nil - this parsed properly). The following transformers are supported by gommand right now:
         - `gommand.StringTransformer`: Transforms the argument into a string.
         - `gommand.IntTransformer`: Transforms the argument into a integer.
         - `gommand.UIntTransformer`: Transforms the argument into a unsigned integer.
@@ -31,8 +31,8 @@ The command **MUST** have the `Name` (the name of the command) and `Function` (t
     - `Optional`: If this is true and the argument does not exist, it will be set to nil. Note that due to what this does, it has to be either at the end of the argument list or followed by other optional arguments (if you don't combine with Remainder).
     - `Remainder`: If this is true, it will just try and parse the raw remainder of the arguments. If the string is blank it will error with not enough arguments unless optional is set. Note that due to what this does, it has to be at the end of the array.
     - `Greedy`: If this is true, the parser will keep trying to parse the users arguments until it hits the end of their message or a parse fails. When this happens, it will go to the next parser in the array. Note that if the first argument fails, this means that it was not set and an error will be put into the error handler unless it was set as optional. The greedy argument will be of the type `[]interface{}` (unless `Optional` is set and it was not specified).
-- `Middleware`: An array of [middleware](/middleware) which only applies to this specific command.
-- `Category`: Allows you to set a [category](/categories) for your command.
+- `Middleware`: An array of [middleware](./middleware.md) which only applies to this specific command.
+- `Category`: Allows you to set a [category](./categories.md) for your command.
 - `CommandAttributes`: A generic interface which you can use for whatever you want.
 
 ## `CommandInterface`

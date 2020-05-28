@@ -9,7 +9,7 @@ The context is a core part of the gommand functionality. The context contains se
 - `RawArgs`: A string of the raw arguments.
 - `Args`: The transformed arguments.
 - `Prefix`: Defines the prefix which was used.
-- `MidddlewareParams`: The params set by [middleware](/middleware).
+- `MidddlewareParams`: The params set by [middleware](./middleware.md).
 
 It also contains several helper functions:
 
@@ -18,4 +18,4 @@ It also contains several helper functions:
 - `Channel() (*disgord.Channel, error)`: Get the channel which this is being ran in.
 - `Reply(data ...interface{}) (*disgord.Message, error)`: A shorter way to quickly reply to a message.
 - `WaitForMessage(CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message`: Waits for a message based on the check function you gave.
-- `DisplayEmbedMenu(m *EmbedMenu) error`: Used to display an [embed menu](/embed-menus).
+- `DisplayEmbedMenu(m *EmbedMenu) error`: Used to display an [embed menu](./embed-menus.md).
