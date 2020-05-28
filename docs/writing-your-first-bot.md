@@ -3,7 +3,7 @@
 Creating your first bot with Gommand is a breeze:
 
 ## Creating the router
-Firstly, we will create the new [router](./router.md) for all disgord/gommand events. In this example, we are using several of the built-in [prefix checkers](./prefix-checckers.md) (`MultiplePrefixCheckers` to use multiple prefix checkers, `StaticPrefix("%")` to use the `%` prefix, and `MentionPrefix` to allow for the mentioning of the bot):
+Firstly, we will create the new [router](./router.md) for all disgord/gommand events. In this example, we are using several of the built-in [prefix checkers](./prefix-checkers.md) (`MultiplePrefixCheckers` to use multiple prefix checkers, `StaticPrefix("%")` to use the `%` prefix, and `MentionPrefix` to allow for the mentioning of the bot):
 ```go
 var router = gommand.NewRouter(&gommand.RouterConfig{
 	// The prefix function should be set here or it will be blank.
