@@ -32,8 +32,8 @@ func TestSingleArgument(t *testing.T) {
 		t.FailNow()
 		return true
 	})
-	r.CommandProcessor(nil, mockMessage("%echo hello"))
-	r.CommandProcessor(nil, mockMessage("%echo \"hello\""))
+	r.CommandProcessor(nil, mockMessage("%echo hello"), true)
+	r.CommandProcessor(nil, mockMessage("%echo \"hello\""), true)
 }
 
 // BenchmarkSingleArgument is used to benchmark a basic echo command.
@@ -59,5 +59,5 @@ func BenchmarkSingleArgument(b *testing.B) {
 			return nil
 		},
 	})
-	r.CommandProcessor(nil, mockMessage("%echo \"hello\""))
+	r.CommandProcessor(nil, mockMessage("%echo \"hello\""), true)
 }

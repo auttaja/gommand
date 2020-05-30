@@ -30,5 +30,5 @@ func TestRemainder(t *testing.T) {
 		t.FailNow()
 		return true
 	})
-	r.CommandProcessor(nil, mockMessage("%remainder   \"hello\""))
+	r.CommandProcessor(nil, mockMessage("%remainder   \"hello\""), true)
 }

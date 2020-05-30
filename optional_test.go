@@ -184,12 +184,12 @@ func TestOptional(t *testing.T) {
 	})
 
 	// Run the commands.
-	r.CommandProcessor(nil, mockMessage("%oneoptional 0"))
-	r.CommandProcessor(nil, mockMessage("%oneoptional 1 test"))
-	r.CommandProcessor(nil, mockMessage("%multioptional 0"))
-	r.CommandProcessor(nil, mockMessage("%multioptional 1 test \"123\""))
-	r.CommandProcessor(nil, mockMessage("%remainder 0"))
-	r.CommandProcessor(nil, mockMessage("%remainder 1 test"))
-	r.CommandProcessor(nil, mockMessage("%greedy 0"))
-	r.CommandProcessor(nil, mockMessage("%greedy 1 1 1  1 1"))
+	r.CommandProcessor(nil, mockMessage("%oneoptional 0"), true)
+	r.CommandProcessor(nil, mockMessage("%oneoptional 1 test"), true)
+	r.CommandProcessor(nil, mockMessage("%multioptional 0"), true)
+	r.CommandProcessor(nil, mockMessage("%multioptional 1 test \"123\""), true)
+	r.CommandProcessor(nil, mockMessage("%remainder 0"), true)
+	r.CommandProcessor(nil, mockMessage("%remainder 1 test"), true)
+	r.CommandProcessor(nil, mockMessage("%greedy 0"), true)
+	r.CommandProcessor(nil, mockMessage("%greedy 1 1 1  1 1"), true)
 }

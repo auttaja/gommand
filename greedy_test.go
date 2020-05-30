@@ -44,5 +44,5 @@ func TestGreedy(t *testing.T) {
 		t.FailNow()
 		return true
 	})
-	r.CommandProcessor(nil, mockMessage("%add 1 1 1  1 hello"))
+	r.CommandProcessor(nil, mockMessage("%add 1 1 1  1 hello"), true)
 }

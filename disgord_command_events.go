@@ -33,7 +33,7 @@ func (r *Router) userUpdate(_ disgord.Session, evt *disgord.UserUpdate) {
 }
 
 // CommandProcessor is used to do the message command processing.
-func (r *Router) CommandProcessor(s disgord.Session, msg *disgord.Message) {
+func (r *Router) CommandProcessor(s disgord.Session, msg *disgord.Message, prefix bool) {
 	// If the message is from a bot or this isn't in a guild, ignore it.
 	if msg.Author.Bot || msg.IsDirectMessage() {
 		return
@@ -56,10 +56,12 @@ func (r *Router) CommandProcessor(s disgord.Session, msg *disgord.Message) {
 	reader := &StringIterator{Text: msg.Content}
 
 	// Run a prefix check.
-	if !r.PrefixCheck(ctx, reader) {
-		// The prefix was not used.
-		r.cmdLock.RUnlock()
-		return
+	if prefix {
+		if !r.PrefixCheck(ctx, reader) {
+			// The prefix was not used.
+			r.cmdLock.RUnlock()
+			return
+		}
 	}
 
 	// The member should be patched into the message object here to make it easier.
@@ -163,7 +165,7 @@ func (r *Router) msgCreate(s disgord.Session, evt *disgord.MessageCreate) {
 	}()
 
 	// Launch the handler in a go-routine.
-	go r.CommandProcessor(s, evt.Message)
+	go r.CommandProcessor(s, evt.Message, true)
 }
 
 // Hook is used to hook all required events into the disgord client.

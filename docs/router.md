@@ -10,7 +10,7 @@ Creating the router is very simple to do. You can simply create a router object 
 From here, we can use the functions attached to the router:
 
 - `AddErrorHandler(Handler ErrorHandler)`: Used to add a error handler as described in [writing your first bot](./writing-your-first-bot.md).
-- `CommandProcessor(s disgord.Session, msg *disgord.Message)`: Used to process a command. You will probably never need to use this.
+- `CommandProcessor(s disgord.Session, msg *disgord.Message, prefix bool)`: Used to process a command. You will probably never need to use this.
 - `GetAllCommands() []CommandInterface`: Get all commands.
 - `GetCommand(Name string) CommandInterface`: Get a command by its name.
 - `GetCommandsOrderedByCategory() map[CategoryInterface][]CommandInterface`: Get all commands ordered by their category.
