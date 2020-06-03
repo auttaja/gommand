@@ -41,6 +41,7 @@ type CommandInterface interface {
 
 // Command defines a command which can be used within the Router.
 type Command struct {
+	*CommandBasics
 	Name                 string                   `json:"name"`
 	Aliases              []string                 `json:"aliases"`
 	Description          string                   `json:"description"`
@@ -53,51 +54,10 @@ type Command struct {
 	Function             func(ctx *Context) error `json:"-"`
 }
 
-// GetName is used to get the name.
-func (c *Command) GetName() string {
-	return c.Name
+// Init is used to initialise the command.
+func (c *Command) Init() {
+	c.CommandBasics = &CommandBasics{parent: c}
 }
-
-// GetAliases is used to get the aliases.
-func (c *Command) GetAliases() []string {
-	if c.Aliases == nil {
-		return []string{}
-	}
-	return c.Aliases
-}
-
-// GetDescription is used to get the description.
-func (c *Command) GetDescription() string {
-	return c.Description
-}
-
-// GetUsage is used to get the usage.
-func (c *Command) GetUsage() string {
-	return c.Usage
-}
-
-// GetCategory is used to get the category.
-func (c *Command) GetCategory() CategoryInterface {
-	return c.Category
-}
-
-// GetPermissionValidators is used to get the permission validators.
-func (c *Command) GetPermissionValidators() []PermissionValidator {
-	return c.PermissionValidators
-}
-
-// GetArgTransformers is used to get the arg transformers.
-func (c *Command) GetArgTransformers() []ArgTransformer {
-	return c.ArgTransformers
-}
-
-// GetMiddleware is used to get the middleware.
-func (c *Command) GetMiddleware() []Middleware {
-	return c.Middleware
-}
-
-// Init does nothing (it is unneeded for this struct).
-func (c *Command) Init() {}
 
 // CommandFunction is used to run the command function.
 func (c *Command) CommandFunction(ctx *Context) error {

@@ -11,47 +11,82 @@ type CommandBasics struct {
 	PermissionValidators []PermissionValidator `json:"-"`
 	ArgTransformers      []ArgTransformer      `json:"-"`
 	Middleware           []Middleware          `json:"-"`
+	parent               *Command
 }
 
 // GetName is used to get the name.
-func (c *CommandBasics) GetName() string {
-	return c.Name
+func (obj *CommandBasics) GetName() string {
+	if obj.parent == nil {
+		return obj.Name
+	} else {
+		return obj.parent.Name
+	}
 }
 
 // GetAliases is used to get the aliases.
-func (c *CommandBasics) GetAliases() []string {
-	if c.Aliases == nil {
+func (obj *CommandBasics) GetAliases() []string {
+	var Aliases []string
+	if obj.parent == nil {
+		Aliases = obj.Aliases
+	} else {
+		Aliases = obj.parent.Aliases
+	}
+	if Aliases == nil {
 		return []string{}
 	}
-	return c.Aliases
+	return Aliases
 }
 
 // GetDescription is used to get the description.
-func (c *CommandBasics) GetDescription() string {
-	return c.Description
+func (obj *CommandBasics) GetDescription() string {
+	if obj.parent == nil {
+		return obj.Description
+	} else {
+		return obj.parent.Description
+	}
 }
 
 // GetUsage is used to get the usage.
-func (c *CommandBasics) GetUsage() string {
-	return c.Usage
+func (obj *CommandBasics) GetUsage() string {
+	if obj.parent == nil {
+		return obj.Usage
+	} else {
+		return obj.parent.Usage
+	}
 }
 
 // GetCategory is used to get the category.
-func (c *CommandBasics) GetCategory() CategoryInterface {
-	return c.Category
+func (obj *CommandBasics) GetCategory() CategoryInterface {
+	if obj.parent == nil {
+		return obj.Category
+	} else {
+		return obj.parent.Category
+	}
 }
 
 // GetPermissionValidators is used to get the permission validators.
-func (c *CommandBasics) GetPermissionValidators() []PermissionValidator {
-	return c.PermissionValidators
+func (obj *CommandBasics) GetPermissionValidators() []PermissionValidator {
+	if obj.parent == nil {
+		return obj.PermissionValidators
+	} else {
+		return obj.parent.PermissionValidators
+	}
 }
 
 // GetArgTransformers is used to get the arg transformers.
-func (c *CommandBasics) GetArgTransformers() []ArgTransformer {
-	return c.ArgTransformers
+func (obj *CommandBasics) GetArgTransformers() []ArgTransformer {
+	if obj.parent == nil {
+		return obj.ArgTransformers
+	} else {
+		return obj.parent.ArgTransformers
+	}
 }
 
 // GetMiddleware is used to get the middleware.
-func (c *CommandBasics) GetMiddleware() []Middleware {
-	return c.Middleware
+func (obj *CommandBasics) GetMiddleware() []Middleware {
+	if obj.parent == nil {
+		return obj.Middleware
+	} else {
+		return obj.parent.Middleware
+	}
 }
