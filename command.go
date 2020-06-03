@@ -41,7 +41,7 @@ type CommandInterface interface {
 
 // Command defines a command which can be used within the Router.
 type Command struct {
-	*CommandBasics
+	*CommandBasics       `json:"-"`
 	Name                 string                   `json:"name"`
 	Aliases              []string                 `json:"aliases"`
 	Description          string                   `json:"description"`
