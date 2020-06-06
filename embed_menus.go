@@ -9,7 +9,7 @@ import (
 )
 
 // This is used to represent all of the current menus.
-var menuCache = map[string]*EmbedMenu{}
+var menuCache = map[disgord.Snowflake]*EmbedMenu{}
 
 // This is the thread lock for the menu cache.
 var menuCacheLock = sync.RWMutex{}
@@ -60,7 +60,11 @@ func (e *EmbedMenu) AddParentMenu(Menu *EmbedMenu) {
 // Display is used to show a menu. This is un-protected so that people can write their own things on top of embed menus, but you probably want to use ctx.DisplayEmbedMenu(menu).
 func (e *EmbedMenu) Display(ChannelID, MessageID disgord.Snowflake, client disgord.Session) error {
 	menuCacheLock.Lock()
-	menuCache[MessageID.String()] = e
+	if len(e.Reactions.ReactionSlice) == 0 {
+		delete(menuCache, MessageID)
+	} else {
+		menuCache[MessageID] = e
+	}
 	menuCacheLock.Unlock()
 
 	EmbedCopy := e.Embed.DeepCopy().(*disgord.Embed)
@@ -159,7 +163,7 @@ func handleMenuReactionEdit(s disgord.Session, evt *disgord.MessageReactionAdd) 
 	go func() {
 		// Get the menu if it exists.
 		menuCacheLock.RLock()
-		menu := menuCache[evt.MessageID.String()]
+		menu := menuCache[evt.MessageID]
 		if menu == nil {
 			menuCacheLock.RUnlock()
 			return
@@ -187,7 +191,7 @@ func handleMenuReactionEdit(s disgord.Session, evt *disgord.MessageReactionAdd) 
 func handleEmbedMenuMessageDelete(s disgord.Session, evt *disgord.MessageDelete) {
 	go func() {
 		menuCacheLock.Lock()
-		delete(menuCache, evt.MessageID.String())
+		delete(menuCache, evt.MessageID)
 		menuCacheLock.Unlock()
 	}()
 }
