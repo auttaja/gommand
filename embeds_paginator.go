@@ -1,7 +1,6 @@
 package gommand
 
 import (
-	"context"
 	"errors"
 	"strconv"
 
@@ -60,7 +59,6 @@ func EmbedsPaginator(ctx *Context, Pages []*disgord.Embed) error {
 					Description: "Goes back a page.",
 				},
 				Function: func(ChannelID, MessageID disgord.Snowflake, _ *EmbedMenu, client disgord.Session) {
-					_ = client.DeleteAllReactions(context.TODO(), ChannelID, MessageID)
 					_ = PageBefore.Display(ChannelID, MessageID, client)
 				},
 			})

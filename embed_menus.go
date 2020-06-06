@@ -59,6 +59,8 @@ func (e *EmbedMenu) AddParentMenu(Menu *EmbedMenu) {
 
 // Display is used to show a menu. This is un-protected so that people can write their own things on top of embed menus, but you probably want to use ctx.DisplayEmbedMenu(menu).
 func (e *EmbedMenu) Display(ChannelID, MessageID disgord.Snowflake, client disgord.Session) error {
+	_ = client.DeleteAllReactions(context.TODO(), ChannelID, MessageID)
+
 	menuCacheLock.Lock()
 	if len(e.Reactions.ReactionSlice) == 0 {
 		delete(menuCache, MessageID)
@@ -115,7 +117,6 @@ func (e *EmbedMenu) NewChildMenu(options *ChildMenuOptions) *EmbedMenu {
 			if options.BeforeAction != nil {
 				options.BeforeAction()
 			}
-			_ = client.DeleteAllReactions(context.TODO(), ChannelID, MessageID)
 			_ = NewEmbedMenu.Display(ChannelID, MessageID, client)
 			if options.AfterAction != nil {
 				options.AfterAction()
@@ -135,7 +136,6 @@ func (e *EmbedMenu) AddBackButton() {
 			Emoji:       "⬆",
 		},
 		Function: func(ChannelID, MessageID disgord.Snowflake, _ *EmbedMenu, client disgord.Session) {
-			_ = client.DeleteAllReactions(context.TODO(), ChannelID, MessageID)
 			_ = e.parent.Display(ChannelID, MessageID, client)
 		},
 	}
