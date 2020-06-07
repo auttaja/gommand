@@ -19,13 +19,17 @@ type MessageCacheStorageAdapter interface {
 	DeleteChannelsMessages(ChannelID disgord.Snowflake)
 	Set(ChannelID, MessageID disgord.Snowflake, Message *disgord.Message, Limit uint)
 
-	// Related to channel and guild ID relationship caching.
-	// Channel ID's are NOT confirmed to be unique and will be repeated on bot reboot as per the Discord API.
-	// You should manage this in your adapter.
+	// Handles guild removal. The behaviour of this changes depending on if GuildChannelRelationshipManagement is implemented.
+	// If it is, this will just be used to remove all guild/channel relationships but not messages from the cache (that'll be done by running DeleteChannelsMessages with each channel ID).
+	// If it isn't, it will remove all of the guilds messages from the cache.
+	RemoveGuild(GuildID disgord.Snowflake)
+}
+
+// GuildChannelRelationshipManagement are an optional set of functions which a struct implementing MessageCacheStorageAdapter can use to manage channel/guild ID relationships.
+type GuildChannelRelationshipManagement interface {
 	GetAllChannelIDs(GuildID disgord.Snowflake) []disgord.Snowflake
 	AddChannelID(GuildID, ChannelID disgord.Snowflake)
 	RemoveChannelID(GuildID, ChannelID disgord.Snowflake)
-	RemoveGuild(GuildID disgord.Snowflake)
 }
 
 // DeletedMessageHandler is used to handle dispatching events for deleted messages.
@@ -46,10 +50,16 @@ func (d *DeletedMessageHandler) guildDelete(_ disgord.Session, evt *disgord.Guil
 		return
 	}
 	go func() {
-		ids := d.MessageCacheStorageAdapter.GetAllChannelIDs(evt.UnavailableGuild.ID)
+		r, ok := d.MessageCacheStorageAdapter.(GuildChannelRelationshipManagement)
+		var ids []disgord.Snowflake
+		if ok {
+			ids = r.GetAllChannelIDs(evt.UnavailableGuild.ID)
+		}
 		d.MessageCacheStorageAdapter.RemoveGuild(evt.UnavailableGuild.ID)
-		for _, v := range ids {
-			d.MessageCacheStorageAdapter.DeleteChannelsMessages(v)
+		if ok {
+			for _, v := range ids {
+				d.MessageCacheStorageAdapter.DeleteChannelsMessages(v)
+			}
 		}
 	}()
 }
@@ -59,7 +69,10 @@ func (d *DeletedMessageHandler) channelDelete(_ disgord.Session, evt *disgord.Ch
 	go func() {
 		gid := evt.Channel.GuildID
 		cid := evt.Channel.ID
-		d.MessageCacheStorageAdapter.RemoveChannelID(gid, cid)
+		r, ok := d.MessageCacheStorageAdapter.(GuildChannelRelationshipManagement)
+		if ok {
+			r.RemoveChannelID(gid, cid)
+		}
 		d.MessageCacheStorageAdapter.DeleteChannelsMessages(cid)
 	}()
 }
@@ -68,8 +81,11 @@ func (d *DeletedMessageHandler) channelDelete(_ disgord.Session, evt *disgord.Ch
 func (d *DeletedMessageHandler) guildCreate(_ disgord.Session, evt *disgord.GuildCreate) {
 	go func() {
 		gid := evt.Guild.ID
-		for _, v := range evt.Guild.Channels {
-			d.MessageCacheStorageAdapter.AddChannelID(gid, v.ID)
+		r, ok := d.MessageCacheStorageAdapter.(GuildChannelRelationshipManagement)
+		if ok {
+			for _, v := range evt.Guild.Channels {
+				r.AddChannelID(gid, v.ID)
+			}
 		}
 	}()
 }
