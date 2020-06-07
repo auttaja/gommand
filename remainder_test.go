@@ -29,5 +29,5 @@ func TestRemainder(t *testing.T) {
 		t.FailNow()
 		return true
 	})
-	r.CommandProcessor(nil, mockMessage("%remainder   \"hello\""), true)
+	r.CommandProcessor(nil, 0, mockMessage("%remainder   \"hello\""), true)
 }

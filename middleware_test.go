@@ -42,5 +42,5 @@ func TestMiddleware(t *testing.T) {
 		t.FailNow()
 		return true
 	})
-	r.CommandProcessor(nil, mockMessage("%middleware"), true)
+	r.CommandProcessor(nil, 0, mockMessage("%middleware"), true)
 }

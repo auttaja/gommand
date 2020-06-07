@@ -46,10 +46,10 @@ type msgQueueItem struct {
 // Router defines the command router which is being used.
 // Please call NewRouter to initialise this rather than creating a new struct.
 type Router struct {
-	BotUser               *disgord.User         `json:"-"`
 	PrefixCheck           PrefixCheck           `json:"-"`
 	CustomCommandsHandler CustomCommandsHandler `json:"-"`
 	cmds                  map[string]CommandInterface
+	botUsers              map[uint]*disgord.User
 	cmdLock               *sync.RWMutex
 	errorHandlers         []ErrorHandler
 	permissionValidators  []PermissionValidator
@@ -79,6 +79,7 @@ func NewRouter(Config *RouterConfig) *Router {
 		DeletedMessageHandler: Config.DeletedMessageHandler,
 		msgWaitingQueue:       []*msgQueueItem{},
 		msgWaitingQueueLock:   &sync.Mutex{},
+		botUsers:              map[uint]*disgord.User{},
 	}
 
 	// Set the help command.

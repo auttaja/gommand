@@ -8,14 +8,16 @@ import (
 // Handles setting the bot user initially.
 func (r *Router) readyEvt(_ disgord.Session, evt *disgord.Ready) {
 	// Set the bot user.
-	r.BotUser = evt.User
+	r.cmdLock.Lock()
+	r.botUsers[evt.ShardID] = evt.User
+	r.cmdLock.Unlock()
 }
 
 // Handles changing the bot user if this is required.
 func (r *Router) userUpdate(_ disgord.Session, evt *disgord.UserUpdate) {
 	// Check if it's the same user.
 	r.cmdLock.RLock()
-	if r.BotUser.ID != evt.User.ID {
+	if r.botUsers[evt.ShardID].ID != evt.User.ID {
 		r.cmdLock.RUnlock()
 		return
 	}
@@ -23,12 +25,12 @@ func (r *Router) userUpdate(_ disgord.Session, evt *disgord.UserUpdate) {
 
 	// Set the bot user.
 	r.cmdLock.Lock()
-	r.BotUser = evt.User
+	r.botUsers[evt.ShardID] = evt.User
 	r.cmdLock.Unlock()
 }
 
 // CommandProcessor is used to do the message command processing.
-func (r *Router) CommandProcessor(s disgord.Session, msg *disgord.Message, prefix bool) {
+func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.Message, prefix bool) {
 	// If the message is from a bot or this isn't in a guild, ignore it.
 	if msg.Author.Bot || msg.IsDirectMessage() {
 		return
@@ -40,7 +42,7 @@ func (r *Router) CommandProcessor(s disgord.Session, msg *disgord.Message, prefi
 	// Create the context.
 	ctx := &Context{
 		Message:          msg,
-		BotUser:          r.BotUser,
+		BotUser:          r.botUsers[ShardID],
 		Router:           r,
 		Session:          s,
 		Args:             []interface{}{},
@@ -152,7 +154,7 @@ func (r *Router) msgCreate(s disgord.Session, evt *disgord.MessageCreate) {
 	}()
 
 	// Launch the handler in a go-routine.
-	go r.CommandProcessor(s, evt.Message, true)
+	go r.CommandProcessor(s, evt.ShardID, evt.Message, true)
 }
 
 // Hook is used to hook all required events into the disgord client.
