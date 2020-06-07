@@ -4,7 +4,6 @@ import "testing"
 
 // TestMiddleware is used to test the middleware functionality.
 func TestMiddleware(t *testing.T) {
-	patchMember = false
 	r := NewRouter(&RouterConfig{
 		PrefixCheck: StaticPrefix("%"),
 		Middleware: []Middleware{

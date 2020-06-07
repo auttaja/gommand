@@ -4,7 +4,6 @@ import "testing"
 
 // TestRemainder is used to test the remainder argument parser.
 func TestRemainder(t *testing.T) {
-	patchMember = false
 	r := NewRouter(&RouterConfig{
 		PrefixCheck: StaticPrefix("%"),
 	})

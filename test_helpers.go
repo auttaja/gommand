@@ -4,6 +4,7 @@ import "github.com/andersfylling/disgord"
 
 func mockMessage(content string) *disgord.Message {
 	return &disgord.Message{
+		Member:          &disgord.Member{},
 		Lockable:        disgord.Lockable{},
 		Author:          &disgord.User{Bot: false},
 		Timestamp:       disgord.Time{},

@@ -4,7 +4,6 @@ import "testing"
 
 // TestGetCommands is used to test getting commands.
 func TestGetCommands(t *testing.T) {
-	patchMember = false
 	r := NewRouter(&RouterConfig{})
 	r.SetCommand(&Command{
 		Name: "a",

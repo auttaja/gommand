@@ -7,7 +7,6 @@ import (
 
 // TestSingleArgument is used to test a basic echo command.
 func TestSingleArgument(t *testing.T) {
-	patchMember = false
 	r := NewRouter(&RouterConfig{
 		PrefixCheck: StaticPrefix("%"),
 	})
@@ -38,7 +37,6 @@ func TestSingleArgument(t *testing.T) {
 
 // BenchmarkSingleArgument is used to benchmark a basic echo command.
 func BenchmarkSingleArgument(b *testing.B) {
-	patchMember = false
 	r := NewRouter(&RouterConfig{
 		PrefixCheck: StaticPrefix("%"),
 	})

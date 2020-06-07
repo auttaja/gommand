@@ -6,7 +6,6 @@ import (
 
 // TestGreedy is used to test the greedy argument parser.
 func TestGreedy(t *testing.T) {
-	patchMember = false
 	r := NewRouter(&RouterConfig{
 		PrefixCheck: StaticPrefix("%"),
 	})

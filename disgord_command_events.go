@@ -1,14 +1,9 @@
 package gommand
 
 import (
-	"context"
 	"github.com/andersfylling/disgord"
 	"strings"
 )
-
-// Defines if the member should be patched in.
-// This is true by default, and should only be made false for unit tests.
-var patchMember = true
 
 // Handles setting the bot user initially.
 func (r *Router) readyEvt(_ disgord.Session, evt *disgord.Ready) {
@@ -64,17 +59,9 @@ func (r *Router) CommandProcessor(s disgord.Session, msg *disgord.Message, prefi
 		}
 	}
 
-	// The member should be patched into the message object here to make it easier.
-	if patchMember {
-		member, err := s.GetMember(context.TODO(), msg.GuildID, msg.Author.ID)
-		if err != nil {
-			r.cmdLock.RUnlock()
-			r.errorHandler(ctx, err)
-			return
-		}
-		member.GuildID = msg.GuildID
-		msg.Member = member
-	}
+	// Parts of the member should be patched into the message object here to make it easier to use.
+	msg.Member.GuildID = msg.GuildID
+	msg.Member.User = msg.Author
 
 	// Iterate the message until the space.
 	cmdname := ""

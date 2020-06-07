@@ -4,7 +4,6 @@ import "testing"
 
 // TestOptional is used to test the optional argument parser.
 func TestOptional(t *testing.T) {
-	patchMember = false
 	r := NewRouter(&RouterConfig{
 		PrefixCheck: StaticPrefix("%"),
 	})
