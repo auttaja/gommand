@@ -2,6 +2,7 @@ package gommand
 
 import (
 	"context"
+	"errors"
 	"github.com/andersfylling/disgord"
 )
 
@@ -37,6 +38,48 @@ func (c *Context) Channel() (*disgord.Channel, error) {
 // Reply is used to quickly reply to a command with a message.
 func (c *Context) Reply(data ...interface{}) (*disgord.Message, error) {
 	return c.Session.SendMsg(context.TODO(), c.Message.ChannelID, data...)
+}
+
+// PermissionVerifiedReply is used to reply to a command with a message.
+// This is slower than the standard reply command since it checks it has permission first, but it also reduces the risk of a Cloudflare ban from the API.
+func (c *Context) PermissionVerifiedReply(data ...interface{}) (*disgord.Message, error) {
+	m, err := c.BotMember()
+	if err != nil {
+		return nil, err
+	}
+	channel, err := c.Channel()
+	if err != nil {
+		return nil, err
+	}
+	perms, err := channel.GetPermissions(context.TODO(), c.Session, m)
+	if err != nil {
+		return nil, err
+	}
+	required := disgord.PermissionSendMessages
+	for _, v := range data {
+		switch v.(type) {
+		case disgord.Embed, *disgord.Embed:
+			required |= disgord.PermissionEmbedLinks
+		case disgord.CreateMessageFileParams, *disgord.CreateMessageFileParams:
+			required |= disgord.PermissionAttachFiles
+		case disgord.Message, *disgord.Message:
+			embedlen := 0
+			x, ok := v.(disgord.Message)
+			if ok {
+				embedlen = len(x.Embeds)
+			} else {
+				x := v.(*disgord.Message)
+				embedlen = len(x.Embeds)
+			}
+			if embedlen >= 1 {
+				required |= disgord.PermissionEmbedLinks
+			}
+		}
+	}
+	if (perms & required) != perms {
+		return nil, errors.New("invalid permission")
+	}
+	return c.Reply(data...)
 }
 
 // WaitForMessage allows you to wait for a message.
