@@ -5,7 +5,7 @@ import "context"
 // Used to wrap permissions.
 func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(ctx *Context) (string, bool) {
 	return func(ctx *Context) (string, bool) {
-		guild, err := ctx.Session.GetGuild(context.TODO(), ctx.Message.Member.GuildID)
+		guild, err := ctx.Guild()
 		if err != nil {
 			return err.Error(), false
 		}

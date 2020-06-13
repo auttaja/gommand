@@ -31,6 +31,11 @@ func (c *Context) BotMember() (*disgord.Member, error) {
 	return c.Session.GetMember(context.TODO(), c.Message.GuildID, c.BotUser.ID)
 }
 
+// Guild is used to get the guild if the bot needs it.
+func (c *Context) Guild() (*disgord.Guild, error) {
+	return c.Session.GetGuild(context.TODO(), c.Message.Member.GuildID)
+}
+
 // Channel is used to get the channel if the bot needs it.
 func (c *Context) Channel() (*disgord.Channel, error) {
 	return c.Session.GetChannel(context.TODO(), c.Message.ChannelID)
@@ -77,8 +82,14 @@ func (c *Context) PermissionVerifiedReply(data ...interface{}) (*disgord.Message
 			}
 		}
 	}
-	if (perms & required) != required {
-		return nil, errors.New("invalid permission")
+	if (perms&required) != required && (perms&disgord.PermissionAdministrator) != disgord.PermissionAdministrator {
+		g, err := c.Guild()
+		if err != nil {
+			return nil, err
+		}
+		if g.OwnerID != m.UserID {
+			return nil, errors.New("invalid permissions")
+		}
 	}
 	return c.Reply(data...)
 }
