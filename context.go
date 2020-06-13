@@ -8,7 +8,7 @@ import (
 
 // Context defines the information which might be required to run the command.
 type Context struct {
-	ShardID          uint                   `json:"shardId`
+	ShardID          uint                   `json:"shardId"`
 	Prefix           string                 `json:"prefix"`
 	Message          *disgord.Message       `json:"message"`
 	BotUser          *disgord.User          `json:"botUser"`
