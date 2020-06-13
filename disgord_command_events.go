@@ -41,6 +41,7 @@ func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.
 
 	// Create the context.
 	ctx := &Context{
+		ShardID:          ShardID,
 		Message:          msg,
 		BotUser:          r.botUsers[ShardID],
 		Router:           r,
