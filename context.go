@@ -76,7 +76,7 @@ func (c *Context) PermissionVerifiedReply(data ...interface{}) (*disgord.Message
 			}
 		}
 	}
-	if (perms & required) != perms {
+	if (perms & required) != required {
 		return nil, errors.New("invalid permission")
 	}
 	return c.Reply(data...)
