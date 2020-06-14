@@ -1,7 +1,7 @@
 package gommand
 
 import (
-	"bytes"
+	"io"
 	"strings"
 )
 
@@ -108,7 +108,7 @@ func (c *Command) HasPermission(ctx *Context) error {
 }
 
 // Used to run the command.
-func runCommand(ctx *Context, reader *StringIterator, c CommandInterface) (err error) {
+func runCommand(ctx *Context, reader io.ReadSeeker, c CommandInterface) (err error) {
 	// Handle recovering from exceptions.
 	defer func() {
 		if r := recover(); r != nil {
@@ -167,64 +167,25 @@ func runCommand(ctx *Context, reader *StringIterator, c CommandInterface) (err e
 		// The array containing all transformed arguments.
 		Args := make([]interface{}, ArgCount)
 
-		// The functions to handle raw arguments.
-		GetOneArg := func() (string, int) {
-			raw := 0
-			arg := bytes.Buffer{}
-			first := true
-			quote := false
-			for {
-				// Read a char.
-				c, err := reader.GetChar()
-				if err != nil {
-					// Return the current argument and raw length.
-					return arg.String(), raw
-				}
-				raw++
-				if c == '"' {
-					if first {
-						// Handle the start of a quote.
-						quote = true
-					} else if quote {
-						// If this is within the quote, return the arg.
-						return arg.String(), raw
-					}
-				} else if c == ' ' {
-					// If this is the beginning, continue. If this isn't a quote, return. If it is, add to it.
-					if first {
-						continue
-					} else if quote {
-						_ = arg.WriteByte(' ')
-					} else {
-						return arg.String(), raw
-					}
-				} else {
-					// Just add to the argument.
-					_ = arg.WriteByte(c)
-				}
-
-				// Set first to false.
-				first = false
-			}
-		}
-		ReaddArg := func(n uint) {
-			reader.Rewind(n)
-		}
+		// Defines the argument parser.
+		parser := ctx.Router.parserManager.Parser(reader)
 
 		// This is where we transform each argument.
 		for i, v := range c.GetArgTransformers() {
 			if v.Remainder {
 				// Get the remainder.
-				remainder, _ := reader.GetRemainder(true)
+				remainder, _ := parser.Remainder()
 				remainder = strings.Trim(remainder, " ")
 				if remainder == "" {
 					// Is this an optional argument?
 					if !v.Optional {
+						parser.Done()
 						return &IncorrectPermissions{err: "Remainder cannot be optional."}
 					}
 				} else {
 					x, err := v.Function(ctx, remainder)
 					if err != nil {
+						parser.Done()
 						return err
 					}
 					Args[i] = x
@@ -235,8 +196,8 @@ func runCommand(ctx *Context, reader *StringIterator, c CommandInterface) (err e
 				FirstArg := true
 				ArgsTransformed := make([]interface{}, 0, 1)
 				for {
-					Arg, n := GetOneArg()
-					if Arg == "" {
+					Argument := parser.GetNextArg()
+					if Argument == nil {
 						if FirstArg {
 							// This is the first argument.
 							// This is important because we are expecting a result if this is not optional.
@@ -246,6 +207,7 @@ func runCommand(ctx *Context, reader *StringIterator, c CommandInterface) (err e
 							} else {
 								// This isn't optional - throw an error.
 								err = &InvalidArgCount{err: "Expected an argument for the greedy converter."}
+								parser.Done()
 								return
 							}
 						} else {
@@ -253,13 +215,14 @@ func runCommand(ctx *Context, reader *StringIterator, c CommandInterface) (err e
 						}
 					} else {
 						// Attempt to parse this argument.
-						res, err := v.Function(ctx, Arg)
+						res, err := v.Function(ctx, Argument.Text)
 						if err != nil {
 							if FirstArg {
+								parser.Done()
 								return err
 							}
 
-							ReaddArg(uint(n))
+							_ = Argument.Rewind()
 							break
 						}
 						ArgsTransformed = append(ArgsTransformed, res)
@@ -271,21 +234,26 @@ func runCommand(ctx *Context, reader *StringIterator, c CommandInterface) (err e
 				}
 			} else {
 				// Try and get one argument.
-				Arg, _ := GetOneArg()
-				if Arg == "" {
+				Argument := parser.GetNextArg()
+				if Argument == nil {
 					if v.Optional {
 						break
 					} else {
+						parser.Done()
 						return &InvalidArgCount{err: "A required argument is missing."}
 					}
 				}
-				x, err := v.Function(ctx, Arg)
+				x, err := v.Function(ctx, Argument.Text)
 				if err != nil {
+					parser.Done()
 					return err
 				}
 				Args[i] = x
 			}
 		}
+
+		// Mark the parser as done.
+		parser.Done()
 
 		// Set the arguments.
 		ctx.Args = Args

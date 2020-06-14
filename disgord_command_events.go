@@ -2,6 +2,7 @@ package gommand
 
 import (
 	"github.com/andersfylling/disgord"
+	"io"
 	"strings"
 )
 
@@ -50,8 +51,8 @@ func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.
 		MiddlewareParams: map[string]interface{}{},
 	}
 
-	// Create a string iterator of the message content.
-	reader := &StringIterator{Text: msg.Content}
+	// Create a read seeker of the message content.
+	reader := strings.NewReader(msg.Content)
 
 	// Run a prefix check.
 	if prefix {
@@ -69,7 +70,7 @@ func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.
 	// Iterate the message until the space.
 	cmdname := ""
 	for {
-		b, err := reader.GetChar()
+		b, err := reader.ReadByte()
 		if err != nil || b == ' ' {
 			break
 		}
@@ -93,7 +94,10 @@ func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.
 	}
 
 	// Get the remainder as raw arguments.
-	remainder, _ := reader.GetRemainder(false)
+	p := r.parserManager.Parser(reader)
+	remainder, _ := p.Remainder()
+	p.Done()
+	reader.Seek(int64(len(remainder)*-1), io.SeekCurrent)
 	ctx.RawArgs = remainder
 
 	// Get the command if it exists.

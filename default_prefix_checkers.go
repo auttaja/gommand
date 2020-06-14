@@ -1,17 +1,22 @@
 package gommand
 
+import "io"
+
+import "strings"
+
 // StaticPrefix is used for simple static prefixes.
-func StaticPrefix(Prefix string) func(_ *Context, r *StringIterator) bool {
+func StaticPrefix(Prefix string) func(_ *Context, r io.ReadSeeker) bool {
 	bytes := []byte(Prefix)
 	l := len(bytes)
-	return func(ctx *Context, r *StringIterator) bool {
+	return func(ctx *Context, r io.ReadSeeker) bool {
 		i := 0
+		ob := make([]byte, 1)
 		for i != l {
-			b, err := r.GetChar()
+			_, err := r.Read(ob)
 			if err != nil {
 				return false
 			}
-			if b != bytes[i] {
+			if ob[0] != bytes[i] {
 				return false
 			}
 			i++
@@ -22,7 +27,7 @@ func StaticPrefix(Prefix string) func(_ *Context, r *StringIterator) bool {
 }
 
 // MentionPrefix is used to handle a mention which is being used as a prefix.
-func MentionPrefix(ctx *Context, r *StringIterator) bool {
+func MentionPrefix(ctx *Context, r io.ReadSeeker) bool {
 	// Get the bot ID.
 	BotID := ctx.BotUser.ID.String()
 
@@ -36,12 +41,13 @@ func MentionPrefix(ctx *Context, r *StringIterator) bool {
 
 	// Remove any whitespace.
 	for {
-		c, err := r.GetChar()
+		ob := make([]byte, 1)
+		_, err := r.Read(ob)
 		if err != nil {
 			break
 		}
-		if c != ' ' {
-			r.Pos--
+		if ob[0] != ' ' {
+			r.Seek(-1, io.SeekCurrent)
 			break
 		}
 	}
@@ -52,14 +58,16 @@ func MentionPrefix(ctx *Context, r *StringIterator) bool {
 }
 
 // MultiplePrefixCheckers is used to handle multiple prefix checkers.
-func MultiplePrefixCheckers(Handlers ...PrefixCheck) func(ctx *Context, r *StringIterator) bool {
-	return func(ctx *Context, r *StringIterator) bool {
-		pos := r.Pos
+func MultiplePrefixCheckers(Handlers ...PrefixCheck) func(ctx *Context, r io.ReadSeeker) bool {
+	return func(ctx *Context, r io.ReadSeeker) bool {
+		sr := r.(*strings.Reader)
+		s := sr.Size()
 		for _, v := range Handlers {
 			if v(ctx, r) {
 				return true
 			}
-			r.Pos = pos
+			read := s - int64(sr.Len())
+			r.Seek(read*-1, io.SeekCurrent)
 		}
 		return false
 	}

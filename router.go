@@ -2,13 +2,15 @@ package gommand
 
 import (
 	"github.com/andersfylling/disgord"
+	"github.com/auttaja/fastparse"
+	"io"
 	"strings"
 	"sync"
 )
 
 // PrefixCheck is the type for a function to check the prefix. true here means the prefix is there and was read.
 // Note that prefix functions cannot see the member object in the message since that is patched in AFTER this is ran.
-type PrefixCheck = func(ctx *Context, r *StringIterator) bool
+type PrefixCheck = func(ctx *Context, r io.ReadSeeker) bool
 
 // ErrorHandler is a function which is used to handle errors.
 // true here means that the error was handled by this handler. If this is false, the processor will go to the next handler.
@@ -17,7 +19,7 @@ type ErrorHandler = func(ctx *Context, err error) bool
 // CustomCommandsHandler is the handler which is used for custom commands.
 // An error being returned by the custom commands handler will return in that being passed through to the error handler instead.
 // true here represents this being a custom command. This means the Router will not go through the errors handler unless an error is set.
-type CustomCommandsHandler = func(ctx *Context, cmdname string, r *StringIterator) (bool, error)
+type CustomCommandsHandler = func(ctx *Context, cmdname string, r io.ReadSeeker) (bool, error)
 
 // PermissionValidator is a function which is used to validate someones permissions who is running a command.
 // If the boolean is set to true, it means the user has permissions.
@@ -36,6 +38,10 @@ type RouterConfig struct {
 	ErrorHandlers         []ErrorHandler
 	PermissionValidators  []PermissionValidator
 	Middleware            []Middleware
+
+	// The number if message pads which will be created in memory to allow for quicker parsing.
+	// Please set this to -1 if you do not want any, 0 will default to 100.
+	MessagePads int
 }
 
 type msgQueueItem struct {
@@ -56,6 +62,7 @@ type Router struct {
 	middleware            []Middleware
 	msgWaitingQueue       []*msgQueueItem
 	msgWaitingQueueLock   *sync.Mutex
+	parserManager         *fastparse.ParserManager
 	DeletedMessageHandler *DeletedMessageHandler
 }
 
@@ -63,12 +70,17 @@ type Router struct {
 func NewRouter(Config *RouterConfig) *Router {
 	if Config.PrefixCheck == nil {
 		// No prefix.
-		Config.PrefixCheck = func(ctx *Context, r *StringIterator) bool {
+		Config.PrefixCheck = func(ctx *Context, r io.ReadSeeker) bool {
 			return true
 		}
 	}
 
 	// Set the Router.
+	if Config.MessagePads == 0 {
+		Config.MessagePads = 100
+	} else if 0 > Config.MessagePads {
+		Config.MessagePads = 0
+	}
 	r := &Router{
 		PrefixCheck:           Config.PrefixCheck,
 		cmds:                  map[string]CommandInterface{},
@@ -80,6 +92,7 @@ func NewRouter(Config *RouterConfig) *Router {
 		msgWaitingQueue:       []*msgQueueItem{},
 		msgWaitingQueueLock:   &sync.Mutex{},
 		botUsers:              map[uint]*disgord.User{},
+		parserManager:         fastparse.NewParserManager(2000, Config.MessagePads),
 	}
 
 	// Set the help command.

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/andersfylling/disgord"
+	"strings"
 )
 
 // Context defines the information which might be required to run the command.
@@ -23,7 +24,7 @@ type Context struct {
 // Replay is used to replay a command.
 func (c *Context) Replay() error {
 	c.Args = []interface{}{}
-	return runCommand(c, &StringIterator{Text: c.RawArgs}, c.Command)
+	return runCommand(c, strings.NewReader(c.RawArgs), c.Command)
 }
 
 // BotMember is used to get the bot as a member of the server this was within.

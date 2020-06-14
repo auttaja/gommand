@@ -3,6 +3,8 @@ package gommand
 import (
 	"context"
 	"github.com/andersfylling/disgord"
+	"github.com/auttaja/fastparse"
+	"io"
 	"strconv"
 	"strings"
 	"time"
@@ -34,7 +36,7 @@ func UIntTransformer(_ *Context, Arg string) (interface{}, error) {
 // UserTransformer is used to transform a user if possible.
 func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid user ID or mention."}
-	id := getMention(&StringIterator{Text: Arg}, '@', false)
+	id := getMention(strings.NewReader(Arg), '@', false)
 	if id == nil {
 		return
 	}
@@ -48,7 +50,7 @@ func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
 // MemberTransformer is used to transform a member if possible.
 func MemberTransformer(ctx *Context, Arg string) (member interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid user ID or mention of someone in this guild."}
-	id := getMention(&StringIterator{Text: Arg}, '@', false)
+	id := getMention(strings.NewReader(Arg), '@', false)
 	if id == nil {
 		return
 	}
@@ -62,7 +64,7 @@ func MemberTransformer(ctx *Context, Arg string) (member interface{}, err error)
 // ChannelTransformer is used to transform a channel if possible.
 func ChannelTransformer(ctx *Context, Arg string) (channel interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid channel ID or mention of a channel in this guild."}
-	id := getMention(&StringIterator{Text: Arg}, '#', false)
+	id := getMention(strings.NewReader(Arg), '#', false)
 	if id == nil {
 		return
 	}
@@ -74,22 +76,25 @@ func ChannelTransformer(ctx *Context, Arg string) (channel interface{}, err erro
 }
 
 // Gets ID's from the URL if possible.
-func getMessageIds(start string, iterator *StringIterator) []string {
-	urlStart := &StringIterator{Text: start}
+func getMessageIds(manager *fastparse.ParserManager, start string, iterator io.ReadSeeker) []string {
+	urlStart := strings.NewReader(start)
+	ob := make([]byte, 1)
 	for {
-		b, e := urlStart.GetChar()
+		b, e := urlStart.ReadByte()
 		if e != nil {
 			break
 		}
-		x, e := iterator.GetChar()
+		_, e = iterator.Read(ob)
 		if e != nil {
 			return nil
 		}
-		if x != b {
+		if ob[0] != b {
 			return nil
 		}
 	}
-	s, _ := iterator.GetRemainder(true)
+	p := manager.Parser(iterator)
+	defer p.Done()
+	s, _ := p.Remainder()
 	split := strings.Split(s, "/")
 	if len(split) != 3 && len(split) != 4 {
 		return nil
@@ -100,11 +105,11 @@ func getMessageIds(start string, iterator *StringIterator) []string {
 // MessageURLTransformer is used to transform a message URL to a message if possible.
 func MessageURLTransformer(ctx *Context, Arg string) (message interface{}, err error) {
 	err = &InvalidTransformation{Description: "This is not a valid message URL or a message which the bot cannot access."}
-	iterator := &StringIterator{Text: Arg}
-	a := getMessageIds("https://discordapp.com/channels/", iterator)
+	iterator := strings.NewReader(Arg)
+	a := getMessageIds(ctx.Router.parserManager, "https://discordapp.com/channels/", iterator)
 	if a == nil {
-		iterator.Pos = 0
-		a = getMessageIds("https://discord.com/channels/", iterator)
+		iterator.Seek(0, io.SeekStart)
+		a = getMessageIds(ctx.Router.parserManager, "https://discord.com/channels/", iterator)
 		if a == nil {
 			return
 		}
@@ -139,7 +144,7 @@ func BooleanTransformer(_ *Context, Arg string) (interface{}, error) {
 // RoleTransformer is used to transform a role if possible.
 func RoleTransformer(ctx *Context, Arg string) (role interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid role ID or mention of a role in this guild."}
-	id := getMention(&StringIterator{Text: Arg}, '@', true)
+	id := getMention(strings.NewReader(Arg), '@', true)
 	if id == nil {
 		return
 	}
