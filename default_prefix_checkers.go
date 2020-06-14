@@ -47,7 +47,7 @@ func MentionPrefix(ctx *Context, r io.ReadSeeker) bool {
 			break
 		}
 		if ob[0] != ' ' {
-			r.Seek(-1, io.SeekCurrent)
+			_, _ = r.Seek(-1, io.SeekCurrent)
 			break
 		}
 	}
@@ -67,7 +67,7 @@ func MultiplePrefixCheckers(Handlers ...PrefixCheck) func(ctx *Context, r io.Rea
 				return true
 			}
 			read := s - int64(sr.Len())
-			r.Seek(read*-1, io.SeekCurrent)
+			_, _ = r.Seek(read*-1, io.SeekCurrent)
 		}
 		return false
 	}

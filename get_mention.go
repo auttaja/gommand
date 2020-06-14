@@ -94,7 +94,7 @@ func getMention(r io.ReadSeeker, char uint8, role bool) *string {
 					if mention {
 						return nil
 					}
-					r.Seek(-1, io.SeekCurrent)
+					_, _ = r.Seek(-1, io.SeekCurrent)
 					return &CmpID
 				}
 			}

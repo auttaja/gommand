@@ -97,7 +97,7 @@ func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.
 	p := r.parserManager.Parser(reader)
 	remainder, _ := p.Remainder()
 	p.Done()
-	reader.Seek(int64(len(remainder)*-1), io.SeekCurrent)
+	_, _ = reader.Seek(int64(len(remainder)*-1), io.SeekCurrent)
 	ctx.RawArgs = remainder
 
 	// Get the command if it exists.

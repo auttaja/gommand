@@ -108,7 +108,7 @@ func MessageURLTransformer(ctx *Context, Arg string) (message interface{}, err e
 	iterator := strings.NewReader(Arg)
 	a := getMessageIds(ctx.Router.parserManager, "https://discordapp.com/channels/", iterator)
 	if a == nil {
-		iterator.Seek(0, io.SeekStart)
+		_, _ = iterator.Seek(0, io.SeekStart)
 		a = getMessageIds(ctx.Router.parserManager, "https://discord.com/channels/", iterator)
 		if a == nil {
 			return
