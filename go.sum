@@ -1,11 +1,5 @@
-github.com/andersfylling/disgord v0.17.1 h1:hsTGznAg3aVF1AaPYeBNV6fcyebgPHiB5JS8V2+LrnQ=
-github.com/andersfylling/disgord v0.17.1/go.mod h1:pVzPt8z0aye3LkxuM0NA0u11h5y2x+1Z3Bf8Ipru/GA=
-github.com/andersfylling/disgord v0.17.3 h1:2wBIMwgmR6VXCXgTjfP/9Eoq4B+YZTlEEFVStgvS5Lo=
-github.com/andersfylling/disgord v0.17.3/go.mod h1:pVzPt8z0aye3LkxuM0NA0u11h5y2x+1Z3Bf8Ipru/GA=
-github.com/andersfylling/disgord v0.17.4-0.20200613142616-ecbe7e86a925 h1:QxFhMi6TxLqL2Pu85l8RU+RtooObWp6lI+G3P8CfGvk=
-github.com/andersfylling/disgord v0.17.4-0.20200613142616-ecbe7e86a925/go.mod h1:pVzPt8z0aye3LkxuM0NA0u11h5y2x+1Z3Bf8Ipru/GA=
-github.com/andersfylling/disgord v0.17.4-0.20200613163439-3957890aae3b h1:uHR/slY2Hyd9ptfO4CHPviaiqiloWPAmn+u+SCuV+fg=
-github.com/andersfylling/disgord v0.17.4-0.20200613163439-3957890aae3b/go.mod h1:pVzPt8z0aye3LkxuM0NA0u11h5y2x+1Z3Bf8Ipru/GA=
+github.com/andersfylling/disgord v0.18.0 h1:IUSLOHk7ll6UeZi64W313KuJjmUtBSe5I8f3CL1w5qk=
+github.com/andersfylling/disgord v0.18.0/go.mod h1:pVzPt8z0aye3LkxuM0NA0u11h5y2x+1Z3Bf8Ipru/GA=
 github.com/andersfylling/snowflake/v4 v4.0.2 h1:7po1HHxq8Pz7F+vsMFMoGiHOlpzBzqXoop4O8b24wqI=
 github.com/andersfylling/snowflake/v4 v4.0.2/go.mod h1:4lIbDTtWCTaYBCZVVIDjIH8xbzHSYz+RvxK2KZND840=
 github.com/auttaja/fastparse v1.0.0 h1:LKz4H6j2M050n0BFGZV9i/6D4zHfbeawXw4yJaD2ncQ=
