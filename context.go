@@ -2,7 +2,6 @@ package gommand
 
 import (
 	"context"
-	"errors"
 	"github.com/andersfylling/disgord"
 	"strings"
 )
@@ -89,7 +88,10 @@ func (c *Context) PermissionVerifiedReply(data ...interface{}) (*disgord.Message
 			return nil, err
 		}
 		if g.OwnerID != m.UserID {
-			return nil, errors.New("invalid permissions")
+			return nil, &disgord.ErrRest{
+				Code: 403,
+				Msg:  "Permissions check failed.",
+			}
 		}
 	}
 	return c.Reply(data...)
