@@ -130,34 +130,6 @@ func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.
 
 // Handles processing new messages.
 func (r *Router) msgCreate(s disgord.Session, evt *disgord.MessageCreate) {
-	// Create a go-routine to handle message waiting.
-	go func() {
-		// Lock the message queue.
-		// This is not a R/W mutex because of potential race conditions if we have to read unlock and then lock.
-		r.msgWaitingQueueLock.Lock()
-
-		// Create the index array for the items we want to purge.
-		indexes := make([]int, 0, 1)
-
-		// Iterate through the message queue.
-		for i, v := range r.msgWaitingQueue {
-			if v.function(s, evt.Message) {
-				// This event can now be dropped from the queue.
-				indexes = append(indexes, i)
-				v.goroutine <- evt.Message
-			}
-		}
-
-		// Remove each index from the array.
-		for _, i := range indexes {
-			r.msgWaitingQueue[i] = r.msgWaitingQueue[len(r.msgWaitingQueue)-1]
-			r.msgWaitingQueue = r.msgWaitingQueue[:len(r.msgWaitingQueue)-1]
-		}
-
-		// Unlock the message queue.
-		r.msgWaitingQueueLock.Unlock()
-	}()
-
 	// Launch the handler in a go-routine.
 	go r.CommandProcessor(s, evt.ShardID, evt.Message, true)
 }

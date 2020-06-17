@@ -99,13 +99,18 @@ func (c *Context) PermissionVerifiedReply(data ...interface{}) (*disgord.Message
 
 // WaitForMessage allows you to wait for a message.
 func (c *Context) WaitForMessage(CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message {
-	c.Router.msgWaitingQueueLock.Lock()
 	x := make(chan *disgord.Message)
-	c.Router.msgWaitingQueue = append(c.Router.msgWaitingQueue, &msgQueueItem{
-		function:  CheckFunc,
-		goroutine: x,
-	})
-	c.Router.msgWaitingQueueLock.Unlock()
+	var once func(s disgord.Session, msg *disgord.MessageCreate)
+	once = func(s disgord.Session, e *disgord.MessageCreate) {
+		go func() {
+			if CheckFunc(s, e.Message) {
+				x <- e.Message
+				return
+			}
+			c.Session.On(disgord.EvtMessageCreate, once, &disgord.Ctrl{Runs: 1})
+		}()
+	}
+	c.Session.On(disgord.EvtMessageCreate, once, &disgord.Ctrl{Runs: 1})
 	return <-x
 }
 

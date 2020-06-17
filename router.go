@@ -44,11 +44,6 @@ type RouterConfig struct {
 	MessagePads int
 }
 
-type msgQueueItem struct {
-	function  func(s disgord.Session, msg *disgord.Message) bool
-	goroutine chan *disgord.Message
-}
-
 // Router defines the command router which is being used.
 // Please call NewRouter to initialise this rather than creating a new struct.
 type Router struct {
@@ -60,8 +55,6 @@ type Router struct {
 	errorHandlers         []ErrorHandler
 	permissionValidators  []PermissionValidator
 	middleware            []Middleware
-	msgWaitingQueue       []*msgQueueItem
-	msgWaitingQueueLock   *sync.Mutex
 	parserManager         *fastparse.ParserManager
 	DeletedMessageHandler *DeletedMessageHandler
 }
@@ -89,8 +82,6 @@ func NewRouter(Config *RouterConfig) *Router {
 		permissionValidators:  Config.PermissionValidators,
 		middleware:            Config.Middleware,
 		DeletedMessageHandler: Config.DeletedMessageHandler,
-		msgWaitingQueue:       []*msgQueueItem{},
-		msgWaitingQueueLock:   &sync.Mutex{},
 		botUsers:              map[uint]*disgord.User{},
 		parserManager:         fastparse.NewParserManager(2000, Config.MessagePads),
 	}
