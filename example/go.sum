@@ -1,10 +1,16 @@
 github.com/andersfylling/disgord v0.17.0/go.mod h1:pVzPt8z0aye3LkxuM0NA0u11h5y2x+1Z3Bf8Ipru/GA=
 github.com/andersfylling/disgord v0.17.1 h1:hsTGznAg3aVF1AaPYeBNV6fcyebgPHiB5JS8V2+LrnQ=
 github.com/andersfylling/disgord v0.17.1/go.mod h1:pVzPt8z0aye3LkxuM0NA0u11h5y2x+1Z3Bf8Ipru/GA=
+github.com/andersfylling/disgord v0.18.0 h1:IUSLOHk7ll6UeZi64W313KuJjmUtBSe5I8f3CL1w5qk=
+github.com/andersfylling/disgord v0.18.0/go.mod h1:pVzPt8z0aye3LkxuM0NA0u11h5y2x+1Z3Bf8Ipru/GA=
 github.com/andersfylling/snowflake/v4 v4.0.2 h1:7po1HHxq8Pz7F+vsMFMoGiHOlpzBzqXoop4O8b24wqI=
 github.com/andersfylling/snowflake/v4 v4.0.2/go.mod h1:4lIbDTtWCTaYBCZVVIDjIH8xbzHSYz+RvxK2KZND840=
+github.com/auttaja/fastparse v1.0.0 h1:LKz4H6j2M050n0BFGZV9i/6D4zHfbeawXw4yJaD2ncQ=
+github.com/auttaja/fastparse v1.0.0/go.mod h1:JJRkYBw609+6Aum/PWRrkQFEVDeLLop+zrD0Mo7jY3I=
 github.com/auttaja/gommand v0.0.0-20200522222909-8fb689513764 h1:WXoyaXIWH6fRFhdmDDNjTJnmFhCdIAxjNIFsa2T0yIo=
 github.com/auttaja/gommand v0.0.0-20200522222909-8fb689513764/go.mod h1:TfOW1gkVk0L0vQuOuHWSY992zJA22wohWyOuXYGx/lY=
+github.com/auttaja/gommand v1.3.2-0.20200701175123-03cbe4d3ff26 h1:ZAeqGqJ3pAUSFzcirPPvBWxX/8PdjiF+uetkaA91G84=
+github.com/auttaja/gommand v1.3.2-0.20200701175123-03cbe4d3ff26/go.mod h1:XDQTPPo/2FBBQ8V/QkKUxXGRZhzLMMrLeOeMKI/zyHw=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gobwas/httphead v0.0.0-20180130184737-2c6c146eadee/go.mod h1:L0fX3K22YWvt/FAX9NnzrNzcI4wNYi9Yku4O0LKYflo=
