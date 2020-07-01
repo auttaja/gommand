@@ -2,27 +2,116 @@ package gommand
 
 import "context"
 
+// PermissionCheckSettings is used to define the settings which are used to define the settings for checking permissions.
+type PermissionCheckSettings uint8
+
+const (
+	// CheckMembersUserPermissions is used to check the members user permissions.
+	CheckMembersUserPermissions PermissionCheckSettings = 1 << iota
+
+	// CheckMembersChannelPermissions is used to check the members channel permissions.
+	CheckMembersChannelPermissions
+
+	// CheckBotUserPermissions is used to check the bots user permissions.
+	CheckBotUserPermissions
+
+	// CheckBotChannelPermissions is used to check the bots channel permissions.
+	CheckBotChannelPermissions
+)
+
 // Used to wrap permissions.
-func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(ctx *Context) (string, bool) {
-	return func(ctx *Context) (string, bool) {
-		guild, err := ctx.Guild()
-		if err != nil {
-			return err.Error(), false
-		}
-		if guild.OwnerID == ctx.Message.Author.ID {
-			return "", true
-		}
-		perms, err := ctx.Message.Member.GetPermissions(context.TODO(), ctx.Session)
-		if err != nil {
-			return err.Error(), false
+func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(Checks PermissionCheckSettings) func(ctx *Context) (string, bool) {
+	return func(Checks PermissionCheckSettings) func(ctx *Context) (string, bool) {
+		// Get all of the check types.
+		checkMemberUser := Checks&CheckMembersUserPermissions != 0
+		checkMemberChannel := Checks&CheckMembersChannelPermissions != 0
+		checkBotUser := Checks&CheckBotUserPermissions != 0
+		checkBotChannel := Checks&CheckBotChannelPermissions != 0
+
+		// If all are false, assume we want to check the member user.
+		if !checkBotChannel && !checkBotUser && !checkMemberChannel && !checkMemberUser {
+			checkMemberUser = true
 		}
 
-		// 0x00000008 is the ADMINISTRATOR permission hex code and bypasses everything.
-		if (perms & 0x00000008) == 0x00000008 {
-			return "", true
+		// Create the array of checks we want.
+		checks := make([]func(ctx *Context) (string, bool), 0, 1)
+
+		// Run any member checks.
+		if checkMemberChannel || checkMemberUser {
+			f := func(ctx *Context) (string, bool) {
+				guild, err := ctx.Guild()
+				if err != nil {
+					return err.Error(), false
+				}
+				if guild.OwnerID == ctx.Message.Author.ID {
+					return "", true
+				}
+				var perms uint64
+				if checkMemberChannel {
+					c, err := ctx.Channel()
+					if err != nil {
+						return err.Error(), false
+					}
+					perms, err = c.GetPermissions(context.TODO(), ctx.Session, ctx.Message.Member)
+				} else {
+					perms, err = ctx.Message.Member.GetPermissions(context.TODO(), ctx.Session)
+				}
+				if err != nil {
+					return err.Error(), false
+				}
+
+				// 0x00000008 is the ADMINISTRATOR permission hex code and bypasses everything.
+				if (perms & 0x00000008) == 0x00000008 {
+					return "", true
+				}
+
+				return "You must have the  \"" + PermissionName + "\" permission to run this command.", (perms & PermissionsHex) == PermissionsHex
+			}
+			checks = append(checks, f)
 		}
 
-		return "You must have the  \"" + PermissionName + "\" permission to run this command.", (perms & PermissionsHex) == PermissionsHex
+		// Run any bot user checks.
+		if checkBotChannel || checkBotUser {
+			f := func(ctx *Context) (string, bool) {
+				member, err := ctx.BotMember()
+				if err != nil {
+					return err.Error(), false
+				}
+
+				var perms uint64
+				if checkBotChannel {
+					c, err := ctx.Channel()
+					if err != nil {
+						return err.Error(), false
+					}
+					perms, err = c.GetPermissions(context.TODO(), ctx.Session, member)
+				} else {
+					perms, err = member.GetPermissions(context.TODO(), ctx.Session)
+				}
+				if err != nil {
+					return err.Error(), false
+				}
+
+				// 0x00000008 is the ADMINISTRATOR permission hex code and bypasses everything.
+				if (perms & 0x00000008) == 0x00000008 {
+					return "", true
+				}
+
+				return "The bot must have the  \"" + PermissionName + "\" permission to run this command.", (perms & PermissionsHex) == PermissionsHex
+			}
+			checks = append(checks, f)
+		}
+
+		// Return something to run through them.
+		return func(ctx *Context) (string, bool) {
+			for _, check := range checks {
+				s, ok := check(ctx)
+				if !ok {
+					return s, ok
+				}
+			}
+			return "", true
+		}
 	}
 }
 
