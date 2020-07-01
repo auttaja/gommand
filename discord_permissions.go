@@ -53,11 +53,14 @@ func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(Check
 						return err.Error(), false
 					}
 					perms, err = c.GetPermissions(context.TODO(), ctx.Session, ctx.Message.Member)
+					if err != nil {
+						return err.Error(), false
+					}
 				} else {
 					perms, err = ctx.Message.Member.GetPermissions(context.TODO(), ctx.Session)
-				}
-				if err != nil {
-					return err.Error(), false
+					if err != nil {
+						return err.Error(), false
+					}
 				}
 
 				// 0x00000008 is the ADMINISTRATOR permission hex code and bypasses everything.
@@ -85,11 +88,14 @@ func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(Check
 						return err.Error(), false
 					}
 					perms, err = c.GetPermissions(context.TODO(), ctx.Session, member)
+					if err != nil {
+						return err.Error(), false
+					}
 				} else {
 					perms, err = member.GetPermissions(context.TODO(), ctx.Session)
-				}
-				if err != nil {
-					return err.Error(), false
+					if err != nil {
+						return err.Error(), false
+					}
 				}
 
 				// 0x00000008 is the ADMINISTRATOR permission hex code and bypasses everything.
