@@ -152,7 +152,7 @@ var VIEW_CHANNEL = permissionsWrapper("View Channel", 0x00000400)
 var SEND_MESSAGES = permissionsWrapper("Send Messages", 0x00000800)
 
 // SEND_TTS_MESSAGES is a wrapper for the Discord permission.
-var SEND_TTS_MESSAGES = permissionsWrapper("Send Tts Messages", 0x00001000)
+var SEND_TTS_MESSAGES = permissionsWrapper("Send TTS Messages", 0x00001000)
 
 // MANAGE_MESSAGES is a wrapper for the Discord permission.
 var MANAGE_MESSAGES = permissionsWrapper("Manage Messages", 0x00002000)
