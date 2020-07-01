@@ -2,7 +2,7 @@ package gommand
 
 import "context"
 
-// PermissionCheckSettings is used to define the settings which are used to define the settings for checking permissions.
+// PermissionCheckSettings is used to define the settings which are used for checking permissions.
 type PermissionCheckSettings uint8
 
 const (
