@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/andersfylling/disgord"
 	"strings"
+	"time"
 )
 
 // Context defines the information which might be required to run the command.
@@ -97,20 +98,32 @@ func (c *Context) PermissionVerifiedReply(data ...interface{}) (*disgord.Message
 	return c.Reply(data...)
 }
 
-// WaitForMessage allows you to wait for a message.
-func (c *Context) WaitForMessage(CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message {
+// WaitForMessage allows you to wait for a message. You should NOT block during the check function.
+func (c *Context) WaitForMessage(ctx context.Context, CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message {
 	x := make(chan *disgord.Message)
-	var once func(s disgord.Session, msg *disgord.MessageCreate)
-	once = func(s disgord.Session, e *disgord.MessageCreate) {
-		go func() {
-			if CheckFunc(s, e.Message) {
-				x <- e.Message
-				return
+	middleware := func(evt interface{}) interface{} {
+		if e, ok := evt.(*disgord.MessageCreate); ok {
+			if !CheckFunc(c.Session, e.Message) {
+				return nil
 			}
-			c.Session.On(disgord.EvtMessageCreate, once, &disgord.Ctrl{Runs: 1})
-		}()
+		}
+		return evt
 	}
-	c.Session.On(disgord.EvtMessageCreate, once, &disgord.Ctrl{Runs: 1})
+	var timer *time.Timer
+	until, ok := ctx.Deadline()
+	if ok {
+		d := until.Sub(time.Now())
+		timer = time.AfterFunc(d, func() {
+			x <- nil
+		})
+	}
+	emitChan := func(_ disgord.Session, e *disgord.MessageCreate) {
+		x <- e.Message
+		if timer != nil {
+			timer.Stop()
+		}
+	}
+	c.Session.On(disgord.EvtMessageCreate, middleware, emitChan, &disgord.Ctrl{Runs: 1, Until: until})
 	return <-x
 }
 

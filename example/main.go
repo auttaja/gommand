@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/andersfylling/disgord"
 	"github.com/auttaja/gommand"
@@ -110,10 +111,15 @@ func init() {
 		Description: "Wait for a message then echo it.",
 		Function: func(ctx *gommand.Context) error {
 			_, _ = ctx.Reply("say the message")
-			resp := ctx.WaitForMessage(func(_ disgord.Session, msg *disgord.Message) bool {
+			c, _ := context.WithTimeout(context.TODO(), 5*time.Second)
+			resp := ctx.WaitForMessage(context.TODO(), func(_ disgord.Session, msg *disgord.Message) bool {
 				return msg.Author.ID == ctx.Message.Author.ID && msg.ChannelID == ctx.Message.ChannelID
 			})
-			_, _ = ctx.Reply(resp.Content)
+			if resp == nil {
+				_, _ = ctx.Reply("timed out")
+			} else {
+				_, _ = ctx.Reply(resp.Content)
+			}
 			return nil
 		},
 	})
