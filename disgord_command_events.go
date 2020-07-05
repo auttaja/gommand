@@ -41,17 +41,16 @@ func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.
 	r.cmdLock.RLock()
 
 	// Create the context.
-	var ctx *Context
-	ctx = &Context{
+	ctx := &Context{
 		ShardID:          ShardID,
 		Message:          msg,
 		BotUser:          r.botUsers[ShardID],
 		Router:           r,
 		Session:          s,
 		Args:             []interface{}{},
-		WaitManager:      &WaitManager{ctx: ctx},
 		MiddlewareParams: map[string]interface{}{},
 	}
+	ctx.WaitManager = &WaitManager{ctx: ctx}
 
 	// Create a read seeker of the message content.
 	reader := strings.NewReader(msg.Content)
