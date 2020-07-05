@@ -17,5 +17,5 @@ It also contains several helper functions:
 - `BotMember() (*disgord.Member, error)`: Get the bot as a member of the guild which the command is being ran in.
 - `Channel() (*disgord.Channel, error)`: Get the channel which this is being ran in.
 - `Reply(data ...interface{}) (*disgord.Message, error)`: A shorter way to quickly reply to a message.
-- `WaitForMessage(CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message`: Waits for a message based on the check function you gave.
+- `WaitForMessage(ctx context.Context, CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message`: Waits for a message based on the check function you gave.
 - `DisplayEmbedMenu(m *EmbedMenu) error`: Used to display an [embed menu](./embed-menus.md).
