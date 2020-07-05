@@ -125,6 +125,29 @@ func init() {
 		},
 	})
 
+	// Waits for a reaction from the user.
+	router.SetCommand(&gommand.Command{
+		Name:        "reactionwait",
+		Description: "Wait for a reaction from the user then echo it.",
+		Function: func(ctx *gommand.Context) error {
+			msg, err := ctx.Reply("react with what you want echoed")
+			if err != nil {
+				return nil
+			}
+			c, cancel := context.WithTimeout(context.TODO(), time.Minute)
+			defer cancel()
+			resp := ctx.WaitManager.WaitForMessageReactionAdd(c, func(_ disgord.Session, evt *disgord.MessageReactionAdd) bool {
+				return evt.UserID == ctx.Message.Author.ID && evt.MessageID == msg.ID
+			})
+			if resp == nil {
+				_, _ = ctx.Reply("timed out")
+			} else {
+				_, _ = ctx.Reply(resp.PartialEmoji)
+			}
+			return nil
+		},
+	})
+
 	// Create a basic embed menu.
 	router.SetCommand(&gommand.Command{
 		Name:        "embedmenu",
