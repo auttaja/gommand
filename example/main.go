@@ -112,7 +112,7 @@ func init() {
 		Function: func(ctx *gommand.Context) error {
 			_, _ = ctx.Reply("say the message")
 			c, _ := context.WithTimeout(context.TODO(), 5*time.Second)
-			resp := ctx.WaitForMessage(context.TODO(), func(_ disgord.Session, msg *disgord.Message) bool {
+			resp := ctx.WaitForMessage(c, func(_ disgord.Session, msg *disgord.Message) bool {
 				return msg.Author.ID == ctx.Message.Author.ID && msg.ChannelID == ctx.Message.ChannelID
 			})
 			if resp == nil {
