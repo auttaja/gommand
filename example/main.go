@@ -111,7 +111,8 @@ func init() {
 		Description: "Wait for a message then echo it.",
 		Function: func(ctx *gommand.Context) error {
 			_, _ = ctx.Reply("say the message")
-			c, _ := context.WithTimeout(context.TODO(), 5*time.Second)
+			c, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+			defer cancel()
 			resp := ctx.WaitForMessage(c, func(_ disgord.Session, msg *disgord.Message) bool {
 				return msg.Author.ID == ctx.Message.Author.ID && msg.ChannelID == ctx.Message.ChannelID
 			})
