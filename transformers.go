@@ -105,14 +105,25 @@ func getMessageIds(manager *fastparse.ParserManager, start string, iterator io.R
 // MessageURLTransformer is used to transform a message URL to a message if possible.
 func MessageURLTransformer(ctx *Context, Arg string) (message interface{}, err error) {
 	err = &InvalidTransformation{Description: "This is not a valid message URL or a message which the bot cannot access."}
+	discordMsgLinks := []string{
+		"https://discordapp.com/channels/",
+		"https://discord.com/channels",
+		"https://canary.discordapp.com/channels/",
+		"https://ptb.discordapp.com/channels/",
+	}
+	var a []string
 	iterator := strings.NewReader(Arg)
-	a := getMessageIds(ctx.Router.parserManager, "https://discordapp.com/channels/", iterator)
-	if a == nil {
-		_, _ = iterator.Seek(0, io.SeekStart)
-		a = getMessageIds(ctx.Router.parserManager, "https://discord.com/channels/", iterator)
-		if a == nil {
-			return
+	for i, link := range discordMsgLinks {
+		// Avoid unnecessary seeks when possible (first iteration)
+		if i > 0 {
+			_, _ = iterator.Seek(0, io.SeekStart)
 		}
+		if a = getMessageIds(ctx.Router.parserManager, link, iterator); a != nil {
+			break
+		}
+	}
+	if a == nil {
+		return
 	}
 	message, e := ctx.Session.GetMessage(context.TODO(), disgord.ParseSnowflakeString(a[1]), disgord.ParseSnowflakeString(a[2]))
 	if e == nil {
