@@ -112,8 +112,7 @@ func (c *Context) WaitForMessage(ctx context.Context, CheckFunc func(s disgord.S
 	var timer *time.Timer
 	until, ok := ctx.Deadline()
 	if ok {
-		d := until.Sub(time.Now())
-		timer = time.AfterFunc(d, func() {
+		timer = time.AfterFunc(time.Until(until), func() {
 			x <- nil
 		})
 	}
