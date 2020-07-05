@@ -53,6 +53,10 @@ func (w *WaitManager) WaitFor{{ . }}(ctx context.Context, CheckFunc func(s disgo
 		}
 		return false
 	})
-	return x.(*disgord.{{ . }})
+	r, ok := x.(*disgord.{{ . }})
+	if !ok {
+	    return nil
+	}
+	return r
 }
 {{ end }}

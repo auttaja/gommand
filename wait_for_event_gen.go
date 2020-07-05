@@ -113,7 +113,11 @@ func (w *WaitManager) WaitForChannelCreate(ctx context.Context, CheckFunc func(s
 		}
 		return false
 	})
-	return x.(*disgord.ChannelCreate)
+	r, ok := x.(*disgord.ChannelCreate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForChannelUpdate allows you to wait for the ChannelUpdate event. You should NOT block during the check function.
@@ -124,7 +128,11 @@ func (w *WaitManager) WaitForChannelUpdate(ctx context.Context, CheckFunc func(s
 		}
 		return false
 	})
-	return x.(*disgord.ChannelUpdate)
+	r, ok := x.(*disgord.ChannelUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForChannelDelete allows you to wait for the ChannelDelete event. You should NOT block during the check function.
@@ -135,7 +143,11 @@ func (w *WaitManager) WaitForChannelDelete(ctx context.Context, CheckFunc func(s
 		}
 		return false
 	})
-	return x.(*disgord.ChannelDelete)
+	r, ok := x.(*disgord.ChannelDelete)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForChannelPinsUpdate allows you to wait for the ChannelPinsUpdate event. You should NOT block during the check function.
@@ -146,7 +158,11 @@ func (w *WaitManager) WaitForChannelPinsUpdate(ctx context.Context, CheckFunc fu
 		}
 		return false
 	})
-	return x.(*disgord.ChannelPinsUpdate)
+	r, ok := x.(*disgord.ChannelPinsUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForTypingStart allows you to wait for the TypingStart event. You should NOT block during the check function.
@@ -157,7 +173,11 @@ func (w *WaitManager) WaitForTypingStart(ctx context.Context, CheckFunc func(s d
 		}
 		return false
 	})
-	return x.(*disgord.TypingStart)
+	r, ok := x.(*disgord.TypingStart)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForInviteDelete allows you to wait for the InviteDelete event. You should NOT block during the check function.
@@ -168,7 +188,11 @@ func (w *WaitManager) WaitForInviteDelete(ctx context.Context, CheckFunc func(s 
 		}
 		return false
 	})
-	return x.(*disgord.InviteDelete)
+	r, ok := x.(*disgord.InviteDelete)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForMessageCreate allows you to wait for the MessageCreate event. You should NOT block during the check function.
@@ -179,7 +203,11 @@ func (w *WaitManager) WaitForMessageCreate(ctx context.Context, CheckFunc func(s
 		}
 		return false
 	})
-	return x.(*disgord.MessageCreate)
+	r, ok := x.(*disgord.MessageCreate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForMessageUpdate allows you to wait for the MessageUpdate event. You should NOT block during the check function.
@@ -190,7 +218,11 @@ func (w *WaitManager) WaitForMessageUpdate(ctx context.Context, CheckFunc func(s
 		}
 		return false
 	})
-	return x.(*disgord.MessageUpdate)
+	r, ok := x.(*disgord.MessageUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForMessageDelete allows you to wait for the MessageDelete event. You should NOT block during the check function.
@@ -201,7 +233,11 @@ func (w *WaitManager) WaitForMessageDelete(ctx context.Context, CheckFunc func(s
 		}
 		return false
 	})
-	return x.(*disgord.MessageDelete)
+	r, ok := x.(*disgord.MessageDelete)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForMessageDeleteBulk allows you to wait for the MessageDeleteBulk event. You should NOT block during the check function.
@@ -212,7 +248,11 @@ func (w *WaitManager) WaitForMessageDeleteBulk(ctx context.Context, CheckFunc fu
 		}
 		return false
 	})
-	return x.(*disgord.MessageDeleteBulk)
+	r, ok := x.(*disgord.MessageDeleteBulk)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForMessageReactionAdd allows you to wait for the MessageReactionAdd event. You should NOT block during the check function.
@@ -223,7 +263,11 @@ func (w *WaitManager) WaitForMessageReactionAdd(ctx context.Context, CheckFunc f
 		}
 		return false
 	})
-	return x.(*disgord.MessageReactionAdd)
+	r, ok := x.(*disgord.MessageReactionAdd)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForMessageReactionRemove allows you to wait for the MessageReactionRemove event. You should NOT block during the check function.
@@ -234,7 +278,11 @@ func (w *WaitManager) WaitForMessageReactionRemove(ctx context.Context, CheckFun
 		}
 		return false
 	})
-	return x.(*disgord.MessageReactionRemove)
+	r, ok := x.(*disgord.MessageReactionRemove)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForMessageReactionRemoveAll allows you to wait for the MessageReactionRemoveAll event. You should NOT block during the check function.
@@ -245,7 +293,11 @@ func (w *WaitManager) WaitForMessageReactionRemoveAll(ctx context.Context, Check
 		}
 		return false
 	})
-	return x.(*disgord.MessageReactionRemoveAll)
+	r, ok := x.(*disgord.MessageReactionRemoveAll)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildEmojisUpdate allows you to wait for the GuildEmojisUpdate event. You should NOT block during the check function.
@@ -256,7 +308,11 @@ func (w *WaitManager) WaitForGuildEmojisUpdate(ctx context.Context, CheckFunc fu
 		}
 		return false
 	})
-	return x.(*disgord.GuildEmojisUpdate)
+	r, ok := x.(*disgord.GuildEmojisUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildCreate allows you to wait for the GuildCreate event. You should NOT block during the check function.
@@ -267,7 +323,11 @@ func (w *WaitManager) WaitForGuildCreate(ctx context.Context, CheckFunc func(s d
 		}
 		return false
 	})
-	return x.(*disgord.GuildCreate)
+	r, ok := x.(*disgord.GuildCreate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildUpdate allows you to wait for the GuildUpdate event. You should NOT block during the check function.
@@ -278,7 +338,11 @@ func (w *WaitManager) WaitForGuildUpdate(ctx context.Context, CheckFunc func(s d
 		}
 		return false
 	})
-	return x.(*disgord.GuildUpdate)
+	r, ok := x.(*disgord.GuildUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildDelete allows you to wait for the GuildDelete event. You should NOT block during the check function.
@@ -289,7 +353,11 @@ func (w *WaitManager) WaitForGuildDelete(ctx context.Context, CheckFunc func(s d
 		}
 		return false
 	})
-	return x.(*disgord.GuildDelete)
+	r, ok := x.(*disgord.GuildDelete)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildBanAdd allows you to wait for the GuildBanAdd event. You should NOT block during the check function.
@@ -300,7 +368,11 @@ func (w *WaitManager) WaitForGuildBanAdd(ctx context.Context, CheckFunc func(s d
 		}
 		return false
 	})
-	return x.(*disgord.GuildBanAdd)
+	r, ok := x.(*disgord.GuildBanAdd)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildBanRemove allows you to wait for the GuildBanRemove event. You should NOT block during the check function.
@@ -311,7 +383,11 @@ func (w *WaitManager) WaitForGuildBanRemove(ctx context.Context, CheckFunc func(
 		}
 		return false
 	})
-	return x.(*disgord.GuildBanRemove)
+	r, ok := x.(*disgord.GuildBanRemove)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildMemberAdd allows you to wait for the GuildMemberAdd event. You should NOT block during the check function.
@@ -322,7 +398,11 @@ func (w *WaitManager) WaitForGuildMemberAdd(ctx context.Context, CheckFunc func(
 		}
 		return false
 	})
-	return x.(*disgord.GuildMemberAdd)
+	r, ok := x.(*disgord.GuildMemberAdd)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildMemberRemove allows you to wait for the GuildMemberRemove event. You should NOT block during the check function.
@@ -333,7 +413,11 @@ func (w *WaitManager) WaitForGuildMemberRemove(ctx context.Context, CheckFunc fu
 		}
 		return false
 	})
-	return x.(*disgord.GuildMemberRemove)
+	r, ok := x.(*disgord.GuildMemberRemove)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildMemberUpdate allows you to wait for the GuildMemberUpdate event. You should NOT block during the check function.
@@ -344,7 +428,11 @@ func (w *WaitManager) WaitForGuildMemberUpdate(ctx context.Context, CheckFunc fu
 		}
 		return false
 	})
-	return x.(*disgord.GuildMemberUpdate)
+	r, ok := x.(*disgord.GuildMemberUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildRoleCreate allows you to wait for the GuildRoleCreate event. You should NOT block during the check function.
@@ -355,7 +443,11 @@ func (w *WaitManager) WaitForGuildRoleCreate(ctx context.Context, CheckFunc func
 		}
 		return false
 	})
-	return x.(*disgord.GuildRoleCreate)
+	r, ok := x.(*disgord.GuildRoleCreate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildRoleUpdate allows you to wait for the GuildRoleUpdate event. You should NOT block during the check function.
@@ -366,7 +458,11 @@ func (w *WaitManager) WaitForGuildRoleUpdate(ctx context.Context, CheckFunc func
 		}
 		return false
 	})
-	return x.(*disgord.GuildRoleUpdate)
+	r, ok := x.(*disgord.GuildRoleUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForGuildRoleDelete allows you to wait for the GuildRoleDelete event. You should NOT block during the check function.
@@ -377,7 +473,11 @@ func (w *WaitManager) WaitForGuildRoleDelete(ctx context.Context, CheckFunc func
 		}
 		return false
 	})
-	return x.(*disgord.GuildRoleDelete)
+	r, ok := x.(*disgord.GuildRoleDelete)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForPresenceUpdate allows you to wait for the PresenceUpdate event. You should NOT block during the check function.
@@ -388,7 +488,11 @@ func (w *WaitManager) WaitForPresenceUpdate(ctx context.Context, CheckFunc func(
 		}
 		return false
 	})
-	return x.(*disgord.PresenceUpdate)
+	r, ok := x.(*disgord.PresenceUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForUserUpdate allows you to wait for the UserUpdate event. You should NOT block during the check function.
@@ -399,7 +503,11 @@ func (w *WaitManager) WaitForUserUpdate(ctx context.Context, CheckFunc func(s di
 		}
 		return false
 	})
-	return x.(*disgord.UserUpdate)
+	r, ok := x.(*disgord.UserUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForVoiceStateUpdate allows you to wait for the VoiceStateUpdate event. You should NOT block during the check function.
@@ -410,7 +518,11 @@ func (w *WaitManager) WaitForVoiceStateUpdate(ctx context.Context, CheckFunc fun
 		}
 		return false
 	})
-	return x.(*disgord.VoiceStateUpdate)
+	r, ok := x.(*disgord.VoiceStateUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForVoiceServerUpdate allows you to wait for the VoiceServerUpdate event. You should NOT block during the check function.
@@ -421,7 +533,11 @@ func (w *WaitManager) WaitForVoiceServerUpdate(ctx context.Context, CheckFunc fu
 		}
 		return false
 	})
-	return x.(*disgord.VoiceServerUpdate)
+	r, ok := x.(*disgord.VoiceServerUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForWebhooksUpdate allows you to wait for the WebhooksUpdate event. You should NOT block during the check function.
@@ -432,7 +548,11 @@ func (w *WaitManager) WaitForWebhooksUpdate(ctx context.Context, CheckFunc func(
 		}
 		return false
 	})
-	return x.(*disgord.WebhooksUpdate)
+	r, ok := x.(*disgord.WebhooksUpdate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
 
 // WaitForInviteCreate allows you to wait for the InviteCreate event. You should NOT block during the check function.
@@ -443,5 +563,9 @@ func (w *WaitManager) WaitForInviteCreate(ctx context.Context, CheckFunc func(s 
 		}
 		return false
 	})
-	return x.(*disgord.InviteCreate)
+	r, ok := x.(*disgord.InviteCreate)
+	if !ok {
+	    return nil
+	}
+	return r
 }
