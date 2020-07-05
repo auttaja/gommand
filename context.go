@@ -1,10 +1,10 @@
+//go:generate go run generate_wait_for_event.go
 package gommand
 
 import (
 	"context"
 	"github.com/andersfylling/disgord"
 	"strings"
-	"time"
 )
 
 // Context defines the information which might be required to run the command.
@@ -18,6 +18,7 @@ type Context struct {
 	Command          CommandInterface       `json:"command"`
 	RawArgs          string                 `json:"rawArgs"`
 	Args             []interface{}          `json:"args"`
+	WaitManager      *WaitManager           `json:"-"`
 	MiddlewareParams map[string]interface{} `json:"middlewareParams"`
 }
 
@@ -98,32 +99,15 @@ func (c *Context) PermissionVerifiedReply(data ...interface{}) (*disgord.Message
 	return c.Reply(data...)
 }
 
-// WaitForMessage allows you to wait for a message. You should NOT block during the check function.
-func (c *Context) WaitForMessage(ctx context.Context, CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message {
-	x := make(chan *disgord.Message)
-	middleware := func(evt interface{}) interface{} {
-		if e, ok := evt.(*disgord.MessageCreate); ok {
-			if !CheckFunc(c.Session, e.Message) {
-				return nil
-			}
-		}
-		return evt
+// WaitForMessage allows you to wait for a message. This function uses WaitForMessageCreate internally and is mainly here for simplicity and compatibility. You should NOT block during the check function.
+func (c *Context) WaitForMessage(ctx context.Context, CheckFunc func(s disgord.Session, evt *disgord.Message) bool) *disgord.Message {
+	x := c.WaitManager.WaitForMessageCreate(ctx, func(s disgord.Session, evt *disgord.MessageCreate) bool {
+		return CheckFunc(s, evt.Message)
+	})
+	if x == nil {
+		return nil
 	}
-	var timer *time.Timer
-	until, ok := ctx.Deadline()
-	if ok {
-		timer = time.AfterFunc(time.Until(until), func() {
-			x <- nil
-		})
-	}
-	emitChan := func(_ disgord.Session, e *disgord.MessageCreate) {
-		x <- e.Message
-		if timer != nil {
-			timer.Stop()
-		}
-	}
-	c.Session.On(disgord.EvtMessageCreate, middleware, emitChan, &disgord.Ctrl{Runs: 1, Until: until})
-	return <-x
+	return x.Message
 }
 
 // DisplayEmbedMenu is used to allow you to easily display a embed menu.
