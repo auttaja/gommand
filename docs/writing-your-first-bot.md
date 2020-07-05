@@ -104,8 +104,8 @@ The boolean in this function represents whether the error should be parsed throu
 ## Waiting for a message
 The [`Context`](./context.md) struct which is provided when a command is ran contains some extremely powerful features. One example of this would be waiting for a message. To wait for a message, we can use the `WaitForMessage` function to wait for a message based on the condition specified. When the condition is met, the response will be the message:
 ```go
-    // Echos the message.
-    resp := ctx.WaitForMessage(func(_ disgord.Session, msg *disgord.Message) bool {
+    // Echos the message. You can change the context to have a timeout.
+    resp := ctx.WaitForMessage(context.TODO(), func(_ disgord.Session, msg *disgord.Message) bool {
         return msg.Author.ID == ctx.Message.Author.ID && msg.ChannelID == ctx.Message.ChannelID
     })
     _, _ = ctx.Reply(resp.Content)
