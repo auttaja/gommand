@@ -107,7 +107,7 @@ func MessageURLTransformer(ctx *Context, Arg string) (message interface{}, err e
 	err = &InvalidTransformation{Description: "This is not a valid message URL or a message which the bot cannot access."}
 	discordMsgLinks := []string{
 		"https://discordapp.com/channels/",
-		"https://discord.com/channels",
+		"https://discord.com/channels/",
 		"https://canary.discordapp.com/channels/",
 		"https://ptb.discordapp.com/channels/",
 	}

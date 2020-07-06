@@ -1,8 +1,9 @@
 package gommand
 
-import "io"
-
-import "strings"
+import (
+	"io"
+	"strings"
+)
 
 // StaticPrefix is used for simple static prefixes.
 func StaticPrefix(Prefix string) func(_ *Context, r io.ReadSeeker) bool {
