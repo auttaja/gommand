@@ -20,6 +20,12 @@ type ArgTransformer struct {
 
 	// Function is used to transform the argument. The function should error if this is not possible.
 	Function func(ctx *Context, Arg string) (interface{}, error)
+
+	// Default is the value the arg will have if it isn't supplied by the user.
+	// This will not be used in case of an error from the transformer function, only when no argument is passed by the user.
+	// Either a slice or a single value can be passed here and it will be handled accordingly.
+	// Similarly to optional, this either has to be one of the end arguments (or followed by other default arguments only).
+	Default interface{}
 }
 
 // CommandInterface is used to define a interface which is used for commands.
@@ -177,6 +183,10 @@ func runCommand(ctx *Context, reader io.ReadSeeker, c CommandInterface) (err err
 				remainder, _ := parser.Remainder()
 				remainder = strings.Trim(remainder, " ")
 				if remainder == "" {
+					if v.Default != nil {
+						Args[i] = v.Default
+						continue
+					}
 					// Is this an optional argument?
 					if !v.Optional {
 						parser.Done()
@@ -201,11 +211,20 @@ func runCommand(ctx *Context, reader io.ReadSeeker, c CommandInterface) (err err
 						if FirstArg {
 							// This is the first argument.
 							// This is important because we are expecting a result if this is not optional.
-							if v.Optional {
+							if v.Default != nil {
+								// The user didn't provide an argument here, but there was a default argument for this converter - use that instead.
+								if defaultSlice, ok := v.Default.([]interface{}); ok {
+									// If the default is a slice then treat it as multiple arguments and pass those to ArgsTransformed.
+									ArgsTransformed = append(ArgsTransformed, defaultSlice...)
+								} else {
+									ArgsTransformed = append(ArgsTransformed, v.Default)
+								}
+								break
+							} else if v.Optional {
 								// This is optional! We can break the loop here.
 								break
 							} else {
-								// This isn't optional - throw an error.
+								// This isn't optional and no default was provided - throw an error.
 								err = &InvalidArgCount{err: "Expected an argument for the greedy converter."}
 								parser.Done()
 								return
@@ -235,20 +254,25 @@ func runCommand(ctx *Context, reader io.ReadSeeker, c CommandInterface) (err err
 			} else {
 				// Try and get one argument.
 				Argument := parser.GetNextArg()
-				if Argument == nil {
-					if v.Optional {
-						break
-					} else {
+				if Argument != nil {
+					x, err := v.Function(ctx, Argument.Text)
+					if err != nil {
 						parser.Done()
-						return &InvalidArgCount{err: "A required argument is missing."}
+						return err
 					}
+					Args[i] = x
+					continue
 				}
-				x, err := v.Function(ctx, Argument.Text)
-				if err != nil {
+				if v.Default != nil {
+					Args[i] = v.Default
+					continue
+				}
+				if v.Optional {
+					break
+				} else {
 					parser.Done()
-					return err
+					return &InvalidArgCount{err: "A required argument is missing."}
 				}
-				Args[i] = x
 			}
 		}
 
