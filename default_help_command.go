@@ -83,6 +83,10 @@ func defaultHelpCommand() *Command {
 				Function: StringTransformer,
 			},
 		},
+		PermissionValidators: []PermissionValidator{
+			MANAGE_MESSAGES(CheckBotChannelPermissions),
+			EMBED_LINKS(CheckBotChannelPermissions),
+		},
 		Function: func(ctx *Context) error {
 			// Get a single command if it is set.
 			cmdname, ok := ctx.Args[0].(string)
