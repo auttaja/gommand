@@ -23,7 +23,6 @@ type ArgTransformer struct {
 
 	// Default is the value the arg will have if it isn't supplied by the user.
 	// This will not be used in case of an error from the transformer function, only when no argument is passed by the user.
-	// Either a slice or a single value can be passed here and it will be handled accordingly.
 	// Similarly to optional, this either has to be one of the end arguments (or followed by other default arguments only).
 	Default interface{}
 }
@@ -213,12 +212,7 @@ func runCommand(ctx *Context, reader io.ReadSeeker, c CommandInterface) (err err
 							// This is important because we are expecting a result if this is not optional.
 							if v.Default != nil {
 								// The user didn't provide an argument here, but there was a default argument for this converter - use that instead.
-								if defaultSlice, ok := v.Default.([]interface{}); ok {
-									// If the default is a slice then treat it as multiple arguments and pass those to ArgsTransformed.
-									ArgsTransformed = append(ArgsTransformed, defaultSlice...)
-								} else {
-									ArgsTransformed = append(ArgsTransformed, v.Default)
-								}
+								ArgsTransformed = append(ArgsTransformed, v.Default)
 								break
 							} else if v.Optional {
 								// This is optional! We can break the loop here.
