@@ -76,15 +76,14 @@ func defaultHelpCommand() *Command {
 	return &Command{
 		Name:        "help",
 		Description: "Used to get help for a command.",
-		Usage:       "[command]",
+		Usage:       "[page/command]",
 		ArgTransformers: []ArgTransformer{
 			{
 				Optional: true,
-				Function: StringTransformer,
+				Function: AnyTransformer(UIntTransformer, StringTransformer),
 			},
 		},
 		PermissionValidators: []PermissionValidator{
-			MANAGE_MESSAGES(CheckBotChannelPermissions),
 			EMBED_LINKS(CheckBotChannelPermissions),
 		},
 		Function: func(ctx *Context) error {
@@ -113,6 +112,9 @@ func defaultHelpCommand() *Command {
 				return nil
 			}
 
+			// Get the page if it is set. If not, this will default to 0.
+			page, _ := ctx.Args[0].(uint64)
+
 			// Get the embed pages.
 			pages := make([]*disgord.Embed, 0)
 			for k, v := range ctx.Router.GetCommandsOrderedByCategory() {
@@ -120,7 +122,7 @@ func defaultHelpCommand() *Command {
 			}
 
 			// Send the embed pages.
-			_ = EmbedsPaginator(ctx, pages)
+			_ = EmbedsPaginator(ctx, pages, uint(page), "Use " + ctx.Prefix + "help <page number> to flick between pages.")
 
 			// Return no errors.
 			return nil
