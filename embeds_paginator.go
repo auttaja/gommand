@@ -29,7 +29,7 @@ func EmbedsPaginator(ctx *Context, Pages []*disgord.Embed, InitialPage uint, NoB
 	PagesLen := len(Pages)
 
 	// If initial page is greater than the length of pages, make it 0.
-	if int(InitialPage) > PagesLen {
+	if int(InitialPage) > PagesLen || InitialPage == 0 {
 		InitialPage = 1
 	}
 

@@ -112,7 +112,7 @@ func defaultHelpCommand() *Command {
 				return nil
 			}
 
-			// Get the page if it is set. If not, this will default to 0.
+			// Get the page if it is set. If not, this will default to 0 which is handled.
 			page, _ := ctx.Args[0].(uint64)
 
 			// Get the embed pages.

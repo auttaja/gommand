@@ -15,6 +15,8 @@ github.com/auttaja/gommand v1.4.1-0.20200705190519-1d77a9e2c434 h1:9u662ocD3mfr0
 github.com/auttaja/gommand v1.4.1-0.20200705190519-1d77a9e2c434/go.mod h1:XDQTPPo/2FBBQ8V/QkKUxXGRZhzLMMrLeOeMKI/zyHw=
 github.com/auttaja/gommand v1.4.1-0.20200705220348-c3dbf82c02f3 h1:zYmUUkGDPd8vlrnDBnQiPCtB+p5n3tgncv4d0COyyfA=
 github.com/auttaja/gommand v1.4.1-0.20200705220348-c3dbf82c02f3/go.mod h1:XDQTPPo/2FBBQ8V/QkKUxXGRZhzLMMrLeOeMKI/zyHw=
+github.com/auttaja/gommand v1.6.1-0.20200710221438-194bda7d32b2 h1:kwh3lbIlLKVVaPNHHquSMTFd7UEXLbSuvtBRWv0SpPE=
+github.com/auttaja/gommand v1.6.1-0.20200710221438-194bda7d32b2/go.mod h1:XDQTPPo/2FBBQ8V/QkKUxXGRZhzLMMrLeOeMKI/zyHw=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gobwas/httphead v0.0.0-20180130184737-2c6c146eadee/go.mod h1:L0fX3K22YWvt/FAX9NnzrNzcI4wNYi9Yku4O0LKYflo=

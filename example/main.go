@@ -198,7 +198,7 @@ func init() {
 						URL: "https://cdn.vox-cdn.com/thumbor/s6HznC4HCYrV3axUS-7wVOPbC2c=/0x0:1020x680/2050x1367/cdn.vox-cdn.com/assets/3785529/DOGE-10.jpg",
 					},
 				},
-			})
+			}, 0, "")
 			return nil
 		},
 	})
