@@ -154,13 +154,22 @@ func BooleanTransformer(_ *Context, Arg string) (interface{}, error) {
 
 // RoleTransformer is used to transform a role if possible.
 func RoleTransformer(ctx *Context, Arg string) (role interface{}, err error) {
-	err = &InvalidTransformation{Description: "This was not a valid role ID or mention of a role in this guild."}
+	err = &InvalidTransformation{Description: "This was not a valid role ID, mention or name of a role in this guild."}
 	id := getMention(strings.NewReader(Arg), '@', true)
-	if id == nil {
-		return
-	}
 	roles, e := ctx.Session.GetGuildRoles(context.TODO(), ctx.Message.GuildID)
 	if e != nil {
+		err = e
+		return
+	}
+	if id == nil {
+		// Try searching guild roles.
+		for _, role = range roles {
+			if strings.ToLower(role.(*disgord.Role).Name) == strings.ToLower(Arg) {
+				// This is the same role.
+				err = nil
+				return
+			}
+		}
 		return
 	}
 	for _, role = range roles {
