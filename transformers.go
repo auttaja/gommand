@@ -164,7 +164,7 @@ func RoleTransformer(ctx *Context, Arg string) (role interface{}, err error) {
 	if id == nil {
 		// Try searching guild roles.
 		for _, role = range roles {
-			if strings.ToLower(role.(*disgord.Role).Name) == strings.ToLower(Arg) {
+			if strings.EqualFold(role.(*disgord.Role).Name, Arg) {
 				// This is the same role.
 				err = nil
 				return
