@@ -56,9 +56,7 @@ func EmbedsPaginator(ctx *Context, Pages []*disgord.Embed, InitialPage uint, NoB
 	var LastPage *EmbedMenu
 
 	// Iterate through the pages.
-	var i uint
-	var em *disgord.Embed
-	for i, em = range Pages {
+	for i, em := range Pages {
 		// Prepare the embed.
 		em = PrepareEmbed(em)
 
@@ -87,10 +85,10 @@ func EmbedsPaginator(ctx *Context, Pages []*disgord.Embed, InitialPage uint, NoB
 					},
 				})
 			}
-			if i+1 == InitialPage {
+			if uint(i)+1 == InitialPage {
 				DisplayPage = LastPage
 			}
-		} else if i+1 == InitialPage {
+		} else if uint(i)+1 == InitialPage {
 			DisplayEmbed = em
 		}
 
