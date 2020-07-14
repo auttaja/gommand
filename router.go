@@ -38,7 +38,7 @@ type RouterConfig struct {
 	ErrorHandlers         []ErrorHandler
 	PermissionValidators  []PermissionValidator
 	Middleware            []Middleware
-	Cooldown Cooldown
+	Cooldown              Cooldown
 
 	// The number if message pads which will be created in memory to allow for quicker parsing.
 	// Please set this to -1 if you do not want any, 0 will default to 100.
@@ -58,7 +58,7 @@ type Router struct {
 	middleware            []Middleware
 	parserManager         *fastparse.ParserManager
 	DeletedMessageHandler *DeletedMessageHandler
-	Cooldown Cooldown
+	Cooldown              Cooldown
 }
 
 // NewRouter creates a new command Router.
@@ -84,7 +84,7 @@ func NewRouter(Config *RouterConfig) *Router {
 		permissionValidators:  Config.PermissionValidators,
 		middleware:            Config.Middleware,
 		DeletedMessageHandler: Config.DeletedMessageHandler,
-		Cooldown: Config.Cooldown,
+		Cooldown:              Config.Cooldown,
 		botUsers:              map[uint]*disgord.User{},
 		parserManager:         fastparse.NewParserManager(2000, Config.MessagePads),
 	}

@@ -14,7 +14,7 @@ type CategoryInterface interface {
 type Category struct {
 	Name                 string                `json:"name"`
 	Description          string                `json:"description"`
-	Cooldown Cooldown `json:"cooldown"`
+	Cooldown             Cooldown              `json:"cooldown"`
 	PermissionValidators []PermissionValidator `json:"-"`
 	Middleware           []Middleware          `json:"-"`
 }

@@ -57,7 +57,7 @@ func (i *cooldownInternals) check(id disgord.Snowflake, max uint, expires time.D
 	// Is the usages equal to max runs? If so, return false.
 	if usages == max {
 		durationFmt := durafmt.Parse(expires).String()
-		return "This command has a "+durationFmt+" cooldown.", false
+		return "This command has a " + durationFmt + " cooldown.", false
 	}
 
 	// Add 1 to usages and set it.
@@ -70,7 +70,7 @@ func (i *cooldownInternals) check(id disgord.Snowflake, max uint, expires time.D
 	})
 
 	// Return true here.
-	return  "", true
+	return "", true
 }
 
 // GuildCooldown implements the Cooldown interface and is used to handle guild level ratelimits.
