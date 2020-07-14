@@ -47,7 +47,7 @@ type CommandInterface interface {
 
 // Command defines a command which can be used within the Router.
 type Command struct {
-	*CommandBasics       `json:"-"`
+	*commandBasics       `json:"-"`
 	Name                 string                   `json:"name"`
 	Aliases              []string                 `json:"aliases"`
 	Description          string                   `json:"description"`
@@ -63,7 +63,7 @@ type Command struct {
 
 // Init is used to initialise the command.
 func (c *Command) Init() {
-	c.CommandBasics = &CommandBasics{parent: c}
+	c.commandBasics = &commandBasics{parent: c}
 }
 
 // CommandFunction is used to run the command function.

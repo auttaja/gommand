@@ -1,8 +1,6 @@
 package gommand
 
-// CommandBasics is the basic command structure minus Init and CommandFunction.
-// The objective is that you can inherit this with your structs if you wish to make your own.
-type CommandBasics struct {
+type commandBasics struct {
 	Name                 string                `json:"name"`
 	Aliases              []string              `json:"aliases"`
 	Description          string                `json:"description"`
@@ -15,8 +13,12 @@ type CommandBasics struct {
 	parent               *Command
 }
 
+// CommandBasics is the basic command structure minus Init and CommandFunction.
+// The objective is that you can inherit this with your structs if you wish to make your own.
+type CommandBasics = commandBasics
+
 // GetName is used to get the name.
-func (obj *CommandBasics) GetName() string {
+func (obj *commandBasics) GetName() string {
 	if obj.parent == nil {
 		return obj.Name
 	} else {
@@ -25,7 +27,7 @@ func (obj *CommandBasics) GetName() string {
 }
 
 // GetAliases is used to get the aliases.
-func (obj *CommandBasics) GetAliases() []string {
+func (obj *commandBasics) GetAliases() []string {
 	var Aliases []string
 	if obj.parent == nil {
 		Aliases = obj.Aliases
@@ -39,7 +41,7 @@ func (obj *CommandBasics) GetAliases() []string {
 }
 
 // GetDescription is used to get the description.
-func (obj *CommandBasics) GetDescription() string {
+func (obj *commandBasics) GetDescription() string {
 	if obj.parent == nil {
 		return obj.Description
 	} else {
@@ -48,7 +50,7 @@ func (obj *CommandBasics) GetDescription() string {
 }
 
 // GetUsage is used to get the usage.
-func (obj *CommandBasics) GetUsage() string {
+func (obj *commandBasics) GetUsage() string {
 	if obj.parent == nil {
 		return obj.Usage
 	} else {
@@ -57,7 +59,7 @@ func (obj *CommandBasics) GetUsage() string {
 }
 
 // GetCategory is used to get the category.
-func (obj *CommandBasics) GetCategory() CategoryInterface {
+func (obj *commandBasics) GetCategory() CategoryInterface {
 	if obj.parent == nil {
 		return obj.Category
 	} else {
@@ -66,7 +68,7 @@ func (obj *CommandBasics) GetCategory() CategoryInterface {
 }
 
 // GetPermissionValidators is used to get the permission validators.
-func (obj *CommandBasics) GetPermissionValidators() []PermissionValidator {
+func (obj *commandBasics) GetPermissionValidators() []PermissionValidator {
 	if obj.parent == nil {
 		return obj.PermissionValidators
 	} else {
@@ -75,7 +77,7 @@ func (obj *CommandBasics) GetPermissionValidators() []PermissionValidator {
 }
 
 // GetArgTransformers is used to get the arg transformers.
-func (obj *CommandBasics) GetArgTransformers() []ArgTransformer {
+func (obj *commandBasics) GetArgTransformers() []ArgTransformer {
 	if obj.parent == nil {
 		return obj.ArgTransformers
 	} else {
@@ -84,7 +86,7 @@ func (obj *CommandBasics) GetArgTransformers() []ArgTransformer {
 }
 
 // GetCooldown is used to get the cooldown.
-func (obj *CommandBasics) GetCooldown() Cooldown {
+func (obj *commandBasics) GetCooldown() Cooldown {
 	if obj.parent == nil {
 		return obj.Cooldown
 	} else {
@@ -93,7 +95,7 @@ func (obj *CommandBasics) GetCooldown() Cooldown {
 }
 
 // GetMiddleware is used to get the middleware.
-func (obj *CommandBasics) GetMiddleware() []Middleware {
+func (obj *commandBasics) GetMiddleware() []Middleware {
 	if obj.parent == nil {
 		return obj.Middleware
 	} else {
