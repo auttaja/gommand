@@ -7,12 +7,14 @@ type CategoryInterface interface {
 	GetDescription() string
 	GetPermissionValidators() []func(ctx *Context) (string, bool) // If I change this to the PermissionValidator type, it triggers #25838 in Go.
 	GetMiddleware() []Middleware
+	GetCooldown() Cooldown
 }
 
 // Category is the generic category struct which uses the category interface.
 type Category struct {
 	Name                 string                `json:"name"`
 	Description          string                `json:"description"`
+	Cooldown Cooldown `json:"cooldown"`
 	PermissionValidators []PermissionValidator `json:"-"`
 	Middleware           []Middleware          `json:"-"`
 }
@@ -41,4 +43,9 @@ func (c *Category) GetMiddleware() []Middleware {
 		return []Middleware{}
 	}
 	return c.Middleware
+}
+
+// GetCooldown is used to get the cooldown from the category.
+func (c *Category) GetCooldown() Cooldown {
+	return c.Cooldown
 }

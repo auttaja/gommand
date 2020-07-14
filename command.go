@@ -134,10 +134,30 @@ func runCommand(ctx *Context, reader io.ReadSeeker, c CommandInterface) (err err
 		return
 	}
 
+	// Get the category.
+	cat := c.GetCategory()
+
 	// Check if the command is on cooldown.
-	cooldown := c.GetCooldown()
-	if cooldown != nil {
-		msg, ok := cooldown.Check(ctx)
+	cmdCooldown := c.GetCooldown()
+	if cmdCooldown != nil {
+		msg, ok := cmdCooldown.Check(ctx)
+		if !ok {
+			return &CommandOnCooldown{Message: msg}
+		}
+	}
+	routerCooldown := ctx.Router.Cooldown
+	var catCooldown Cooldown
+	if cat != nil {
+		catCooldown = cat.GetCooldown()
+	}
+	if catCooldown != nil && cmdCooldown != catCooldown && routerCooldown != catCooldown {
+		msg, ok := catCooldown.Check(ctx)
+		if !ok {
+			return &CommandOnCooldown{Message: msg}
+		}
+	}
+	if routerCooldown != nil && cmdCooldown != routerCooldown {
+		msg, ok := routerCooldown.Check(ctx)
 		if !ok {
 			return &CommandOnCooldown{Message: msg}
 		}
@@ -152,8 +172,8 @@ func runCommand(ctx *Context, reader io.ReadSeeker, c CommandInterface) (err err
 			}
 		}
 	}
-	if c.GetCategory() != nil {
-		for _, v := range c.GetCategory().GetMiddleware() {
+	if cat != nil {
+		for _, v := range cat.GetMiddleware() {
 			err = v(ctx)
 			if err != nil {
 				return

@@ -9,7 +9,8 @@ import (
 
 // Cooldown is used to define the interface which is used to handle command cooldowns.
 type Cooldown interface {
-	// Init is ran on the insertion of the cooldown bucket into a command which has been added to the router.
+	// Init is ran on the insertion of the cooldown bucket into a command/category/attribute which has been added to the router.
+	// Note that your struct should implement logic to make sure that Init only modifies the struct once since a cooldown might be shared across objects!
 	Init()
 
 	// Check should add one X (where X is what you're measuring) to the cooldown bucket and return true if the command should run.
@@ -86,6 +87,10 @@ type GuildCooldown struct {
 
 // Init is used to initialise the guild cooldowns.
 func (g *GuildCooldown) Init() {
+	if g.internals != nil {
+		// This has been initialised already.
+		return
+	}
 	g.internals = &cooldownInternals{
 		coolingDown:     map[disgord.Snowflake]uint{},
 		coolingDownLock: &sync.Mutex{},
@@ -123,6 +128,10 @@ type UserCooldown struct {
 
 // Init is used to initialise the user cooldowns.
 func (u *UserCooldown) Init() {
+	if u.internals != nil {
+		// This has been initialised already.
+		return
+	}
 	u.internals = &cooldownInternals{
 		coolingDown:     map[disgord.Snowflake]uint{},
 		coolingDownLock: &sync.Mutex{},
@@ -160,6 +169,10 @@ type ChannelCooldown struct {
 
 // Init is used to initialise the channel cooldowns.
 func (c *ChannelCooldown) Init() {
+	if c.internals != nil {
+		// This has been initialised already.
+		return
+	}
 	c.internals = &cooldownInternals{
 		coolingDown:     map[disgord.Snowflake]uint{},
 		coolingDownLock: &sync.Mutex{},

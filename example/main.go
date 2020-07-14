@@ -47,6 +47,10 @@ func init() {
 	router.SetCommand(&gommand.Command{
 		Name:        "tag",
 		Description: "Tags the user specified.",
+		Cooldown: &gommand.UserCooldown{
+			MaxRuns:      2,
+			UsageExpires: time.Minute,
+		},
 		ArgTransformers: []gommand.ArgTransformer{
 			{
 				Function: gommand.UserTransformer,
