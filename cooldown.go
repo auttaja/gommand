@@ -217,6 +217,7 @@ func (m *multiCooldownHandler) Clear() {
 
 // Check is used to call Check on all cooldown handlers. If one returns false, we return the result of it.
 func (m *multiCooldownHandler) Check(ctx *Context) (msg string, ok bool) {
+	ok = true
 	for _, v := range m.cooldowns {
 		msg, ok = v.Check(ctx)
 		if !ok {
