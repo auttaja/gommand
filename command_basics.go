@@ -8,6 +8,7 @@ type CommandBasics struct {
 	Description          string                `json:"description"`
 	Usage                string                `json:"usage"`
 	Category             CategoryInterface     `json:"category"`
+	Cooldown             Cooldown              `json:"cooldown"`
 	PermissionValidators []PermissionValidator `json:"-"`
 	ArgTransformers      []ArgTransformer      `json:"-"`
 	Middleware           []Middleware          `json:"-"`
@@ -79,6 +80,15 @@ func (obj *CommandBasics) GetArgTransformers() []ArgTransformer {
 		return obj.ArgTransformers
 	} else {
 		return obj.parent.ArgTransformers
+	}
+}
+
+// GetCooldown is used to get the cooldown.
+func (obj *CommandBasics) GetCooldown() Cooldown {
+	if obj.parent == nil {
+		return obj.Cooldown
+	} else {
+		return obj.parent.Cooldown
 	}
 }
 

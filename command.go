@@ -34,6 +34,7 @@ type CommandInterface interface {
 	GetAliases() []string
 	GetDescription() string
 	GetUsage() string
+	GetCooldown() Cooldown
 	GetCategory() CategoryInterface
 	GetPermissionValidators() []PermissionValidator
 	GetArgTransformers() []ArgTransformer
@@ -52,6 +53,7 @@ type Command struct {
 	Description          string                   `json:"description"`
 	Usage                string                   `json:"usage"`
 	Category             CategoryInterface        `json:"category"`
+	Cooldown             Cooldown                 `json:"cooldown"`
 	CommandAttributes    interface{}              `json:"commandAttributes"`
 	PermissionValidators []PermissionValidator    `json:"-"`
 	ArgTransformers      []ArgTransformer         `json:"-"`

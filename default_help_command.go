@@ -122,7 +122,7 @@ func defaultHelpCommand() *Command {
 			}
 
 			// Send the embed pages.
-			_ = EmbedsPaginator(ctx, pages, uint(page), "Use " + ctx.Prefix + "help <page number> to flick between pages.")
+			_ = EmbedsPaginator(ctx, pages, uint(page), "Use "+ctx.Prefix+"help <page number> to flick between pages.")
 
 			// Return no errors.
 			return nil
