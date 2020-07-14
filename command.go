@@ -134,6 +134,15 @@ func runCommand(ctx *Context, reader io.ReadSeeker, c CommandInterface) (err err
 		return
 	}
 
+	// Check if the command is on cooldown.
+	cooldown := c.GetCooldown()
+	if cooldown != nil {
+		msg, ok := cooldown.Check(ctx)
+		if !ok {
+			return &CommandOnCooldown{Message: msg}
+		}
+	}
+
 	// Run any middleware.
 	if ctx.Router.middleware != nil {
 		for _, v := range ctx.Router.middleware {

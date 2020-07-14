@@ -13,7 +13,7 @@ type Cooldown interface {
 	Init()
 
 	// Check should add one X (where X is what you're measuring) to the cooldown bucket and return true if the command should run.
-	Check(ctx *Context) bool
+	Check(ctx *Context) (message string, ok bool)
 
 	// Clear should clear any command related ratelimits.
 	Clear()
@@ -51,7 +51,7 @@ func (i *cooldownInternals) check(id disgord.Snowflake, max uint, expires time.D
 	defer i.coolingDownLock.Unlock()
 
 	// Check how many usages by the guild.
-	usages, _ := i.coolingDown[id]
+	usages := i.coolingDown[id]
 
 	// Is the usages equal to max runs? If so, return false.
 	if usages == max {

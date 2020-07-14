@@ -20,6 +20,16 @@ func (c *CommandBlank) Error() string {
 	return c.err
 }
 
+// CommandOnCooldown is the error which is thrown when a command is on cooldown.
+type CommandOnCooldown struct {
+	Message string
+}
+
+// Error is used to give the error description.
+func (c *CommandOnCooldown) Error() string {
+	return c.Message
+}
+
 // IncorrectPermissions is the error which is thrown when the user does not have enough permissions.
 type IncorrectPermissions struct {
 	err string
