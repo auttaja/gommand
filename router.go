@@ -138,6 +138,10 @@ func (r *Router) GetCommand(Name string) CommandInterface {
 // SetCommand is used to set a command.
 func (r *Router) SetCommand(c CommandInterface) {
 	c.Init()
+	cooldown := c.GetCooldown()
+	if cooldown != nil {
+		cooldown.Init()
+	}
 	r.cmdLock.Lock()
 	name := strings.ToLower(c.GetName())
 	r.cmds[name] = c
