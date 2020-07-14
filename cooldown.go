@@ -195,3 +195,38 @@ func (c *ChannelCooldown) Clear() {
 	}
 	oldLock.Unlock()
 }
+
+// Handles multiple cooldowns.
+type multiCooldownHandler struct {
+	cooldowns []Cooldown
+}
+
+// Init is used to call Init on all cooldown handlers.
+func (m *multiCooldownHandler) Init() {
+	for _, v := range m.cooldowns {
+		v.Init()
+	}
+}
+
+// Clear is used to call Clear on all cooldown handlers.
+func (m *multiCooldownHandler) Clear() {
+	for _, v := range m.cooldowns {
+		v.Clear()
+	}
+}
+
+// Check is used to call Check on all cooldown handlers. If one returns false, we return the result of it.
+func (m *multiCooldownHandler) Check(ctx *Context) (msg string, ok bool) {
+	for _, v := range m.cooldowns {
+		msg, ok = v.Check(ctx)
+		if !ok {
+			return
+		}
+	}
+	return
+}
+
+// MultipleCooldowns is used to chain multiple cooldowns together.
+func MultipleCooldowns(cooldowns ...Cooldown) Cooldown {
+	return &multiCooldownHandler{cooldowns: cooldowns}
+}
