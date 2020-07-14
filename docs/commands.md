@@ -34,6 +34,7 @@ The command **MUST** have the `Name` (the name of the command) and `Function` (t
    - `Default`: The value the argument will have if the user does not provide another argument (not in the case of an error from the argument transformer). Note that similarly to `Optional`, this either has to be at the end of the argument list of be followed by other `Optional` or `Default` arguments.
 - `Middleware`: An array of [middleware](./middleware.md) which only applies to this specific command.
 - `Category`: Allows you to set a [category](./categories.md) for your command.
+- `Cooldown`: The cooldown interface for this command. You should keep this as nil if you don't want a cooldown.
 - `CommandAttributes`: A generic interface which you can use for whatever you want.
 
 ## `CommandInterface`
@@ -48,6 +49,7 @@ What if you want to create commands as structs or you want more flexibility in t
 - `GetPermissionValidators() []PermissionValidator`: Gets the permission validators of the command. This can't be nil.
 - `GetArgTransformers() []ArgTransformer`: Gets the argument transformers of the command.
 - `GetMiddleware() []Middleware`: Get the middleware of the command. This cannot be nil.
+- `GetCooldown() Cooldown`: Get the cooldown interface for this command. You should keep the result of this as nil if you don't want a cooldown.
 - `Init()`: Called to initialise the interface.
 - `CommandFunction(ctx *Context) error`: The main function for the command.
 

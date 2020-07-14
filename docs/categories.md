@@ -5,6 +5,7 @@ In Go, categories use the `gommand.CategoryInterface` interface to ensure that t
 - `GetDescription() string`: Gets the description of the category.
 - `GetPermissionValidators() []gommand.PermissionValidator`: Gets the array of permission validators. This array cannot be nil.
 - `GetMiddleware() []gommand.Middleware`: Gets the array of permission validators. This array cannot be nil.
+- `GetCooldown() Cooldown`: Get the cooldown interface for this category. You should keep the result of this as nil if you don't want a category wide cooldown.
 
 For ease of use, gommand has the `Category` struct that implements all of these for you. The following attributes can be set in this:
 
@@ -12,6 +13,7 @@ For ease of use, gommand has the `Category` struct that implements all of these 
 - `Description`: The description of the category.
 - `PermissionValidators`: An array of [permission validators](./permission-validators.md) which will be used on each item in the category. This can be nil.
 - `Middleware`: An array of [middleware](./middleware.md) which will be used on each item in the category. This can be nil.
+- `Cooldown`: The cooldown interface for this category. You should keep this as nil if you don't want a category wide cooldown.
 
 The default help command will automatically take advantage of categories when it is displaying commands. Note that you might want to change the category of the default help command. This is simple to do:
 ```go
