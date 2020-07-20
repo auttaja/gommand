@@ -48,6 +48,50 @@ func (c *Context) Reply(data ...interface{}) (*disgord.Message, error) {
 	return c.Session.SendMsg(context.TODO(), c.Message.ChannelID, data...)
 }
 
+// EmbedTextFailover is used to check the permissions when sending a message and failover to sending text if we cannot send an embed but can send a message.
+// If the bot doesn't have permissions to send a message, we return an error.
+// If the bot has permission to send an embed, we use the embed generator, and if we don't we use the text generator.
+func (c *Context) EmbedTextFailover(EmbedGenerator func() *disgord.Embed, TextGenerator func() string) (*disgord.Message, error) {
+	// Get the permissions in the channel.
+	m, err := c.BotMember()
+	if err != nil {
+		return nil, err
+	}
+	channel, err := c.Channel()
+	if err != nil {
+		return nil, err
+	}
+	perms, err := channel.GetPermissions(context.TODO(), c.Session, m)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if we have permission to send a message.
+	if (perms&disgord.PermissionSendMessages) != disgord.PermissionSendMessages && (perms&disgord.PermissionAdministrator) != disgord.PermissionAdministrator {
+		g, err := c.Guild()
+		if err != nil {
+			return nil, err
+		}
+		if g.OwnerID != m.UserID {
+			return nil, &disgord.ErrRest{
+				Code: 403,
+				Msg:  "Permissions check failed.",
+			}
+		}
+	}
+
+	// Use the correct generator depending on permissions.
+	var content interface{}
+	if (perms&disgord.PermissionEmbedLinks) == disgord.PermissionEmbedLinks {
+		content = EmbedGenerator()
+	} else {
+		content = TextGenerator()
+	}
+
+	// Return the message.
+	return c.Reply(content)
+}
+
 // PermissionVerifiedReply is used to reply to a command with a message.
 // This is slower than the standard reply command since it checks it has permission first, but it also reduces the risk of a Cloudflare ban from the API.
 func (c *Context) PermissionVerifiedReply(data ...interface{}) (*disgord.Message, error) {
