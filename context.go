@@ -82,7 +82,7 @@ func (c *Context) EmbedTextFailover(EmbedGenerator func() *disgord.Embed, TextGe
 
 	// Use the correct generator depending on permissions.
 	var content interface{}
-	if (perms&disgord.PermissionEmbedLinks) == disgord.PermissionEmbedLinks {
+	if (perms&disgord.PermissionEmbedLinks) == disgord.PermissionEmbedLinks || (perms&disgord.PermissionAdministrator) == disgord.PermissionAdministrator {
 		content = EmbedGenerator()
 	} else {
 		content = TextGenerator()
