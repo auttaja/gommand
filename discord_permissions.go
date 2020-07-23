@@ -24,7 +24,7 @@ const (
 )
 
 // Used to wrap permissions.
-func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(Checks PermissionCheckSettings) func(ctx *Context) (string, bool) {
+func permissionsWrapper(PermissionName string, PermissionsHex disgord.PermissionBit) func(Checks PermissionCheckSettings) func(ctx *Context) (string, bool) {
 	return func(Checks PermissionCheckSettings) func(ctx *Context) (string, bool) {
 		// Get all of the check types.
 		checkMemberUser := Checks&CheckMembersUserPermissions != 0
@@ -68,11 +68,11 @@ func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(Check
 				}
 
 				// Administrator bypasses everything.
-				if perms.Contains((disgord.PermissionBit)(disgord.PermissionAdministrator)) {
+				if perms.Contains(disgord.PermissionAdministrator) {
 					return "", true
 				}
 
-				return "You must have the  \"" + PermissionName + "\" permission to run this command.", perms.Contains((disgord.PermissionBit)(PermissionsHex))
+				return "You must have the  \"" + PermissionName + "\" permission to run this command.", perms.Contains(PermissionsHex)
 			}
 			checks = append(checks, f)
 		}
@@ -103,11 +103,11 @@ func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(Check
 				}
 
 				// Administrator bypasses everything.
-				if perms.Contains((disgord.PermissionBit)(disgord.PermissionAdministrator)) {
+				if perms.Contains(disgord.PermissionAdministrator) {
 					return "", true
 				}
 
-				return "The bot must have the  \"" + PermissionName + "\" permission to run this command.", perms.Contains((disgord.PermissionBit)(PermissionsHex))
+				return "The bot must have the  \"" + PermissionName + "\" permission to run this command.", perms.Contains(PermissionsHex)
 			}
 			checks = append(checks, f)
 		}
