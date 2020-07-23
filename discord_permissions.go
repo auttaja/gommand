@@ -1,6 +1,10 @@
 package gommand
 
-import "context"
+import (
+	"context"
+
+	"github.com/andersfylling/disgord"
+)
 
 // PermissionCheckSettings is used to define the settings which are used for checking permissions.
 type PermissionCheckSettings uint8
@@ -46,7 +50,7 @@ func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(Check
 				if guild.OwnerID == ctx.Message.Author.ID {
 					return "", true
 				}
-				var perms uint64
+				var perms disgord.PermissionBit
 				if checkMemberChannel {
 					c, err := ctx.Channel()
 					if err != nil {
@@ -63,12 +67,12 @@ func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(Check
 					}
 				}
 
-				// 0x00000008 is the ADMINISTRATOR permission hex code and bypasses everything.
-				if (perms & 0x00000008) == 0x00000008 {
+				// Administrator bypasses everything.
+				if perms.Contains((disgord.PermissionBit)(disgord.PermissionAdministrator)) {
 					return "", true
 				}
 
-				return "You must have the  \"" + PermissionName + "\" permission to run this command.", (perms & PermissionsHex) == PermissionsHex
+				return "You must have the  \"" + PermissionName + "\" permission to run this command.", perms.Contains((disgord.PermissionBit)(PermissionsHex))
 			}
 			checks = append(checks, f)
 		}
@@ -81,7 +85,7 @@ func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(Check
 					return err.Error(), false
 				}
 
-				var perms uint64
+				var perms disgord.PermissionBit
 				if checkBotChannel {
 					c, err := ctx.Channel()
 					if err != nil {
@@ -98,12 +102,12 @@ func permissionsWrapper(PermissionName string, PermissionsHex uint64) func(Check
 					}
 				}
 
-				// 0x00000008 is the ADMINISTRATOR permission hex code and bypasses everything.
-				if (perms & 0x00000008) == 0x00000008 {
+				// Administrator bypasses everything.
+				if perms.Contains((disgord.PermissionBit)(disgord.PermissionAdministrator)) {
 					return "", true
 				}
 
-				return "The bot must have the  \"" + PermissionName + "\" permission to run this command.", (perms & PermissionsHex) == PermissionsHex
+				return "The bot must have the  \"" + PermissionName + "\" permission to run this command.", perms.Contains((disgord.PermissionBit)(PermissionsHex))
 			}
 			checks = append(checks, f)
 		}
