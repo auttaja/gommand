@@ -218,5 +218,5 @@ func (c *InMemoryMessageCacheStorageAdapter) Update(ChannelID, MessageID disgord
 		return
 	}
 
-	(*c.cache[ChannelID])[MessageID].msg = Message
+	(*msgs)[MessageID].msg = Message
 }
