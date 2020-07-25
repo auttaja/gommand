@@ -21,6 +21,14 @@ github.com/auttaja/gommand v1.6.1-0.20200710223934-23aadee428ec h1:4lTlaJILim3oX
 github.com/auttaja/gommand v1.6.1-0.20200710223934-23aadee428ec/go.mod h1:XDQTPPo/2FBBQ8V/QkKUxXGRZhzLMMrLeOeMKI/zyHw=
 github.com/auttaja/gommand v1.7.1-0.20200714111648-204ff29346f7 h1:jRpp/dBMPWxQutuVLlIG9DKhWGUGrgf2/hpr5JJuROc=
 github.com/auttaja/gommand v1.7.1-0.20200714111648-204ff29346f7/go.mod h1:bO3SQxtESAqQyahfkKZRIMQgkRe55iAjJQ/yeExDqWo=
+github.com/auttaja/gommand v1.9.1-0.20200725123711-f72156570608 h1:YZPx1HjB+jvfyz10SrOwkJxr9o638/xbHmPbM0L1cqk=
+github.com/auttaja/gommand v1.9.1-0.20200725123711-f72156570608/go.mod h1:bO3SQxtESAqQyahfkKZRIMQgkRe55iAjJQ/yeExDqWo=
+github.com/auttaja/gommand v1.9.1-0.20200725125025-c6e8f99bb426 h1:AgSBYfokA6MSBVV2g8jdK/Jfq2U68VkbtHPBWkRbg04=
+github.com/auttaja/gommand v1.9.1-0.20200725125025-c6e8f99bb426/go.mod h1:bO3SQxtESAqQyahfkKZRIMQgkRe55iAjJQ/yeExDqWo=
+github.com/auttaja/gommand v1.9.1-0.20200725125349-b9f3320c274a h1:s+jz+jHd62xsmya0OGHhEykGvrsknj7cyucGI/HWuKk=
+github.com/auttaja/gommand v1.9.1-0.20200725125349-b9f3320c274a/go.mod h1:bO3SQxtESAqQyahfkKZRIMQgkRe55iAjJQ/yeExDqWo=
+github.com/auttaja/gommand v1.9.1-0.20200725130615-591ca0ee8759 h1:uVkK0at2WsAcdEmgloMWN+JI+SzBcnck9UsChQl/jhQ=
+github.com/auttaja/gommand v1.9.1-0.20200725130615-591ca0ee8759/go.mod h1:bO3SQxtESAqQyahfkKZRIMQgkRe55iAjJQ/yeExDqWo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gobwas/httphead v0.0.0-20180130184737-2c6c146eadee/go.mod h1:L0fX3K22YWvt/FAX9NnzrNzcI4wNYi9Yku4O0LKYflo=

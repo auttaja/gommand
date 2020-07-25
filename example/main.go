@@ -16,10 +16,13 @@ var router = gommand.NewRouter(&gommand.RouterConfig{
 	// We are using % and mention prefixes for this example.
 	PrefixCheck: gommand.MultiplePrefixCheckers(gommand.StaticPrefix("%"), gommand.MentionPrefix),
 
-	// Prints deleted messages.
-	DeletedMessageHandler: &gommand.DeletedMessageHandler{
-		Callback: func(s disgord.Session, msg *disgord.Message) {
+	// Prints deleted/edited messages.
+	MessageCacheHandler: &gommand.MessageCacheHandler{
+		DeletedCallback: func(s disgord.Session, msg *disgord.Message) {
 			println(msg.Content)
+		},
+		UpdatedCallback: func(s disgord.Session, before, after *disgord.Message) {
+			println(before.Content, ">", after.Content)
 		},
 	},
 })
