@@ -107,7 +107,7 @@ func (d *MessageCacheHandler) messageDelete(s disgord.Session, evt *disgord.Mess
 			member.GuildID = evt.GuildID
 			msg.Member = member
 			msg.Author = member.User
-			d.DeletedMessageCallback(s, msg)
+			d.DeletedCallback(s, msg)
 		}
 	}()
 }
@@ -134,7 +134,7 @@ func (d *MessageCacheHandler) messageUpdate(s disgord.Session, evt *disgord.Mess
 	go func() {
 		before := d.MessageCacheStorageAdapter.Update(evt.Message.ChannelID, evt.Message.ID, evt.Message)
 		if before != nil {
-			d.UpdatedMessageCallback(s, before, evt.Message)
+			d.UpdatedCallback(s, before, evt.Message)
 		}
 	}()
 }
