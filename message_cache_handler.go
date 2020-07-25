@@ -134,6 +134,15 @@ func (d *MessageCacheHandler) messageUpdate(s disgord.Session, evt *disgord.Mess
 	go func() {
 		before := d.MessageCacheStorageAdapter.Update(evt.Message.ChannelID, evt.Message.ID, evt.Message)
 		if before != nil {
+			member, err := s.GetMember(context.TODO(), evt.Message.GuildID, evt.Message.Author.ID)
+			if err != nil {
+				return
+			}
+			member.GuildID = evt.Message.GuildID
+			before.Member = member
+			before.Author = member.User
+			evt.Message.Member = member
+			evt.Message.Author = member.User
 			d.UpdatedCallback(s, before, evt.Message)
 		}
 	}()
