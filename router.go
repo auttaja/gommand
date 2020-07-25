@@ -33,12 +33,12 @@ type Middleware = func(ctx *Context) error
 
 // RouterConfig defines the config which will be used for the Router.
 type RouterConfig struct {
-	DeletedMessageHandler *MessageCacheHandler
-	PrefixCheck           PrefixCheck
-	ErrorHandlers         []ErrorHandler
-	PermissionValidators  []PermissionValidator
-	Middleware            []Middleware
-	Cooldown              Cooldown
+	MessageCacheHandler  *MessageCacheHandler
+	PrefixCheck          PrefixCheck
+	ErrorHandlers        []ErrorHandler
+	PermissionValidators []PermissionValidator
+	Middleware           []Middleware
+	Cooldown             Cooldown
 
 	// The number if message pads which will be created in memory to allow for quicker parsing.
 	// Please set this to -1 if you do not want any, 0 will default to 100.
@@ -57,7 +57,7 @@ type Router struct {
 	permissionValidators  []PermissionValidator
 	middleware            []Middleware
 	parserManager         *fastparse.ParserManager
-	DeletedMessageHandler *MessageCacheHandler
+	MessageCacheHandler   *MessageCacheHandler
 	Cooldown              Cooldown
 }
 
@@ -77,27 +77,27 @@ func NewRouter(Config *RouterConfig) *Router {
 		Config.MessagePads = 0
 	}
 	r := &Router{
-		PrefixCheck:           Config.PrefixCheck,
-		cmds:                  map[string]CommandInterface{},
-		cmdLock:               &sync.RWMutex{},
-		errorHandlers:         Config.ErrorHandlers,
-		permissionValidators:  Config.PermissionValidators,
-		middleware:            Config.Middleware,
-		DeletedMessageHandler: Config.DeletedMessageHandler,
-		Cooldown:              Config.Cooldown,
-		botUsers:              map[uint]*disgord.User{},
-		parserManager:         fastparse.NewParserManager(2000, Config.MessagePads),
+		PrefixCheck:          Config.PrefixCheck,
+		cmds:                 map[string]CommandInterface{},
+		cmdLock:              &sync.RWMutex{},
+		errorHandlers:        Config.ErrorHandlers,
+		permissionValidators: Config.PermissionValidators,
+		middleware:           Config.Middleware,
+		MessageCacheHandler:  Config.MessageCacheHandler,
+		Cooldown:             Config.Cooldown,
+		botUsers:             map[uint]*disgord.User{},
+		parserManager:        fastparse.NewParserManager(2000, Config.MessagePads),
 	}
 
 	// Set the help command.
 	r.SetCommand(defaultHelpCommand())
 
 	// If deleted message handler isn't nil, initialise the storage adapter.
-	if r.DeletedMessageHandler != nil {
-		if r.DeletedMessageHandler.MessageCacheStorageAdapter == nil {
-			r.DeletedMessageHandler.MessageCacheStorageAdapter = &InMemoryMessageCacheStorageAdapter{}
+	if r.MessageCacheHandler != nil {
+		if r.MessageCacheHandler.MessageCacheStorageAdapter == nil {
+			r.MessageCacheHandler.MessageCacheStorageAdapter = &InMemoryMessageCacheStorageAdapter{}
 		}
-		r.DeletedMessageHandler.MessageCacheStorageAdapter.Init()
+		r.MessageCacheHandler.MessageCacheStorageAdapter.Init()
 	}
 
 	// Return the router.

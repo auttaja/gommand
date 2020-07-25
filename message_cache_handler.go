@@ -36,9 +36,9 @@ type GuildChannelRelationshipManagement interface {
 // MessageCacheHandler is used to handle dispatching events for deleted/edited messages.
 // It does this by using the storage adapter to log messages, then the message is deleted from the database at the message limit or when the deleted message handler is called.
 type MessageCacheHandler struct {
-	MessageCacheStorageAdapter MessageCacheStorageAdapter                              `json:"-"`
-	DeletedMessageCallback     func(s disgord.Session, msg *disgord.Message)           `json:"-"`
-	UpdatedMessageCallback     func(s disgord.Session, before, after *disgord.Message) `json:"-"`
+	MessageCacheStorageAdapter MessageCacheStorageAdapter                       `json:"-"`
+	DeletedCallback     func(s disgord.Session, msg *disgord.Message)           `json:"-"`
+	UpdatedCallback     func(s disgord.Session, before, after *disgord.Message)	`json:"-"`
 
 	// Limit defines the amount of messages.
 	// -1 = unlimited (not suggested if it's in-memory since it'll lead to memory leaks), 0 = default, >0 = user set maximum

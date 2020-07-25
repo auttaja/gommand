@@ -1,9 +1,10 @@
 # Handling deleted messages
 
-For some bots, being able to track deleted messages in an easy to use way is important due to the ability to get the content/author of deleted messages. In standalone disgord, you need to manually cache messages. However, gommand has the ability built in to cache deleted messages. To use this handler, simply set the `DeletedMessageHandler` attribute of the router configuration to a struct of the type `&gommand.DeletedMessageHandler`. You can then set the following attributes in this handler:
+For some bots, being able to track deleted messages in an easy to use way is important due to the ability to get the content/author of deleted messages. In standalone disgord, you need to manually cache messages. However, gommand has the ability built in to cache deleted messages. To use this handler, simply set the `MessageCacheHandler` attribute of the router configuration to a struct of the type `&gommand.MessageCacheHandler`. You can then set the following attributes in this handler:
 
 - `Limit`: Defines the maximum amount of cached messages. -1 = unlimited (not suggested if it's in-memory since it'll lead to memory leaks), 0 = default, >0 = user set maximum. This should run on a First In First Out (FIFO) basis. By default, this will be set to 1,000 messages. Messages which have been purged due to this limit will not have an event fired for them.
-- `Callback`: The callback of type `func(s disgord.Session, msg *disgord.Message)` which is called when a message is deleted. As with commands, for ease of use the `Member` attribute is set on the message.
+- `DeletedCallback`: The callback of type `func(s disgord.Session, msg *disgord.Message)` which is called when a message is deleted. As with commands, for ease of use the `Member` attribute is set on the message.
+- `UpdatedCallback`: The callback of type `func(s disgord.Session, before, after *disgord.Message)` which is called when a message is deleted. As with commands, for ease of use the `Member` attribute is set on the message.
 - `MessageCacheStorageAdapter`: The [message cache storage adapter](./message-cache-storage-adapter.md) which is used for this. If this is not set, it will default to the built-in in-memory caching adapter.
 - `IgnoreBots`: Defines whether or not messages from bots should be excluded from cache. Defaults to false, meaning messages from bots will be cached.
 

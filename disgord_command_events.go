@@ -140,13 +140,13 @@ func (r *Router) Hook(s disgord.Session) {
 	s.On(disgord.EvtReady, r.readyEvt)
 	s.On(disgord.EvtUserUpdate, r.userUpdate)
 	s.On(disgord.EvtMessageCreate, r.msgCreate)
-	if r.DeletedMessageHandler != nil {
-		s.On(disgord.EvtGuildDelete, r.DeletedMessageHandler.guildDelete)
-		s.On(disgord.EvtChannelDelete, r.DeletedMessageHandler.channelDelete)
-		s.On(disgord.EvtGuildCreate, r.DeletedMessageHandler.guildCreate)
-		s.On(disgord.EvtMessageCreate, r.DeletedMessageHandler.messageCreate)
-		s.On(disgord.EvtMessageDelete, r.DeletedMessageHandler.messageDelete)
-		s.On(disgord.EvtMessageUpdate, r.DeletedMessageHandler.messageUpdate)
+	if r.MessageCacheHandler != nil {
+		s.On(disgord.EvtGuildDelete, r.MessageCacheHandler.guildDelete)
+		s.On(disgord.EvtChannelDelete, r.MessageCacheHandler.channelDelete)
+		s.On(disgord.EvtGuildCreate, r.MessageCacheHandler.guildCreate)
+		s.On(disgord.EvtMessageCreate, r.MessageCacheHandler.messageCreate)
+		s.On(disgord.EvtMessageDelete, r.MessageCacheHandler.messageDelete)
+		s.On(disgord.EvtMessageUpdate, r.MessageCacheHandler.messageUpdate)
 	}
 	s.On(disgord.EvtMessageReactionAdd, handleMenuReactionEdit)
 	s.On(disgord.EvtMessageDelete, handleEmbedMenuMessageDelete)

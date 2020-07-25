@@ -5,7 +5,7 @@ Creating the router is very simple to do. You can simply create a router object 
 - `ErrorHandlers`: An array of functions as described in [writing your first bot](./writing-your-first-bot.md) which will run one after another. This can be nil and you can also add one with the `AddErrorHandler` function attached to the router.
 - `PermissionValidators`: This is any [permission validators](./permission-validators.md) which you wish to add on a global router scale. This can be nil.
 - `Middleware`: This is any [middleware](./middleware.md) which you wish to add on a global router scale. This can be nil.
-- `DeletedMessageHandler`: See the [deleted message handler](./handling-deleted-messages.md) documentation below.
+- `MessageCacheHandler`: See the [deleted message handler](./handling-deleted-messages.md) documentation below.
 - `Cooldown`: The cooldown interface for this router. You should keep this as nil if you don't want a router wide cooldown.
 
 From here, we can use the functions attached to the router:
