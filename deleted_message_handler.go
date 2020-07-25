@@ -18,6 +18,7 @@ type MessageCacheStorageAdapter interface {
 	Delete(ChannelID, MessageID disgord.Snowflake)
 	DeleteChannelsMessages(ChannelID disgord.Snowflake)
 	Set(ChannelID, MessageID disgord.Snowflake, Message *disgord.Message, Limit uint)
+	Update(ChannelID, MessageID disgord.Snowflake, Message *disgord.Message)
 
 	// Handles guild removal. The behaviour of this changes depending on if GuildChannelRelationshipManagement is implemented.
 	// If it is, this will just be used to remove all guild/channel relationships but not messages from the cache (that'll be done by running DeleteChannelsMessages with each channel ID).
@@ -41,6 +42,9 @@ type DeletedMessageHandler struct {
 	// Limit defines the amount of messages.
 	// -1 = unlimited (not suggested if it's in-memory since it'll lead to memory leaks), 0 = default, >0 = user set maximum
 	Limit int `json:"limit"`
+
+	// IgnoreBots is whether or not messages from bots should be excluded from the message cache.
+	IgnoreBots bool `json:"ignoreBots"`
 }
 
 // Removes the guild from the cache.
@@ -109,6 +113,9 @@ func (d *DeletedMessageHandler) messageDelete(s disgord.Session, evt *disgord.Me
 
 // Defines the message creation handler.
 func (d *DeletedMessageHandler) messageCreate(_ disgord.Session, evt *disgord.MessageCreate) {
+	if d.IgnoreBots && evt.Message.Author.Bot {
+		return
+	}
 	Limit := d.Limit
 	if Limit == 0 {
 		Limit = defaultMessageCount
@@ -116,4 +123,11 @@ func (d *DeletedMessageHandler) messageCreate(_ disgord.Session, evt *disgord.Me
 		Limit = 0
 	}
 	go d.MessageCacheStorageAdapter.Set(evt.Message.ChannelID, evt.Message.ID, evt.Message, uint(Limit))
+}
+
+func (d *DeletedMessageHandler) messageUpdate(_ disgord.Session, evt *disgord.MessageUpdate) {
+	if d.IgnoreBots && evt.Message.Author.Bot {
+		return
+	}
+	go d.MessageCacheStorageAdapter.Update(evt.Message.ChannelID, evt.Message.ID, evt.Message)
 }
