@@ -128,10 +128,18 @@ func (d *MessageCacheHandler) messageCreate(_ disgord.Session, evt *disgord.Mess
 
 // Defines the message update handler.
 func (d *MessageCacheHandler) messageUpdate(s disgord.Session, evt *disgord.MessageUpdate) {
-	if d.IgnoreBots && evt.Message.Author.Bot {
-		return
-	}
 	go func() {
+		if evt.Message.Author == nil {
+			// We need to get the message.
+			var err error
+			evt.Message, err = s.GetMessage(context.TODO(), evt.Message.ChannelID, evt.Message.ID)
+			if err != nil {
+				return
+			}
+		}
+		if d.IgnoreBots && evt.Message.Author.Bot {
+			return
+		}
 		before := d.MessageCacheStorageAdapter.Update(evt.Message.ChannelID, evt.Message.ID, evt.Message)
 		if before != nil {
 			member, err := s.GetMember(context.TODO(), evt.Message.GuildID, evt.Message.Author.ID)
