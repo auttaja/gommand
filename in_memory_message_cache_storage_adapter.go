@@ -201,3 +201,22 @@ func (c *InMemoryMessageCacheStorageAdapter) Set(ChannelID, MessageID disgord.Sn
 	// Write unlock the cache.
 	c.lock.Unlock()
 }
+
+// Update is used to update an item in the cache.
+func (c *InMemoryMessageCacheStorageAdapter) Update(ChannelID, MessageID disgord.Snowflake, Message *disgord.Message) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	msgs := c.cache[ChannelID]
+	if msgs == nil {
+		// This channel isn't cached, return here.
+		return
+	}
+
+	if _, ok := (*msgs)[MessageID]; !ok {
+		// This message wasn't cached, return here.
+		return
+	}
+
+	(*c.cache[ChannelID])[MessageID].msg = Message
+}
