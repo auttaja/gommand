@@ -33,7 +33,7 @@ type Middleware = func(ctx *Context) error
 
 // RouterConfig defines the config which will be used for the Router.
 type RouterConfig struct {
-	DeletedMessageHandler *DeletedMessageHandler
+	DeletedMessageHandler *MessageCacheHandler
 	PrefixCheck           PrefixCheck
 	ErrorHandlers         []ErrorHandler
 	PermissionValidators  []PermissionValidator
@@ -57,7 +57,7 @@ type Router struct {
 	permissionValidators  []PermissionValidator
 	middleware            []Middleware
 	parserManager         *fastparse.ParserManager
-	DeletedMessageHandler *DeletedMessageHandler
+	DeletedMessageHandler *MessageCacheHandler
 	Cooldown              Cooldown
 }
 
