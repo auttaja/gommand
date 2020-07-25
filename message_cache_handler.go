@@ -36,9 +36,9 @@ type GuildChannelRelationshipManagement interface {
 // MessageCacheHandler is used to handle dispatching events for deleted/edited messages.
 // It does this by using the storage adapter to log messages, then the message is deleted from the database at the message limit or when the deleted message handler is called.
 type MessageCacheHandler struct {
-	MessageCacheStorageAdapter MessageCacheStorageAdapter                       `json:"-"`
-	DeletedCallback     func(s disgord.Session, msg *disgord.Message)           `json:"-"`
-	UpdatedCallback     func(s disgord.Session, before, after *disgord.Message)	`json:"-"`
+	MessageCacheStorageAdapter MessageCacheStorageAdapter                              `json:"-"`
+	DeletedCallback            func(s disgord.Session, msg *disgord.Message)           `json:"-"`
+	UpdatedCallback            func(s disgord.Session, before, after *disgord.Message) `json:"-"`
 
 	// Limit defines the amount of messages.
 	// -1 = unlimited (not suggested if it's in-memory since it'll lead to memory leaks), 0 = default, >0 = user set maximum
@@ -99,7 +99,7 @@ func (d *MessageCacheHandler) guildCreate(_ disgord.Session, evt *disgord.GuildC
 func (d *MessageCacheHandler) messageDelete(s disgord.Session, evt *disgord.MessageDelete) {
 	go func() {
 		msg := d.MessageCacheStorageAdapter.GetAndDelete(evt.ChannelID, evt.MessageID)
-		if msg != nil {
+		if msg != nil && d.DeletedCallback != nil {
 			member, err := s.GetMember(context.TODO(), msg.GuildID, msg.Author.ID)
 			if err != nil {
 				return
@@ -141,7 +141,7 @@ func (d *MessageCacheHandler) messageUpdate(s disgord.Session, evt *disgord.Mess
 			return
 		}
 		before := d.MessageCacheStorageAdapter.Update(evt.Message.ChannelID, evt.Message.ID, evt.Message)
-		if before != nil {
+		if before != nil && d.UpdatedCallback != nil {
 			member, err := s.GetMember(context.TODO(), evt.Message.GuildID, evt.Message.Author.ID)
 			if err != nil {
 				return
