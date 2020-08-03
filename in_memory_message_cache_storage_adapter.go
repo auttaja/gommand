@@ -213,14 +213,51 @@ func (c *InMemoryMessageCacheStorageAdapter) Update(ChannelID, MessageID disgord
 		return
 	}
 
-	if x, ok := (*msgs)[MessageID]; !ok {
-		// This message wasn't cached, return here.
-		return
-	} else {
-		// Set the message.
+	if x, ok := (*msgs)[MessageID]; ok {
+		// The message is cached, retrieve the old value.
 		old = x.msg
+
+		// Set the new message value in cache.
+		(*msgs)[MessageID].msg = Message
+	}
+	return
+}
+
+// BulkGetAndDelete is used to delete a slice of message IDs in the cache. Returns the deleted messages.
+func (c *InMemoryMessageCacheStorageAdapter) BulkGetAndDelete(ChannelID disgord.Snowflake, MessageIDs []disgord.Snowflake) []*disgord.Message {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	msgs := make([]*disgord.Message, 0, len(MessageIDs))
+
+	channel, ok := c.cache[ChannelID]
+
+	if !ok {
+		// That channel isn't cached, return here.
+		return msgs
 	}
 
-	(*msgs)[MessageID].msg = Message
-	return
+	for _, msgID := range MessageIDs {
+		if msg, ok := (*channel)[msgID]; ok {
+			msgs = append(msgs, msg.msg)
+
+			// Delete the message from the cache.
+			delete(*channel, msgID)
+
+			// Remove the message from the list
+			c.list.Remove(msg.el)
+
+			// Decrement the list length
+			c.len--
+		}
+
+		if len(*channel) == 0 {
+			// Delete the channel from the cache.
+			delete(c.cache, ChannelID)
+
+			// There's no messages left in the cache for this channel, so return here.
+			return msgs
+		}
+	}
+	return msgs
 }

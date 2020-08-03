@@ -147,6 +147,7 @@ func (r *Router) Hook(s disgord.Session) {
 		s.On(disgord.EvtMessageCreate, r.MessageCacheHandler.messageCreate)
 		s.On(disgord.EvtMessageDelete, r.MessageCacheHandler.messageDelete)
 		s.On(disgord.EvtMessageUpdate, r.MessageCacheHandler.messageUpdate)
+		s.On(disgord.EvtMessageDeleteBulk, r.MessageCacheHandler.bulkDeleteHandler)
 	}
 	s.On(disgord.EvtMessageReactionAdd, handleMenuReactionEdit)
 	s.On(disgord.EvtMessageDelete, handleEmbedMenuMessageDelete)
