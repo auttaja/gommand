@@ -19,7 +19,8 @@ type ErrorHandler = func(ctx *Context, err error) bool
 // CustomCommandsHandler is the handler which is used for custom commands.
 // An error being returned by the custom commands handler will return in that being passed through to the error handler instead.
 // true here represents this being a custom command. This means the Router will not go through the errors handler unless an error is set.
-type CustomCommandsHandler = func(ctx *Context, cmdname string, r io.ReadSeeker) (bool, error)
+// You should NOT call Done on the parser since this is done internally.
+type CustomCommandsHandler = func(ctx *Context, cmdname string, parser *fastparse.Parser) (bool, error)
 
 // PermissionValidator is a function which is used to validate someones permissions who is running a command.
 // If the boolean is set to true, it means the user has permissions.
