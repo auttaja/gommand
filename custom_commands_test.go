@@ -1,8 +1,7 @@
 package gommand
 
 import (
-	"io"
-	"io/ioutil"
+	"github.com/auttaja/fastparse"
 	"testing"
 )
 
@@ -13,16 +12,16 @@ func TestCustomCommands(t *testing.T) {
 	})
 	exists := false
 	errored := false
-	r.CustomCommandsHandler = func(ctx *Context, cmdname string, r io.ReadSeeker) (bool, error) {
+	r.CustomCommandsHandler = func(ctx *Context, cmdname string, parser *fastparse.Parser) (bool, error) {
 		if !exists {
 			return false, nil
 		}
 		if cmdname != "test" {
 			t.Fatal("invalid command name:", cmdname)
 		}
-		b, _ := ioutil.ReadAll(r)
-		if string(b) != "123" {
-			t.Fatal("Invalid arguments:", b)
+		arg := parser.GetNextArg()
+		if arg.Text != "123" {
+			t.Fatal("Invalid arguments:", arg.Text)
 		}
 		return true, nil
 	}

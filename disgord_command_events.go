@@ -79,18 +79,7 @@ func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.
 	}
 	if cmdname == "" {
 		r.cmdLock.RUnlock()
-		var ok bool
-		var err error
-		if r.CustomCommandsHandler != nil {
-			ok, err = r.CustomCommandsHandler(ctx, "", reader)
-		}
-		if err == nil {
-			if !ok {
-				r.errorHandler(ctx, &CommandBlank{err: "The command is blank."})
-			}
-		} else {
-			r.errorHandler(ctx, err)
-		}
+		r.errorHandler(ctx, &CommandBlank{err: "The command is blank."})
 		return
 	}
 
@@ -109,7 +98,9 @@ func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.
 		var ok bool
 		var err error
 		if r.CustomCommandsHandler != nil {
-			ok, err = r.CustomCommandsHandler(ctx, cmdname, reader)
+			parser := ctx.Router.parserManager.Parser(reader)
+			ok, err = r.CustomCommandsHandler(ctx, cmdname, parser)
+			parser.Done()
 		}
 		if err == nil {
 			if !ok {
