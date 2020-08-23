@@ -24,7 +24,7 @@ func EmbedsPaginatorWithLifetime(ctx *Context, Pages []*disgord.Embed, InitialPa
 	if err != nil {
 		return err
 	}
-	UseEmbedMenus := (perms&disgord.PermissionManageMessages) == disgord.PermissionManageMessages && (perms&disgord.PermissionAddReactions) == disgord.PermissionAddReactions
+	UseEmbedMenus := (perms&disgord.PermissionAdministrator) == disgord.PermissionAdministrator || ((perms&disgord.PermissionManageMessages) == disgord.PermissionManageMessages && (perms&disgord.PermissionAddReactions) == disgord.PermissionAddReactions)
 
 	// Get the pages length.
 	PagesLen := len(Pages)
