@@ -8,8 +8,9 @@ import (
 	"github.com/andersfylling/disgord"
 )
 
-// EmbedsPaginator is used to paginate together several embeds.
-func EmbedsPaginator(ctx *Context, Pages []*disgord.Embed, InitialPage uint, NoButtonTextContent string) error {
+// EmbedsPaginatorWithLifetime is used to paginate together several embeds, but with an optional *EmbedLifetimeOptions parameter to control the embed lifetime.
+// Passing nil to this parameter indicates no maximum lifetime.
+func EmbedsPaginatorWithLifetime(ctx *Context, Pages []*disgord.Embed, InitialPage uint, NoButtonTextContent string, Lifetime *EmbedLifetimeOptions) (err error) {
 	// Check the permissions which the bot has permission to use embed menus in this channel.
 	c, err := ctx.Channel()
 	if err != nil {
@@ -98,8 +99,16 @@ func EmbedsPaginator(ctx *Context, Pages []*disgord.Embed, InitialPage uint, NoB
 
 	// Return displaying the embed.
 	if UseEmbedMenus {
-		return ctx.DisplayEmbedMenu(DisplayPage)
-	} else {
-		return func() (err error) { _, err = ctx.Reply(NoButtonTextContent, DisplayEmbed); return }()
+		if Lifetime == nil {
+			return ctx.DisplayEmbedMenu(DisplayPage)
+		}
+		return ctx.DisplayEmbedMenuWithLifetime(DisplayPage, Lifetime)
 	}
+	return func() (err error) { _, err = ctx.Reply(NoButtonTextContent, DisplayEmbed); return }()
+
+}
+
+// EmbedsPaginator is used to paginate together several embeds.
+func EmbedsPaginator(ctx *Context, Pages []*disgord.Embed, InitialPage uint, NoButtonTextContent string) error {
+	return EmbedsPaginatorWithLifetime(ctx, Pages, InitialPage, NoButtonTextContent, nil)
 }
