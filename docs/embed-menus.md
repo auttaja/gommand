@@ -11,6 +11,7 @@ menu := gommand.NewEmbedMenu(&disgord.Embed{
 Embed menus have the following functions attached to them:
 
 - `AddBackButton()`: Adds the back button to the embed menu. **Don't use this on the first embed menu, this is meant for child menus.**
+- `AddExitButton()`: Adds an exit button to the menu, causing the menu message to delete. This can be used on any menu.
 - `AddParentMenu(Menu *EmbedMenu)`: Sets the parent of the menu.
 - `Display(ChannelID, MessageID disgord.Snowflake, client disgord.Session) error`: Manually displays the embed. Note that using the `DisplayEmbedMenu` function below should be prefered since it is much easier.
 - `NewChildMenu(options *ChildMenuOptions) *EmbedMenu`: Create a child menu with the options specified. The following options can be set in `ChildMenuOptions`:
@@ -24,9 +25,16 @@ Embed menus also have the `Reactions` attribute attached to them. This contains 
 - `Function func(ChannelID, MessageID disgord.Snowflake, menu *EmbedMenu, client disgord.Session)`: Defines the function that will be called when the button is clicked.
 
 
-The command context has the function `DisplayEmbedMenu` which can be used to easily display the embed. The error defines any issues when it comes to showing the embed:
+The command context has defines two key functions for easily displaying the embed: 
+- `DisplayEmbedMenu(m *EmbedMenu)`: Displays the embed and returns any errors while creating it.
 ```go
 err := ctx.DisplayEmbedMenu(menu)
+```
+- `DisplayEmbedMenuWithLifetime(m *EmbedMenu, lifetime *EmbedLifetimeOptions)`: Displays the embed and allows the usage of [embed lifetimes](#lifetime-options), returning any errors while creating it.
+```go
+err := ctx.DisplayEmbedMenuWithLifetime(menu, &gommand.EmbedLifetimeOptions{
+	MaximumLifetime: time.Minute * 2,
+})
 ```
 
 ## Menu button
@@ -34,3 +42,11 @@ err := ctx.DisplayEmbedMenu(menu)
 - `Emoji`: The unicode emoji that will be used.
 - `Name`: The name of the menu button.
 - `Description`: The description of the menu button.
+
+## Lifetime Options
+`EmbedLifetimeOptions` objects are used to control the maximum duration for which an embed menu will be active / exist. This contains the following attributes:
+- `MaximumLifetime`: The maximum duration the embed should exist for, regardless of activity - optional.
+- `InactiveLifetime`: The maximum duration after the most recent reaction to the menu that the menu should exist for - optional.
+After the duration of either of the above has passed, the menu will be deleted.
+- `BeforeDelete`: The function called when the menu is scheduled to be deleted, but just before the message itself is deleted.
+- `AfterDelete`: The function called after the menu message is deleted, ran regardless of any errors when deleting the message.
