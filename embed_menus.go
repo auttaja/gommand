@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/andersfylling/disgord"
 )
@@ -13,6 +14,12 @@ var menuCache = map[disgord.Snowflake]*EmbedMenu{}
 
 // This is the thread lock for the menu cache.
 var menuCacheLock = sync.RWMutex{}
+
+// This is used to hold the lifetime information (if applicable) for each active menu.
+var menuLifetimeCache = map[disgord.Snowflake]*EmbedLifetimeOptions{}
+
+// This is the thread lock for the lifetimeCache.
+var menuLifetimeCacheLock = sync.RWMutex{}
 
 // MenuInfo contains the information about the menu.
 type MenuInfo struct {
@@ -142,6 +149,21 @@ func (e *EmbedMenu) AddBackButton() {
 	e.Reactions.Add(Reaction)
 }
 
+// AddExitButton is used to add an Exit button to the page, deleting the menu if pressed.
+func (e *EmbedMenu) AddExitButton() {
+	Reaction := MenuReaction{
+		Button: &MenuButton{
+			Description: "Exits the current menu.",
+			Name:        "Exit",
+			Emoji:       "❌",
+		},
+		Function: func(ChannelID, MessageID disgord.Snowflake, _ *EmbedMenu, client disgord.Session) {
+			_ = client.DeleteMessage(context.TODO(), ChannelID, MessageID)
+		},
+	}
+	e.Reactions.Add(Reaction)
+}
+
 // NewEmbedMenu is used to create a new menu handler.
 func NewEmbedMenu(embed *disgord.Embed, ctx *Context) *EmbedMenu {
 	var reactions []MenuReaction
@@ -156,6 +178,85 @@ func NewEmbedMenu(embed *disgord.Embed, ctx *Context) *EmbedMenu {
 		},
 	}
 	return menu
+}
+
+// EmbedLifetimeOptions represents the options used to control the lifetime of a menu, all fields are optional.
+type EmbedLifetimeOptions struct {
+	// The maximum time after which an embed is created for which it can exist.
+	// After this time has passed, if it hasn't already then the menu will be deleted.
+	MaximumLifetime time.Duration
+
+	// The maximum time after an embed was last interacted with (reacted to) that it can exist for.
+	// After this time has passed, if it hasn't already then the menu will be deleted.
+	InactiveLifetime time.Duration
+
+	// The function called before the menu should be deleted.
+	BeforeDelete func()
+
+	// The function called after the message is deleted (only if deleted through exceeded lifetime).
+	// Called regardless of errors returned when deleting the message.
+	AfterDelete func()
+
+	maxLifetimeTimer *time.Timer
+
+	inactiveTimer *time.Timer
+}
+
+// Start inits the timers for the lifetime.
+func (l *EmbedLifetimeOptions) Start(ChannelID, MessageID disgord.Snowflake, client disgord.Session) {
+	if l.MaximumLifetime == time.Duration(0) && l.InactiveLifetime == time.Duration(0) {
+		// This is blank, don't bother caching / updating it.
+		return
+	}
+
+	menuLifetimeCacheLock.Lock()
+	if l.MaximumLifetime > time.Duration(0) {
+		// init the maxLifetimeTimer if the MaximumLifetime is a positive non-zero value.
+		l.maxLifetimeTimer = time.AfterFunc(l.MaximumLifetime, func() {
+			if l.BeforeDelete != nil {
+				l.BeforeDelete()
+			}
+			err := client.DeleteMessage(context.TODO(), ChannelID, MessageID)
+			if err != nil {
+				// If there was an error deleting the message, remove from the menu cache anyway.
+				menuCacheLock.Lock()
+				delete(menuCache, MessageID)
+				menuCacheLock.Unlock()
+
+				menuLifetimeCacheLock.Lock()
+				delete(menuLifetimeCache, MessageID)
+				menuLifetimeCacheLock.Unlock()
+			}
+			if l.AfterDelete != nil {
+				l.AfterDelete()
+			}
+		})
+	}
+
+	if l.InactiveLifetime > time.Duration(0) {
+		l.inactiveTimer = time.AfterFunc(l.InactiveLifetime, func() {
+			if l.BeforeDelete != nil {
+				l.BeforeDelete()
+			}
+			err := client.DeleteMessage(context.TODO(), ChannelID, MessageID)
+			if err != nil {
+				// If there was an error deleting the message, remove from the menu cache anyway.
+				menuCacheLock.Lock()
+				delete(menuCache, MessageID)
+				menuCacheLock.Unlock()
+
+				menuLifetimeCacheLock.Lock()
+				delete(menuLifetimeCache, MessageID)
+				menuLifetimeCacheLock.Unlock()
+			}
+			if l.AfterDelete != nil {
+				l.AfterDelete()
+			}
+		})
+	}
+
+	menuLifetimeCache[MessageID] = l
+	menuLifetimeCacheLock.Unlock()
 }
 
 // This is used to handle menu reactions.
@@ -180,6 +281,14 @@ func handleMenuReactionEdit(s disgord.Session, evt *disgord.MessageReactionAdd) 
 
 		for _, v := range menu.Reactions.ReactionSlice {
 			if v.Button.Emoji == evt.PartialEmoji.Name {
+				menuLifetimeCacheLock.Lock()
+				if lifetime, ok := menuLifetimeCache[evt.MessageID]; ok && lifetime.inactiveTimer != nil {
+					if lifetime.inactiveTimer.Stop() {
+						// Only reset the timer if it's still "active".
+						_ = lifetime.inactiveTimer.Reset(lifetime.InactiveLifetime)
+					}
+				}
+				menuLifetimeCacheLock.Unlock()
 				v.Function(evt.ChannelID, evt.MessageID, menu, s)
 				return
 			}
@@ -193,5 +302,17 @@ func handleEmbedMenuMessageDelete(s disgord.Session, evt *disgord.MessageDelete)
 		menuCacheLock.Lock()
 		delete(menuCache, evt.MessageID)
 		menuCacheLock.Unlock()
+
+		menuLifetimeCacheLock.Lock()
+		if lifetime, ok := menuLifetimeCache[evt.MessageID]; ok {
+			if lifetime.inactiveTimer != nil {
+				_ = lifetime.inactiveTimer.Stop()
+			}
+			if lifetime.maxLifetimeTimer != nil {
+				_ = lifetime.maxLifetimeTimer.Stop()
+			}
+			delete(menuLifetimeCache, evt.MessageID)
+		}
+		menuLifetimeCacheLock.Unlock()
 	}()
 }

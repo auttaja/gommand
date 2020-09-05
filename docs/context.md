@@ -19,3 +19,4 @@ It also contains several helper functions:
 - `Reply(data ...interface{}) (*disgord.Message, error)`: A shorter way to quickly reply to a message.
 - `WaitForMessage(ctx context.Context, CheckFunc func(s disgord.Session, msg *disgord.Message) bool) *disgord.Message`: Waits for a message based on the check function you gave.
 - `DisplayEmbedMenu(m *EmbedMenu) error`: Used to display an [embed menu](./embed-menus.md).
+- `DisplayEmbedMenuWithLifetime(m *EmbedMenu, lifetime *EmbedLifetimeOptions) error`: Used to display an [embed menu](./embed-menus.md) and set a maximum lifetime of the menu.
