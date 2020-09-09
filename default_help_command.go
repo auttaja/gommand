@@ -5,6 +5,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Creates the embeds for the categories.
@@ -122,7 +123,7 @@ func defaultHelpCommand() *Command {
 			}
 
 			// Send the embed pages.
-			_ = EmbedsPaginator(ctx, pages, uint(page), "Use "+ctx.Prefix+"help <page number> to flick between pages.")
+			_ = EmbedsPaginatorWithLifetime(ctx, pages, uint(page), "Use "+ctx.Prefix+"help <page number> to flick between pages.", &EmbedLifetimeOptions{InactiveLifetime: time.Minute * 5})
 
 			// Return no errors.
 			return nil

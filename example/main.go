@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/andersfylling/disgord"
@@ -23,6 +25,27 @@ var router = gommand.NewRouter(&gommand.RouterConfig{
 		},
 		UpdatedCallback: func(s disgord.Session, before, after *disgord.Message) {
 			println(before.Content, ">", after.Content)
+		},
+		BulkDeletedCallback: func(s disgord.Session, channelID disgord.Snowflake, messages []*disgord.Message) {
+			builder := &strings.Builder{}
+			for _, m := range messages {
+				builder.WriteString(fmt.Sprintf("[Timestamp: %s] [Author: %s] [ID: %s] [Content: %s]\n",
+					m.Timestamp.Format("Mon Jan 2 15:04:05"),
+					m.Author.String(),
+					m.ID.String(),
+					m.Content,
+				))
+			}
+
+			_, _ = s.CreateMessage(context.TODO(), channelID, &disgord.CreateMessageParams{
+				Content: fmt.Sprintf("Bulk delete in <#%s>. %d deleted messages logged.", channelID.String(), len(messages)),
+				Files: []disgord.CreateMessageFileParams{
+					{
+						Reader:   strings.NewReader(builder.String()),
+						FileName: channelID.String() + "_deleted.txt",
+					},
+				},
+			})
 		},
 	},
 })

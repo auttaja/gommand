@@ -156,9 +156,21 @@ func (c *Context) WaitForMessage(ctx context.Context, CheckFunc func(s disgord.S
 
 // DisplayEmbedMenu is used to allow you to easily display a embed menu.
 func (c *Context) DisplayEmbedMenu(m *EmbedMenu) error {
+	return c.DisplayEmbedMenuWithLifetime(m, nil)
+}
+
+// DisplayEmbedMenuWithLifetime is used to easily display an embed menu with a lifetime.
+func (c *Context) DisplayEmbedMenuWithLifetime(m *EmbedMenu, lifetime *EmbedLifetimeOptions) error {
 	msg, err := c.Reply("Loading...")
 	if err != nil {
 		return err
 	}
-	return m.Display(c.Message.ChannelID, msg.ID, c.Session)
+	err = m.Display(c.Message.ChannelID, msg.ID, c.Session)
+	if err != nil {
+		return err
+	}
+	if lifetime != nil {
+		lifetime.Start(msg.ChannelID, msg.ID, c.Session)
+	}
+	return nil
 }

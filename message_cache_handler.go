@@ -14,6 +14,7 @@ type MessageCacheStorageAdapter interface {
 	Init()
 
 	// Related to message caching.
+	BulkGetAndDelete(ChannelID disgord.Snowflake, MessageIDs []disgord.Snowflake) []*disgord.Message
 	GetAndDelete(ChannelID, MessageID disgord.Snowflake) *disgord.Message
 	Delete(ChannelID, MessageID disgord.Snowflake)
 	DeleteChannelsMessages(ChannelID disgord.Snowflake)
@@ -36,9 +37,10 @@ type GuildChannelRelationshipManagement interface {
 // MessageCacheHandler is used to handle dispatching events for deleted/edited messages.
 // It does this by using the storage adapter to log messages, then the message is deleted from the database at the message limit or when the deleted message handler is called.
 type MessageCacheHandler struct {
-	MessageCacheStorageAdapter MessageCacheStorageAdapter                       `json:"-"`
-	DeletedCallback     func(s disgord.Session, msg *disgord.Message)           `json:"-"`
-	UpdatedCallback     func(s disgord.Session, before, after *disgord.Message)	`json:"-"`
+	MessageCacheStorageAdapter MessageCacheStorageAdapter                                                        `json:"-"`
+	BulkDeletedCallback        func(s disgord.Session, channelID disgord.Snowflake, messages []*disgord.Message) `json:""`
+	DeletedCallback            func(s disgord.Session, msg *disgord.Message)                                     `json:"-"`
+	UpdatedCallback            func(s disgord.Session, before, after *disgord.Message)                           `json:"-"`
 
 	// Limit defines the amount of messages.
 	// -1 = unlimited (not suggested if it's in-memory since it'll lead to memory leaks), 0 = default, >0 = user set maximum
@@ -99,14 +101,20 @@ func (d *MessageCacheHandler) guildCreate(_ disgord.Session, evt *disgord.GuildC
 func (d *MessageCacheHandler) messageDelete(s disgord.Session, evt *disgord.MessageDelete) {
 	go func() {
 		msg := d.MessageCacheStorageAdapter.GetAndDelete(evt.ChannelID, evt.MessageID)
-		if msg != nil {
+		if msg != nil && d.DeletedCallback != nil {
 			member, err := s.GetMember(context.TODO(), msg.GuildID, msg.Author.ID)
-			if err != nil {
-				return
+			if err == nil {
+				member.GuildID = evt.GuildID
+				msg.Member = member
+				msg.Author = member.User
+			} else {
+				if user, err := s.GetUser(context.TODO(), msg.Author.ID); err == nil {
+					msg.Author = user
+					msg.Member = nil
+				} else {
+					return
+				}
 			}
-			member.GuildID = evt.GuildID
-			msg.Member = member
-			msg.Author = member.User
 			d.DeletedCallback(s, msg)
 		}
 	}()
@@ -141,7 +149,7 @@ func (d *MessageCacheHandler) messageUpdate(s disgord.Session, evt *disgord.Mess
 			return
 		}
 		before := d.MessageCacheStorageAdapter.Update(evt.Message.ChannelID, evt.Message.ID, evt.Message)
-		if before != nil {
+		if before != nil && d.UpdatedCallback != nil {
 			member, err := s.GetMember(context.TODO(), evt.Message.GuildID, evt.Message.Author.ID)
 			if err != nil {
 				return
@@ -153,5 +161,53 @@ func (d *MessageCacheHandler) messageUpdate(s disgord.Session, evt *disgord.Mess
 			evt.Message.Author = member.User
 			d.UpdatedCallback(s, before, evt.Message)
 		}
+	}()
+}
+
+// Defines the message bulk delete handler.
+func (d *MessageCacheHandler) bulkDeleteHandler(s disgord.Session, evt *disgord.MessageDeleteBulk) {
+	go func() {
+		msgs := d.MessageCacheStorageAdapter.BulkGetAndDelete(evt.ChannelID, evt.MessageIDs)
+		if d.BulkDeletedCallback == nil {
+			// check if a bulk deleted callback is set, we should delete the messages from cache even if it isn't though.
+			return
+		}
+
+		failedMap := make(map[disgord.Snowflake]*disgord.User)
+		// a map of user ID's that fail to yield a guild member, most likely they left the guild.
+		// save them here to avoid making lots of requests which will error.
+
+		messages := make([]*disgord.Message, 0, len(msgs))
+
+		for _, m := range msgs {
+			if user, ok := failedMap[m.Author.ID]; ok {
+				if user != nil {
+					m.Author = user
+					messages = append(messages, m)
+				}
+				continue
+			}
+			member, err := s.GetMember(context.TODO(), m.GuildID, m.Author.ID)
+			if err == nil {
+				m.Member = member
+				m.Member.GuildID = m.GuildID
+				m.Author = member.User
+				messages = append(messages, m)
+
+			} else {
+				if user, err := s.GetUser(context.TODO(), m.Author.ID); err == nil {
+					failedMap[m.Author.ID] = user
+					m.Author = user
+					m.Member = nil
+					messages = append(messages, m)
+				} else {
+					// Can't set either the author or member for this message, exclude it from the callback.
+					failedMap[m.Author.ID] = nil
+					continue
+				}
+			}
+		}
+		// msgs may be an empty slice, but we should still fire so that the bot knows there was a bulk delete.
+		d.BulkDeletedCallback(s, evt.ChannelID, messages)
 	}()
 }
