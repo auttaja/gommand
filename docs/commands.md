@@ -23,6 +23,7 @@ The command **MUST** have the `Name` (the name of the command) and `Function` (t
         - `gommand.UserTransformer`: Transforms the argument into a user.
         - `gommand.MemberTransformer`: Transforms the argument into a member.
         - `gommand.ChannelTransformer`: Transforms the argument into a channel.
+        - `gommand.GuildTransformer` : Transforms the argument into a guild.
         - `gommand.MessageURLTransformer`: Transforms a message URL into a message.
         - `gommand.BooleanTransformer`: Transforms the argument into a boolean.
         - `gommand.RoleTransformer`: Transforms the argument into a role.
