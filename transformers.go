@@ -78,7 +78,11 @@ func ChannelTransformer(ctx *Context, Arg string) (channel interface{}, err erro
 // GuildTransformer is used to transform a guild if possible.
 func GuildTransformer(ctx *Context, Arg string) (guild interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid guild ID."}
-	guild, e := ctx.Session.GetGuild(context.TODO(), disgord.ParseSnowflakeString(Arg))
+	id, e := strconv.ParseUint(Arg, 10, 64)
+	if e != nil {
+		return
+	}
+	guild, e = ctx.Session.GetGuild(context.TODO(), disgord.NewSnowflake(id))
 	if e == nil {
 		err = nil
 	}
