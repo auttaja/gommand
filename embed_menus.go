@@ -3,6 +3,7 @@ package gommand
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -51,6 +52,8 @@ type EmbedMenu struct {
 	parent    *EmbedMenu
 	Embed     *disgord.Embed
 	MenuInfo  *MenuInfo
+
+	myID disgord.Snowflake
 }
 
 // Add is used to add a menu reaction.
@@ -79,8 +82,12 @@ func (e *EmbedMenu) Display(ChannelID, MessageID disgord.Snowflake, client disgo
 	EmbedCopy := e.Embed.DeepCopy().(*disgord.Embed)
 	Fields := make([]*disgord.EmbedField, 0)
 	for _, k := range e.Reactions.ReactionSlice {
+		emojiFormatted := k.Button.Emoji
+		if strings.Contains(k.Button.Emoji, ":") {
+			emojiFormatted = "<" + emojiFormatted + ">"
+		}
 		Fields = append(Fields, &disgord.EmbedField{
-			Name:   fmt.Sprintf("%s %s", k.Button.Emoji, k.Button.Name),
+			Name:   fmt.Sprintf("%s %s", emojiFormatted, k.Button.Name),
 			Value:  k.Button.Description,
 			Inline: false,
 		})
@@ -116,6 +123,7 @@ func (e *EmbedMenu) NewChildMenu(options *ChildMenuOptions) *EmbedMenu {
 		},
 		Embed:    options.Embed,
 		MenuInfo: e.MenuInfo,
+		myID:     e.myID,
 	}
 	NewEmbedMenu.parent = e
 	Reaction := MenuReaction{
@@ -168,6 +176,7 @@ func (e *EmbedMenu) AddExitButton() {
 func NewEmbedMenu(embed *disgord.Embed, ctx *Context) *EmbedMenu {
 	var reactions []MenuReaction
 	menu := &EmbedMenu{
+		myID: ctx.BotUser.ID,
 		Reactions: &MenuReactions{
 			ReactionSlice: reactions,
 		},
@@ -272,6 +281,10 @@ func handleMenuReactionEdit(s disgord.Session, evt *disgord.MessageReactionAdd) 
 		menuCacheLock.RUnlock()
 
 		// Remove the reaction.
+		if evt.UserID == menu.myID {
+			// This is by me! Do not delete!
+			return
+		}
 		_ = s.DeleteUserReaction(context.TODO(), evt.ChannelID, evt.MessageID, evt.UserID, evt.PartialEmoji)
 
 		// Check the author of the reaction.
@@ -280,7 +293,15 @@ func handleMenuReactionEdit(s disgord.Session, evt *disgord.MessageReactionAdd) 
 		}
 
 		for _, v := range menu.Reactions.ReactionSlice {
-			if v.Button.Emoji == evt.PartialEmoji.Name {
+			standardized := ""
+			if evt.PartialEmoji.ID == 0 {
+				standardized = evt.PartialEmoji.Name
+			} else {
+				standardized = evt.PartialEmoji.Name + ":" + evt.PartialEmoji.ID.String()
+			}
+
+			// We use HasSuffix here because of the "a:" that might be attached.
+			if strings.HasSuffix(v.Button.Emoji, standardized) {
 				menuLifetimeCacheLock.Lock()
 				if lifetime, ok := menuLifetimeCache[evt.MessageID]; ok && lifetime.inactiveTimer != nil {
 					if lifetime.inactiveTimer.Stop() {
