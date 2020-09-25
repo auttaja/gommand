@@ -84,7 +84,7 @@ func (e *EmbedMenu) Display(ChannelID, MessageID disgord.Snowflake, client disgo
 	for _, k := range e.Reactions.ReactionSlice {
 		emojiFormatted := k.Button.Emoji
 		if strings.Contains(k.Button.Emoji, ":") {
-			emojiFormatted = "<" + emojiFormatted + ">"
+			emojiFormatted = "<:" + emojiFormatted + ">"
 		}
 		Fields = append(Fields, &disgord.EmbedField{
 			Name:   fmt.Sprintf("%s %s", emojiFormatted, k.Button.Name),
