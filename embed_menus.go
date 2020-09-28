@@ -82,6 +82,10 @@ func (e *EmbedMenu) Display(ChannelID, MessageID disgord.Snowflake, client disgo
 	EmbedCopy := e.Embed.DeepCopy().(*disgord.Embed)
 	Fields := make([]*disgord.EmbedField, 0)
 	for _, k := range e.Reactions.ReactionSlice {
+		if k.Button.Name == "" || k.Button.Description == "" {
+			continue
+		}
+
 		emojiFormatted := k.Button.Emoji
 		if strings.Contains(k.Button.Emoji, ":") {
 			if strings.HasPrefix(k.Button.Emoji, "a:") {
