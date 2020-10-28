@@ -1,7 +1,6 @@
 package gommand
 
 import (
-	"context"
 	"github.com/andersfylling/disgord"
 	"github.com/auttaja/fastparse"
 	"io"
@@ -33,6 +32,14 @@ func UIntTransformer(_ *Context, Arg string) (interface{}, error) {
 	return i, nil
 }
 
+func safeSnowflakeParse(x string) *disgord.Snowflake {
+	defer func() {
+		_ = recover()
+	}()
+	r := disgord.ParseSnowflakeString(x)
+	return &r
+}
+
 // UserTransformer is used to transform a user if possible.
 func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid user ID or mention."}
@@ -40,7 +47,11 @@ func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
 	if id == nil {
 		return
 	}
-	user, e := ctx.Session.GetUser(context.TODO(), disgord.ParseSnowflakeString(*id))
+	x := safeSnowflakeParse(*id)
+	if x == nil {
+		return
+	}
+	user, e := ctx.Session.User(*x).Get()
 	if e == nil {
 		err = nil
 	}
@@ -54,7 +65,11 @@ func MemberTransformer(ctx *Context, Arg string) (member interface{}, err error)
 	if id == nil {
 		return
 	}
-	member, e := ctx.Session.GetMember(context.TODO(), ctx.Message.GuildID, disgord.ParseSnowflakeString(*id))
+	x := safeSnowflakeParse(*id)
+	if x == nil {
+		return
+	}
+	member, e := ctx.Session.Guild(ctx.Message.GuildID).Member(*x).Get()
 	if e == nil {
 		err = nil
 	}
@@ -68,7 +83,11 @@ func ChannelTransformer(ctx *Context, Arg string) (channel interface{}, err erro
 	if id == nil {
 		return
 	}
-	channel, e := ctx.Session.GetChannel(context.TODO(), disgord.ParseSnowflakeString(*id))
+	x := safeSnowflakeParse(*id)
+	if x == nil {
+		return
+	}
+	channel, e := ctx.Session.Channel(*x).Get()
 	if e == nil {
 		err = nil
 	}
@@ -78,11 +97,11 @@ func ChannelTransformer(ctx *Context, Arg string) (channel interface{}, err erro
 // GuildTransformer is used to transform a guild if possible.
 func GuildTransformer(ctx *Context, Arg string) (guild interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid guild ID."}
-	id, e := strconv.ParseUint(Arg, 10, 64)
-	if e != nil {
+	x := safeSnowflakeParse(Arg)
+	if x == nil {
 		return
 	}
-	guild, e = ctx.Session.GetGuild(context.TODO(), disgord.NewSnowflake(id))
+	guild, e := ctx.Session.Guild(*x).Get()
 	if e == nil {
 		err = nil
 	}
@@ -139,7 +158,15 @@ func MessageURLTransformer(ctx *Context, Arg string) (message interface{}, err e
 	if a == nil {
 		return
 	}
-	message, e := ctx.Session.GetMessage(context.TODO(), disgord.ParseSnowflakeString(a[1]), disgord.ParseSnowflakeString(a[2]))
+	channelId := safeSnowflakeParse(a[1])
+	if channelId == nil {
+		return
+	}
+	messageId := safeSnowflakeParse(a[2])
+	if messageId == nil {
+		return
+	}
+	message, e := ctx.Session.Channel(*channelId).Message(*messageId).Get()
 	if e == nil {
 		err = nil
 	}
@@ -170,7 +197,7 @@ func BooleanTransformer(_ *Context, Arg string) (interface{}, error) {
 func RoleTransformer(ctx *Context, Arg string) (role interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid role ID, mention or name of a role in this guild."}
 	id := getMention(strings.NewReader(Arg), '@', true)
-	roles, e := ctx.Session.GetGuildRoles(context.TODO(), ctx.Message.GuildID)
+	roles, e := ctx.Session.Guild(ctx.Message.GuildID).GetRoles()
 	if e != nil {
 		err = e
 		return

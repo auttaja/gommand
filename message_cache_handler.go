@@ -1,7 +1,6 @@
 package gommand
 
 import (
-	"context"
 	"github.com/andersfylling/disgord"
 )
 
@@ -102,13 +101,13 @@ func (d *MessageCacheHandler) messageDelete(s disgord.Session, evt *disgord.Mess
 	go func() {
 		msg := d.MessageCacheStorageAdapter.GetAndDelete(evt.ChannelID, evt.MessageID)
 		if msg != nil && d.DeletedCallback != nil {
-			member, err := s.GetMember(context.TODO(), msg.GuildID, msg.Author.ID)
+			member, err := s.Guild(msg.GuildID).Member(msg.Author.ID).Get()
 			if err == nil {
 				member.GuildID = evt.GuildID
 				msg.Member = member
 				msg.Author = member.User
 			} else {
-				if user, err := s.GetUser(context.TODO(), msg.Author.ID); err == nil {
+				if user, err := s.User(msg.Author.ID).Get(); err == nil {
 					msg.Author = user
 					msg.Member = nil
 				} else {
@@ -140,7 +139,7 @@ func (d *MessageCacheHandler) messageUpdate(s disgord.Session, evt *disgord.Mess
 		if evt.Message.Author == nil {
 			// We need to get the message.
 			var err error
-			evt.Message, err = s.GetMessage(context.TODO(), evt.Message.ChannelID, evt.Message.ID)
+			evt.Message, err = s.Channel(evt.Message.ChannelID).Message(evt.Message.ID).Get()
 			if err != nil {
 				return
 			}
@@ -150,7 +149,7 @@ func (d *MessageCacheHandler) messageUpdate(s disgord.Session, evt *disgord.Mess
 		}
 		before := d.MessageCacheStorageAdapter.Update(evt.Message.ChannelID, evt.Message.ID, evt.Message)
 		if before != nil && d.UpdatedCallback != nil {
-			member, err := s.GetMember(context.TODO(), evt.Message.GuildID, evt.Message.Author.ID)
+			member, err := s.Guild(evt.Message.GuildID).Member(evt.Message.Author.ID).Get()
 			if err != nil {
 				return
 			}
@@ -187,7 +186,7 @@ func (d *MessageCacheHandler) bulkDeleteHandler(s disgord.Session, evt *disgord.
 				}
 				continue
 			}
-			member, err := s.GetMember(context.TODO(), m.GuildID, m.Author.ID)
+			member, err := s.Guild(m.GuildID).Member(m.Author.ID).Get()
 			if err == nil {
 				m.Member = member
 				m.Member.GuildID = m.GuildID
@@ -195,7 +194,7 @@ func (d *MessageCacheHandler) bulkDeleteHandler(s disgord.Session, evt *disgord.
 				messages = append(messages, m)
 
 			} else {
-				if user, err := s.GetUser(context.TODO(), m.Author.ID); err == nil {
+				if user, err := s.User(m.Author.ID).Get(); err == nil {
 					failedMap[m.Author.ID] = user
 					m.Author = user
 					m.Member = nil
