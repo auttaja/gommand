@@ -134,25 +134,11 @@ func (g *CommandGroup) CommandFunction(ctx *Context) error {
 
 // Init is used to initialise the commands group.
 func (g *CommandGroup) Init() {
-	if g.subcommands == nil {
-		g.subcommands = map[string]CommandInterface{}
-	}
 	if g.NoCommandSpecified != nil {
 		g.NoCommandSpecified.Init()
 	}
-	uniques := make([]CommandInterface, 0, len(g.subcommands))
-	for _, v := range g.subcommands {
-		isUnique := true
-		for _, x := range uniques {
-			if v == x {
-				isUnique = false
-				break
-			}
-		}
-		if isUnique {
-			uniques = append(uniques, v)
-			v.Init()
-		}
+	for _, v := range g.GetSubcommands() {
+		v.Init()
 	}
 }
 
@@ -166,4 +152,25 @@ func (g *CommandGroup) AddCommand(cmd CommandInterface) {
 	for _, alias := range cmd.GetAliases() {
 		g.subcommands[strings.ToLower(alias)] = cmd
 	}
+}
+
+// GetSubcommands is used to get all the sub-commands of this group.
+func (g *CommandGroup) GetSubcommands() []CommandInterface {
+	if g.subcommands == nil {
+		g.subcommands = map[string]CommandInterface{}
+	}
+	uniques := make([]CommandInterface, 0, len(g.subcommands))
+	for _, v := range g.subcommands {
+		isUnique := true
+		for _, x := range uniques {
+			if v == x {
+				isUnique = false
+				break
+			}
+		}
+		if isUnique {
+			uniques = append(uniques, v)
+		}
+	}
+	return uniques
 }
