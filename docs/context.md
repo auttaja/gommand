@@ -10,6 +10,7 @@ The context is a core part of the gommand functionality. The context contains se
 - `Args`: The transformed arguments.
 - `Prefix`: Defines the prefix which was used.
 - `MidddlewareParams`: The params set by [middleware](./middleware.md).
+- `State`: The state for the current guild.
 
 It also contains several helper functions:
 
