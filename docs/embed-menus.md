@@ -43,6 +43,8 @@ err := ctx.DisplayEmbedMenuWithLifetime(menu, &gommand.EmbedLifetimeOptions{
 - `Name`: The name of the menu button.
 - `Description`: The description of the menu button.
 
+If the button doesn't include either a `Name` or a `Description`, the help field will be omitted entirely.
+
 ## Lifetime Options
 `EmbedLifetimeOptions` objects are used to control the maximum duration for which an embed menu will be active / exist. This contains the following attributes:
 - `MaximumLifetime`: The maximum duration the embed should exist for, regardless of activity - optional.
