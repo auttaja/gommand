@@ -37,7 +37,7 @@ var router = gommand.NewRouter(&gommand.RouterConfig{
 				))
 			}
 
-			_, _ = s.CreateMessage(context.TODO(), channelID, &disgord.CreateMessageParams{
+			_, _ = s.SendMsg(channelID, &disgord.CreateMessageParams{
 				Content: fmt.Sprintf("Bulk delete in <#%s>. %d deleted messages logged.", channelID.String(), len(messages)),
 				Files: []disgord.CreateMessageFileParams{
 					{
