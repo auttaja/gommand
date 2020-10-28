@@ -1,7 +1,6 @@
 package gommand
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -69,7 +68,7 @@ func (e *EmbedMenu) AddParentMenu(Menu *EmbedMenu) {
 
 // Display is used to show a menu. This is un-protected so that people can write their own things on top of embed menus, but you probably want to use ctx.DisplayEmbedMenu(menu).
 func (e *EmbedMenu) Display(ChannelID, MessageID disgord.Snowflake, client disgord.Session) error {
-	_ = client.DeleteAllReactions(context.TODO(), ChannelID, MessageID)
+	_ = client.Channel(ChannelID).Message(MessageID).DeleteAllReactions()
 
 	menuCacheLock.Lock()
 	if len(e.Reactions.ReactionSlice) == 0 {
@@ -102,12 +101,13 @@ func (e *EmbedMenu) Display(ChannelID, MessageID disgord.Snowflake, client disgo
 	}
 	EmbedCopy.Fields = append(EmbedCopy.Fields, Fields...)
 
-	_, err := client.UpdateMessage(context.TODO(), ChannelID, MessageID).SetContent("").SetEmbed(EmbedCopy).Execute()
+	msgRef := client.Channel(ChannelID).Message(MessageID)
+	_, err := msgRef.Update().SetContent("").SetEmbed(EmbedCopy).Execute()
 	if err != nil {
 		return err
 	}
 	for _, k := range e.Reactions.ReactionSlice {
-		err := client.CreateReaction(context.TODO(), ChannelID, MessageID, k.Button.Emoji)
+		err := msgRef.Reaction(k.Button.Emoji).Create()
 		if err != nil {
 			return err
 		}
@@ -174,7 +174,7 @@ func (e *EmbedMenu) AddExitButton() {
 			Emoji:       "❌",
 		},
 		Function: func(ChannelID, MessageID disgord.Snowflake, _ *EmbedMenu, client disgord.Session) {
-			_ = client.DeleteMessage(context.TODO(), ChannelID, MessageID)
+			_ = client.Channel(ChannelID).Message(MessageID).Delete()
 		},
 	}
 	e.Reactions.Add(Reaction)
@@ -233,7 +233,7 @@ func (l *EmbedLifetimeOptions) Start(ChannelID, MessageID disgord.Snowflake, cli
 			if l.BeforeDelete != nil {
 				l.BeforeDelete()
 			}
-			err := client.DeleteMessage(context.TODO(), ChannelID, MessageID)
+			err := client.Channel(ChannelID).Message(MessageID).Delete()
 			if err != nil {
 				// If there was an error deleting the message, remove from the menu cache anyway.
 				menuCacheLock.Lock()
@@ -255,7 +255,7 @@ func (l *EmbedLifetimeOptions) Start(ChannelID, MessageID disgord.Snowflake, cli
 			if l.BeforeDelete != nil {
 				l.BeforeDelete()
 			}
-			err := client.DeleteMessage(context.TODO(), ChannelID, MessageID)
+			err := client.Channel(ChannelID).Message(MessageID).Delete()
 			if err != nil {
 				// If there was an error deleting the message, remove from the menu cache anyway.
 				menuCacheLock.Lock()
@@ -293,7 +293,7 @@ func handleMenuReactionEdit(s disgord.Session, evt *disgord.MessageReactionAdd) 
 			// This is by me! Do not delete!
 			return
 		}
-		_ = s.DeleteUserReaction(context.TODO(), evt.ChannelID, evt.MessageID, evt.UserID, evt.PartialEmoji)
+		_ = s.Channel(evt.ChannelID).Message(evt.MessageID).Reaction(evt.PartialEmoji).DeleteUser(evt.UserID)
 
 		// Check the author of the reaction.
 		if menu.MenuInfo.Author != evt.UserID.String() {

@@ -30,22 +30,22 @@ func (c *Context) Replay() error {
 
 // BotMember is used to get the bot as a member of the server this was within.
 func (c *Context) BotMember() (*disgord.Member, error) {
-	return c.Session.GetMember(context.TODO(), c.Message.GuildID, c.BotUser.ID)
+	return c.Session.Guild(c.Message.GuildID).Member(c.BotUser.ID).Get()
 }
 
 // Guild is used to get the guild if the bot needs it.
 func (c *Context) Guild() (*disgord.Guild, error) {
-	return c.Session.GetGuild(context.TODO(), c.Message.Member.GuildID)
+	return c.Session.Guild(c.Message.Member.GuildID).Get()
 }
 
 // Channel is used to get the channel if the bot needs it.
 func (c *Context) Channel() (*disgord.Channel, error) {
-	return c.Session.GetChannel(context.TODO(), c.Message.ChannelID)
+	return c.Session.Channel(c.Message.ChannelID).Get()
 }
 
 // Reply is used to quickly reply to a command with a message.
 func (c *Context) Reply(data ...interface{}) (*disgord.Message, error) {
-	return c.Session.SendMsg(context.TODO(), c.Message.ChannelID, data...)
+	return c.Session.SendMsg(c.Message.ChannelID, data...)
 }
 
 // EmbedTextFailover is used to check the permissions when sending a message and failover to sending text if we cannot send an embed but can send a message.
