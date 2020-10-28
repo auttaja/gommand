@@ -54,6 +54,7 @@ func (r *Router) CommandProcessor(s disgord.Session, ShardID uint, msg *disgord.
 
 	// Create a read seeker of the message content.
 	reader := strings.NewReader(msg.Content)
+	setupState(ctx)
 
 	// Run a prefix check.
 	if prefix {
