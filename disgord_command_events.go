@@ -128,18 +128,21 @@ func (r *Router) msgCreate(s disgord.Session, evt *disgord.MessageCreate) {
 
 // Hook is used to hook all required events into the disgord client.
 func (r *Router) Hook(s disgord.Session) {
-	s.On(disgord.EvtReady, r.readyEvt)
-	s.On(disgord.EvtUserUpdate, r.userUpdate)
-	s.On(disgord.EvtMessageCreate, r.msgCreate)
+	gateway := s.Gateway()
+	gateway.Ready(r.readyEvt)
+	gateway.UserUpdate(r.userUpdate)
+	gateway.MessageCreate(r.msgCreate)
+
 	if r.MessageCacheHandler != nil {
-		s.On(disgord.EvtGuildDelete, r.MessageCacheHandler.guildDelete)
-		s.On(disgord.EvtChannelDelete, r.MessageCacheHandler.channelDelete)
-		s.On(disgord.EvtGuildCreate, r.MessageCacheHandler.guildCreate)
-		s.On(disgord.EvtMessageCreate, r.MessageCacheHandler.messageCreate)
-		s.On(disgord.EvtMessageDelete, r.MessageCacheHandler.messageDelete)
-		s.On(disgord.EvtMessageUpdate, r.MessageCacheHandler.messageUpdate)
-		s.On(disgord.EvtMessageDeleteBulk, r.MessageCacheHandler.bulkDeleteHandler)
+		gateway.GuildCreate(r.MessageCacheHandler.guildCreate)
+		gateway.GuildDelete(r.MessageCacheHandler.guildDelete)
+		gateway.ChannelDelete(r.MessageCacheHandler.channelDelete)
+		gateway.MessageCreate(r.MessageCacheHandler.messageCreate)
+		gateway.MessageUpdate(r.MessageCacheHandler.messageUpdate)
+		gateway.MessageDelete(r.MessageCacheHandler.messageDelete)
+		gateway.MessageDeleteBulk(r.MessageCacheHandler.bulkDeleteHandler)
 	}
-	s.On(disgord.EvtMessageReactionAdd, handleMenuReactionEdit)
-	s.On(disgord.EvtMessageDelete, handleEmbedMenuMessageDelete)
+
+	gateway.MessageReactionAdd(handleMenuReactionEdit)
+	gateway.MessageDelete(handleEmbedMenuMessageDelete)
 }

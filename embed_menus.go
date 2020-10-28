@@ -78,7 +78,7 @@ func (e *EmbedMenu) Display(ChannelID, MessageID disgord.Snowflake, client disgo
 	}
 	menuCacheLock.Unlock()
 
-	EmbedCopy := e.Embed.DeepCopy().(*disgord.Embed)
+	EmbedCopy := disgord.DeepCopy(e.Embed).(*disgord.Embed)
 	Fields := make([]*disgord.EmbedField, 0)
 	for _, k := range e.Reactions.ReactionSlice {
 		if k.Button.Name == "" || k.Button.Description == "" {

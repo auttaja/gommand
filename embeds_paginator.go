@@ -44,7 +44,7 @@ func EmbedsPaginatorWithLifetime(ctx *Context, Pages []*disgord.Embed, InitialPa
 
 	// Modify the embed to be ready.
 	PrepareEmbed := func(em *disgord.Embed) *disgord.Embed {
-		em = em.DeepCopy().(*disgord.Embed)
+		em = disgord.DeepCopy(em).(*disgord.Embed)
 		em.Footer = &disgord.EmbedFooter{
 			Text: "Page " + strconv.Itoa(CurrentPage) + "/" + strconv.Itoa(PagesLen),
 		}
