@@ -34,20 +34,20 @@ func (w *WaitManager) waitForEvent(ctx context.Context, EventName string, CheckF
 			timer.Stop()
 		}
 	}
-	var emitChan interface{}
+
+	gateway := w.ctx.Session.Gateway().WithMiddleware(middleware).WithCtrl(&disgord.Ctrl{Runs: 1, Until: until})
 	switch EventName {
-	{{ range . }}case disgord.Evt{{ . }}:
-		emitChan = func(_ disgord.Session, e *disgord.{{ . }}) { handleEmit(e) }
+	{{ range . }}case "{{ . }}":
+		gateway.{{ . }}(func(_ disgord.Session, e *disgord.{{.}}) { handleEmit(e) })
 	{{ end }}default:
 		panic("unknown event")
 	}
-	w.ctx.Session.On(EventName, middleware, emitChan, &disgord.Ctrl{Runs: 1, Until: until})
 	return <-x
 }
 {{ range . }}
 // WaitFor{{ . }} allows you to wait for the {{ . }} event. You should NOT block during the check function.
 func (w *WaitManager) WaitFor{{ . }}(ctx context.Context, CheckFunc func(s disgord.Session, evt *disgord.{{ . }}) bool) *disgord.{{ . }} {
-	x := w.waitForEvent(ctx, disgord.Evt{{ . }}, func(s disgord.Session, evt interface{}) bool {
+	x := w.waitForEvent(ctx, "{{ . }}", func(s disgord.Session, evt interface{}) bool {
 		if e, ok := evt.(*disgord.{{ . }}); ok {
 			return CheckFunc(s, e)
 		}
