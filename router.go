@@ -32,6 +32,10 @@ type PermissionValidator = func(ctx *Context) (string, bool)
 // If this errors, it will just get passed through to the error handler.
 type Middleware = func(ctx *Context) error
 
+// GetState is the function used to set the state on the Context.
+// Any errors returned from this function will simply get passed through the error handler.
+type GetState = func(ctx *Context) error
+
 // RouterConfig defines the config which will be used for the Router.
 type RouterConfig struct {
 	MessageCacheHandler  *MessageCacheHandler
@@ -40,6 +44,7 @@ type RouterConfig struct {
 	PermissionValidators []PermissionValidator
 	Middleware           []Middleware
 	Cooldown             Cooldown
+	GetState             GetState
 
 	// The number if message pads which will be created in memory to allow for quicker parsing.
 	// Please set this to -1 if you do not want any, 0 will default to 100.
@@ -60,6 +65,7 @@ type Router struct {
 	parserManager         *fastparse.ParserManager
 	MessageCacheHandler   *MessageCacheHandler
 	Cooldown              Cooldown
+	GetState              GetState
 }
 
 // NewRouter creates a new command Router.
@@ -88,6 +94,7 @@ func NewRouter(Config *RouterConfig) *Router {
 		Cooldown:             Config.Cooldown,
 		botUsers:             map[uint]*disgord.User{},
 		parserManager:        fastparse.NewParserManager(2000, Config.MessagePads),
+		GetState:             Config.GetState,
 	}
 
 	// Set the help command.

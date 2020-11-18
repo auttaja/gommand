@@ -7,6 +7,7 @@ Creating the router is very simple to do. You can simply create a router object 
 - `Middleware`: This is any [middleware](./middleware.md) which you wish to add on a global router scale. This can be nil.
 - `MessageCacheHandler`: See the [deleted message handler](./handling-deleted-messages.md) documentation below.
 - `Cooldown`: The cooldown interface for this router. You should keep this as nil if you don't want a router wide cooldown.
+- `State`: The optional function used to set the value of the State on the context.
 
 From here, we can use the functions attached to the router:
 
@@ -16,5 +17,5 @@ From here, we can use the functions attached to the router:
 - `GetCommand(Name string) CommandInterface`: Get a command by its name.
 - `GetCommandsOrderedByCategory() map[CategoryInterface][]CommandInterface`: Get all commands ordered by their category.
 - `Hook(s disgord.Session)`: Used to hook to a disgord session.
-- `RemoveCommand(c CommandInterface)`: Used to remove a [command](./command.md).
-- `SetCommand(c CommandInterface)`: Used to set the [command](./command.md).
+- `RemoveCommand(c CommandInterface)`: Used to remove a [command](./commands.md).
+- `SetCommand(c CommandInterface)`: Used to set the [command](./commands.md).

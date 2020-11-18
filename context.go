@@ -20,6 +20,7 @@ type Context struct {
 	Args             []interface{}          `json:"args"`
 	WaitManager      *WaitManager           `json:"-"`
 	MiddlewareParams map[string]interface{} `json:"middlewareParams"`
+	State            interface{}            `json:"state"`
 }
 
 // Replay is used to replay a command.
