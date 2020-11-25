@@ -9,7 +9,7 @@ import (
 
 // WaitManager is used to manage waiting within the context.
 type WaitManager struct {
-	ctx *Context
+    ctx *Context
 }
 
 // This allows you to wait for a event with specific conditions. You should NOT block during the check function.
@@ -115,7 +115,7 @@ func (w *WaitManager) WaitForChannelCreate(ctx context.Context, CheckFunc func(s
 	})
 	r, ok := x.(*disgord.ChannelCreate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -130,7 +130,7 @@ func (w *WaitManager) WaitForChannelUpdate(ctx context.Context, CheckFunc func(s
 	})
 	r, ok := x.(*disgord.ChannelUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -145,7 +145,7 @@ func (w *WaitManager) WaitForChannelDelete(ctx context.Context, CheckFunc func(s
 	})
 	r, ok := x.(*disgord.ChannelDelete)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -160,7 +160,7 @@ func (w *WaitManager) WaitForChannelPinsUpdate(ctx context.Context, CheckFunc fu
 	})
 	r, ok := x.(*disgord.ChannelPinsUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -175,7 +175,7 @@ func (w *WaitManager) WaitForTypingStart(ctx context.Context, CheckFunc func(s d
 	})
 	r, ok := x.(*disgord.TypingStart)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -190,7 +190,7 @@ func (w *WaitManager) WaitForInviteDelete(ctx context.Context, CheckFunc func(s 
 	})
 	r, ok := x.(*disgord.InviteDelete)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -205,7 +205,7 @@ func (w *WaitManager) WaitForMessageCreate(ctx context.Context, CheckFunc func(s
 	})
 	r, ok := x.(*disgord.MessageCreate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -220,7 +220,7 @@ func (w *WaitManager) WaitForMessageUpdate(ctx context.Context, CheckFunc func(s
 	})
 	r, ok := x.(*disgord.MessageUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -235,7 +235,7 @@ func (w *WaitManager) WaitForMessageDelete(ctx context.Context, CheckFunc func(s
 	})
 	r, ok := x.(*disgord.MessageDelete)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -250,7 +250,7 @@ func (w *WaitManager) WaitForMessageDeleteBulk(ctx context.Context, CheckFunc fu
 	})
 	r, ok := x.(*disgord.MessageDeleteBulk)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -265,7 +265,7 @@ func (w *WaitManager) WaitForMessageReactionAdd(ctx context.Context, CheckFunc f
 	})
 	r, ok := x.(*disgord.MessageReactionAdd)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -280,7 +280,7 @@ func (w *WaitManager) WaitForMessageReactionRemove(ctx context.Context, CheckFun
 	})
 	r, ok := x.(*disgord.MessageReactionRemove)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -295,7 +295,7 @@ func (w *WaitManager) WaitForMessageReactionRemoveAll(ctx context.Context, Check
 	})
 	r, ok := x.(*disgord.MessageReactionRemoveAll)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -310,7 +310,7 @@ func (w *WaitManager) WaitForGuildEmojisUpdate(ctx context.Context, CheckFunc fu
 	})
 	r, ok := x.(*disgord.GuildEmojisUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -325,7 +325,7 @@ func (w *WaitManager) WaitForGuildCreate(ctx context.Context, CheckFunc func(s d
 	})
 	r, ok := x.(*disgord.GuildCreate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -340,7 +340,7 @@ func (w *WaitManager) WaitForGuildUpdate(ctx context.Context, CheckFunc func(s d
 	})
 	r, ok := x.(*disgord.GuildUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -355,7 +355,7 @@ func (w *WaitManager) WaitForGuildDelete(ctx context.Context, CheckFunc func(s d
 	})
 	r, ok := x.(*disgord.GuildDelete)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -370,7 +370,7 @@ func (w *WaitManager) WaitForGuildBanAdd(ctx context.Context, CheckFunc func(s d
 	})
 	r, ok := x.(*disgord.GuildBanAdd)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -385,7 +385,7 @@ func (w *WaitManager) WaitForGuildBanRemove(ctx context.Context, CheckFunc func(
 	})
 	r, ok := x.(*disgord.GuildBanRemove)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -400,7 +400,7 @@ func (w *WaitManager) WaitForGuildMemberAdd(ctx context.Context, CheckFunc func(
 	})
 	r, ok := x.(*disgord.GuildMemberAdd)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -415,7 +415,7 @@ func (w *WaitManager) WaitForGuildMemberRemove(ctx context.Context, CheckFunc fu
 	})
 	r, ok := x.(*disgord.GuildMemberRemove)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -430,7 +430,7 @@ func (w *WaitManager) WaitForGuildMemberUpdate(ctx context.Context, CheckFunc fu
 	})
 	r, ok := x.(*disgord.GuildMemberUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -445,7 +445,7 @@ func (w *WaitManager) WaitForGuildRoleCreate(ctx context.Context, CheckFunc func
 	})
 	r, ok := x.(*disgord.GuildRoleCreate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -460,7 +460,7 @@ func (w *WaitManager) WaitForGuildRoleUpdate(ctx context.Context, CheckFunc func
 	})
 	r, ok := x.(*disgord.GuildRoleUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -475,7 +475,7 @@ func (w *WaitManager) WaitForGuildRoleDelete(ctx context.Context, CheckFunc func
 	})
 	r, ok := x.(*disgord.GuildRoleDelete)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -490,7 +490,7 @@ func (w *WaitManager) WaitForPresenceUpdate(ctx context.Context, CheckFunc func(
 	})
 	r, ok := x.(*disgord.PresenceUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -505,7 +505,7 @@ func (w *WaitManager) WaitForUserUpdate(ctx context.Context, CheckFunc func(s di
 	})
 	r, ok := x.(*disgord.UserUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -520,7 +520,7 @@ func (w *WaitManager) WaitForVoiceStateUpdate(ctx context.Context, CheckFunc fun
 	})
 	r, ok := x.(*disgord.VoiceStateUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -535,7 +535,7 @@ func (w *WaitManager) WaitForVoiceServerUpdate(ctx context.Context, CheckFunc fu
 	})
 	r, ok := x.(*disgord.VoiceServerUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -550,7 +550,7 @@ func (w *WaitManager) WaitForWebhooksUpdate(ctx context.Context, CheckFunc func(
 	})
 	r, ok := x.(*disgord.WebhooksUpdate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
@@ -565,7 +565,7 @@ func (w *WaitManager) WaitForInviteCreate(ctx context.Context, CheckFunc func(s 
 	})
 	r, ok := x.(*disgord.InviteCreate)
 	if !ok {
-		return nil
+	    return nil
 	}
 	return r
 }
