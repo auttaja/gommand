@@ -4,6 +4,8 @@ github.com/andersfylling/disgord v0.21.0 h1:1nYXZHtbIUICh/mPtOFCvrXHi6ybnsGjqEZn
 github.com/andersfylling/disgord v0.21.0/go.mod h1:ewajFZm40/tKA5py8FyokCW7eT8ITnQGVBakA6BJOL8=
 github.com/andersfylling/disgord v0.22.0 h1:HFYxvCkM201DS/gu1pT59n7sCZA0trx+Cxkim5snzNI=
 github.com/andersfylling/disgord v0.22.0/go.mod h1:HIiBE81VDuZJgJU1eFWOFxTwx0oJjDPH9taKQPBeKFc=
+github.com/andersfylling/disgord v0.23.1 h1:fC85aC+cYTcNlSitMnOHJuA7HsZ78d85A3UUpXKtnBk=
+github.com/andersfylling/disgord v0.23.1/go.mod h1:HIiBE81VDuZJgJU1eFWOFxTwx0oJjDPH9taKQPBeKFc=
 github.com/andersfylling/snowflake/v4 v4.0.2 h1:7po1HHxq8Pz7F+vsMFMoGiHOlpzBzqXoop4O8b24wqI=
 github.com/andersfylling/snowflake/v4 v4.0.2/go.mod h1:4lIbDTtWCTaYBCZVVIDjIH8xbzHSYz+RvxK2KZND840=
 github.com/auttaja/fastparse v1.0.0 h1:LKz4H6j2M050n0BFGZV9i/6D4zHfbeawXw4yJaD2ncQ=
