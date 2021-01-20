@@ -32,14 +32,6 @@ func UIntTransformer(_ *Context, Arg string) (interface{}, error) {
 	return i, nil
 }
 
-func safeSnowflakeParse(x string) *disgord.Snowflake {
-	defer func() {
-		_ = recover()
-	}()
-	r := disgord.ParseSnowflakeString(x)
-	return &r
-}
-
 // UserTransformer is used to transform a user if possible.
 func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid user ID or mention."}
@@ -47,11 +39,11 @@ func UserTransformer(ctx *Context, Arg string) (user interface{}, err error) {
 	if id == nil {
 		return
 	}
-	x := safeSnowflakeParse(*id)
-	if x == nil {
+	x, e := disgord.GetSnowflake(*id)
+	if e != nil {
 		return
 	}
-	user, e := ctx.Session.User(*x).Get()
+	user, e = ctx.Session.User(x).Get()
 	if e == nil {
 		err = nil
 	}
@@ -65,11 +57,11 @@ func MemberTransformer(ctx *Context, Arg string) (member interface{}, err error)
 	if id == nil {
 		return
 	}
-	x := safeSnowflakeParse(*id)
-	if x == nil {
+	x, e := disgord.GetSnowflake(*id)
+	if e != nil {
 		return
 	}
-	member, e := ctx.Session.Guild(ctx.Message.GuildID).Member(*x).Get()
+	member, e = ctx.Session.Guild(ctx.Message.GuildID).Member(x).Get()
 	if e == nil {
 		err = nil
 	}
@@ -83,11 +75,11 @@ func ChannelTransformer(ctx *Context, Arg string) (channel interface{}, err erro
 	if id == nil {
 		return
 	}
-	x := safeSnowflakeParse(*id)
-	if x == nil {
+	x, e := disgord.GetSnowflake(*id)
+	if e != nil {
 		return
 	}
-	channel, e := ctx.Session.Channel(*x).Get()
+	channel, e = ctx.Session.Channel(x).Get()
 	if e == nil {
 		err = nil
 	}
@@ -97,11 +89,11 @@ func ChannelTransformer(ctx *Context, Arg string) (channel interface{}, err erro
 // GuildTransformer is used to transform a guild if possible.
 func GuildTransformer(ctx *Context, Arg string) (guild interface{}, err error) {
 	err = &InvalidTransformation{Description: "This was not a valid guild ID."}
-	x := safeSnowflakeParse(Arg)
-	if x == nil {
+	x, e := disgord.GetSnowflake(Arg)
+	if e != nil {
 		return
 	}
-	guild, e := ctx.Session.Guild(*x).Get()
+	guild, e = ctx.Session.Guild(x).Get()
 	if e == nil {
 		err = nil
 	}
@@ -139,8 +131,10 @@ func getMessageIds(manager *fastparse.ParserManager, start string, iterator io.R
 func MessageURLTransformer(ctx *Context, Arg string) (message interface{}, err error) {
 	err = &InvalidTransformation{Description: "This is not a valid message URL or a message which the bot cannot access."}
 	discordMsgLinks := []string{
-		"https://discordapp.com/channels/",
 		"https://discord.com/channels/",
+		"https://canary.discord.com/channels/",
+		"https://ptb.discord.com/channels/",
+		"https://discordapp.com/channels/",
 		"https://canary.discordapp.com/channels/",
 		"https://ptb.discordapp.com/channels/",
 	}
@@ -158,15 +152,15 @@ func MessageURLTransformer(ctx *Context, Arg string) (message interface{}, err e
 	if a == nil {
 		return
 	}
-	channelId := safeSnowflakeParse(a[1])
-	if channelId == nil {
+	channelId, e := disgord.GetSnowflake(a[1])
+	if e != nil {
 		return
 	}
-	messageId := safeSnowflakeParse(a[2])
-	if messageId == nil {
+	messageId, e := disgord.GetSnowflake(a[2])
+	if e != nil {
 		return
 	}
-	message, e := ctx.Session.Channel(*channelId).Message(*messageId).Get()
+	message, e = ctx.Session.Channel(channelId).Message(messageId).Get()
 	if e == nil {
 		err = nil
 	}
